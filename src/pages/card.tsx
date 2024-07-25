@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import FlashcardForm from '../components/FlashcardForm';
 import FlashcardList from '../components/FlashcardList';
 import { FaCog } from 'react-icons/fa'; // Import the settings gear icon
 
@@ -9,7 +10,7 @@ interface FlashcardType {
   id: number;
   question: string;
   answer: string;
-  order: number;
+  order: number; 
 }
 
 export default function Home() {
@@ -57,25 +58,17 @@ export default function Home() {
     };
   }, [currentFlashcard, flashcards.length, flipped, shortcuts, changingShortcut]);
 
-  async function loadFlashcards() {
-    try {
-      const response = await fetch('/flashcards');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      const formattedData = data.map((flashcard: any) => ({
-        id: flashcard.id,
-        question: flashcard.question,
-        answer: flashcard.answer || (flashcard.answers && flashcard.answers.length > 0 ? flashcard.answers[0] : ''), // Ensure answer is defined
-        order: flashcard.order,
-      }));
-      setFlashcards(formattedData);
-      console.log('Loaded flashcards:', formattedData); // Debug: log loaded flashcards
-    } catch (error) {
-      console.error('Failed to load flashcards:', error);
-    }
-  }
+  const loadFlashcards = () => {
+    const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+    setFlashcards(storedFlashcards);
+  };
+
+  const handleAddFlashcard = (flashcard: Omit<FlashcardType, 'id'>) => {
+    const newFlashcard = { ...flashcard, id: Date.now() }; // Ensure id is assigned
+    const updatedFlashcards = [...flashcards, newFlashcard];
+    setFlashcards(updatedFlashcards);
+    localStorage.setItem('flashcards', JSON.stringify(updatedFlashcards));
+  };
 
   const handleNext = () => {
     if (currentFlashcard < flashcards.length - 1) {
@@ -191,6 +184,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          <FlashcardForm onSave={handleAddFlashcard} />
           <FlashcardList flashcards={flashcards} setFlashcards={setFlashcards} />
         </>
       ) : (
