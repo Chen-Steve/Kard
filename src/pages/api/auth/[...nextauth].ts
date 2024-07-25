@@ -1,9 +1,9 @@
-import NextAuth, { NextAuthOptions, User, Session } from 'next-auth'; // Updated import
+import NextAuth, { NextAuthOptions, User as NextAuthUser, Session as NextAuthSession } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
 import EmailProvider from 'next-auth/providers/email';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt'; // Add this import
-import { AdapterUser } from 'next-auth/adapters'; // Add this import
+import { JWT } from 'next-auth/jwt';
+import { AdapterUser } from 'next-auth/adapters';
 
 const options: NextAuthOptions = {
   providers: [
@@ -34,17 +34,31 @@ const options: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: User | AdapterUser }) { // Updated signature
+    async jwt({ token, user }: { token: JWT; user?: NextAuthUser | AdapterUser }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) { // Updated signature
-      session.user.id = Number(token.id); // Cast token.id to number
+    async session({ session, token }: { session: NextAuthSession; token: JWT }) {
+      if (token.id) {
+        session.user.id = token.id as number;
+      }
       return session;
-    }
-  }
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      else if (url.startsWith('/')) return new URL(url, baseUrl).toString();
+      return baseUrl;
+    },
+  },
+  pages: {
+    signIn: '/signin',
+    signOut: '/signout',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+    newUser: undefined,
+  },
 };
 
 const authHandler = (req: NextApiRequest, res: NextApiResponse) => {

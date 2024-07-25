@@ -10,7 +10,7 @@ interface FlashcardType {
   id: number;
   question: string;
   answer: string;
-  order: number; 
+  order: number;
 }
 
 export default function Home() {
@@ -106,6 +106,11 @@ export default function Home() {
       <Link href="/deck">
         <button className="absolute top-4 left-4 px-4 py-2 bg-gray-700 text-white rounded">
           Edit Decks
+        </button>
+      </Link>
+      <Link href="/dashboard">
+        <button className="absolute top-4 right-4 px-4 py-2 bg-gray-700 text-white rounded">
+          Dashboard
         </button>
       </Link>
       <button
