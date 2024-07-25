@@ -13,7 +13,7 @@ const HomePage: FC = () => {
         <Image src="/logo.png" alt="Flashcard App Logo" width={50} height={50} />
       </header>
       <main className="flex-grow flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-semibold mt-4">Welcome to Kard!</h2>
+        <h2 className="text-2xl font-semibold mt-4">Welcome to Kard!</h2>
         <p className="text-lg text-center mb-8">
           Create and manage your flashcards.
         </p>
@@ -23,7 +23,7 @@ const HomePage: FC = () => {
               Create Flashcards
             </a>
           </Link>
-          <Link href="/study" legacyBehavior>
+          <Link href="/signup" legacyBehavior>
             <a className="bg-purple-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-purple-700 transition shine-effect">
               Create Account!
             </a>
