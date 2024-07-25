@@ -2,45 +2,44 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import supabase from '../lib/supabaseClient';
 
+interface FlashcardType {
+  id: number;
+  question: string;
+  answer: string;
+  order: number;
+  userId?: number; // Made userId optional since it might not be available initially
+}
+
 interface FlashcardFormProps {
-  onSave: (flashcard: { id: number; question: string; answer: string; order: number }) => void;
+  onSave: (flashcard: FlashcardType) => void;
 }
 
 const FlashcardForm: React.FC<FlashcardFormProps> = ({ onSave }) => {
-  const { data: session } = useSession();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const { data: session } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newFlashcard = { id: Date.now(), question, answer, order: Date.now() };
+    const newFlashcard = { question, answer, order: Date.now() }; // Simplified order logic
 
-    if (session) {
+    if (session && session.user) {
       try {
         const { data, error } = await supabase
           .from('flashcards')
-          .insert([{ ...newFlashcard, user_id: session.user.id }])
-          .select(); // Add .select() to ensure data is typed
+          .insert([{ ...newFlashcard, userId: session.user.id }]);
 
         if (error) {
-          throw new Error(error.message);
-        }
-
-        if (data && data.length > 0) {
-          console.log('Flashcard saved to DB:', data);
+          console.error('Error saving flashcard to database:', error);
+        } else if (data) { // Add null check for data
           onSave(data[0]);
-        } else {
-          console.error('No data returned from database');
         }
       } catch (error) {
-        console.error('Failed to save flashcard to database:', error);
+        console.error('Failed to save flashcard:', error);
       }
     } else {
-      console.log('Flashcard saved to local storage:', newFlashcard);
-      onSave(newFlashcard);
-      const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
-      storedFlashcards.push(newFlashcard);
-      localStorage.setItem('flashcards', JSON.stringify(storedFlashcards));
+      const localFlashcard = { ...newFlashcard, id: Date.now() };
+      onSave(localFlashcard);
     }
 
     setQuestion('');

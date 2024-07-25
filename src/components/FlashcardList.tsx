@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { DndContext, useSensor, useSensors, PointerSensor, closestCenter, KeyboardSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { SortableContext, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { SortableItem } from './SortableItem';
+import SortableItem from './SortableItem';
 import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import supabase from '../lib/supabaseClient';
@@ -12,6 +12,7 @@ interface Flashcard {
   question: string;
   answer: string;
   order: number;
+  userId?: number;
 }
 
 interface FlashcardListProps {
@@ -23,7 +24,6 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
   const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [isDecksVisible, setIsDecksVisible] = useState(false);
-  const [localFlashcards, setLocalFlashcards] = useState<Flashcard[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -32,38 +32,32 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
     })
   );
 
-  const loadFlashcardsFromDB = useCallback(async () => {
-    if (session) {
-      try {
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('*')
-          .eq('user_id', session.user.id);
+  const loadFlashcards = useCallback(async () => {
+    if (!session || !session.user) {
+      const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+      setFlashcards(storedFlashcards);
+      return;
+    }
 
-        if (error) {
-          throw new Error(error.message);
-        }
-        console.log('Loaded flashcards from DB:', data);
+    try {
+      const { data, error } = await supabase
+        .from('flashcards')
+        .select('*')
+        .eq('userId', session.user.id);
+
+      if (error) {
+        console.error('Error loading flashcards from database:', error);
+      } else {
         setFlashcards(data);
-      } catch (error) {
-        console.error('Failed to load flashcards from database:', error);
       }
+    } catch (error) {
+      console.error('Failed to load flashcards:', error);
     }
   }, [session, setFlashcards]);
 
-  const loadFlashcardsFromLocalStorage = useCallback(() => {
-    const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
-    console.log('Loaded flashcards from local storage:', storedFlashcards);
-    setLocalFlashcards(storedFlashcards);
-  }, []);
-
   useEffect(() => {
-    if (session) {
-      loadFlashcardsFromDB();
-    } else {
-      loadFlashcardsFromLocalStorage();
-    }
-  }, [session, loadFlashcardsFromDB, loadFlashcardsFromLocalStorage]);
+    loadFlashcards();
+  }, [loadFlashcards]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -92,7 +86,7 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={flashcards.map((flashcard) => flashcard.id)} strategy={verticalListSortingStrategy}>
             <Grid>
-              {(session ? flashcards : localFlashcards).map((flashcard) => (
+              {flashcards.map((flashcard) => (
                 <SortableItem key={flashcard.id} id={flashcard.id}>
                   <Card>
                     <CardTitle>{flashcard.question}</CardTitle>

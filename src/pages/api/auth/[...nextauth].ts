@@ -1,9 +1,9 @@
-import NextAuth, { NextAuthOptions, User as NextAuthUser, Session as NextAuthSession } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
 import EmailProvider from 'next-auth/providers/email';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
-import { AdapterUser } from 'next-auth/adapters';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import prisma from '../../../lib/prisma';
 
 const options: NextAuthOptions = {
   providers: [
@@ -19,28 +19,36 @@ const options: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         if (!credentials) {
+          console.error("No credentials provided");
           return null;
         }
-        const user = await authenticateUser(credentials.email, credentials.password);
-        if (user) {
-          return user;
-        } else {
+        try {
+          const user = await authenticateUser(credentials.email, credentials.password);
+          if (user) {
+            return user;
+          } else {
+            console.error("Invalid email or password");
+            return null;
+          }
+        } catch (error) {
+          console.error("Error in authorize function", error);
           return null;
         }
       }
     })
   ],
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: NextAuthUser | AdapterUser }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }: { session: NextAuthSession; token: JWT }) {
+    async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id as number;
       }
@@ -59,15 +67,33 @@ const options: NextAuthOptions = {
     verifyRequest: '/auth/verify-request',
     newUser: undefined,
   },
+  debug: true, // Enable debug mode
 };
 
-const authHandler = (req: NextApiRequest, res: NextApiResponse) => {
-  return NextAuth(req, res, options);
+const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log("Auth request received:", req.method, req.url);
+  try {
+    await NextAuth(req, res, options);
+  } catch (error) {
+    console.error("Error in authHandler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 export default authHandler;
 
 async function authenticateUser(email: string, password: string) {
-  // Replace with your own user authentication logic
-  return { id: 1, name: 'User', email: email };
+  console.log("Authenticating user:", email);
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user && user.password === password) {
+      return user;
+    } else {
+      console.error("Invalid email or password");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in authenticateUser:", error);
+    return null;
+  }
 }

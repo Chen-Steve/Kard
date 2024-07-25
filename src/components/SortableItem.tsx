@@ -7,7 +7,7 @@ interface SortableItemProps {
   children: React.ReactNode;
 }
 
-export const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   const style = {
@@ -21,3 +21,5 @@ export const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
     </div>
   );
 };
+
+export default SortableItem;

@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import FlashcardForm from '../components/FlashcardForm';
 import FlashcardList from '../components/FlashcardList';
-import { FaCog } from 'react-icons/fa';
+import KeyboardShortcuts from '../components/KeyboardShortcuts';
 import { useSession } from 'next-auth/react';
 import supabase from '../lib/supabaseClient';
 
@@ -15,18 +14,11 @@ interface FlashcardType {
   order: number;
 }
 
-export default function Home() {
+const CardPage = () => {
   const { data: session } = useSession();
   const [flashcards, setFlashcards] = useState<FlashcardType[]>([]);
   const [currentFlashcard, setCurrentFlashcard] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [shortcuts, setShortcuts] = useState({
-    flip: 'Space',
-    prev: 'ArrowLeft',
-    next: 'ArrowRight',
-  });
-  const [changingShortcut, setChangingShortcut] = useState<string | null>(null);
 
   const loadFlashcardsFromDB = useCallback(async () => {
     if (session) {
@@ -64,34 +56,6 @@ export default function Home() {
     }
   }, [session, loadFlashcardsFromDB, loadFlashcardsFromLocalStorage]);
 
-  const handleAddFlashcard = async (flashcard: Omit<FlashcardType, 'id'>) => {
-    const newFlashcard = { ...flashcard, id: Date.now() };
-    const updatedFlashcards = [...flashcards, newFlashcard];
-
-    if (session) {
-      try {
-        const { data, error } = await supabase
-          .from('flashcards')
-          .insert([{ ...newFlashcard, user_id: session.user.id }]);
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        if (data) {
-          console.log('Flashcard saved to DB:', data);
-          setFlashcards((prev) => [...prev, data[0]]);
-        }
-      } catch (error) {
-        console.error('Failed to save flashcard to database:', error);
-      }
-    } else {
-      console.log('Flashcard saved to local storage:', newFlashcard);
-      setFlashcards(updatedFlashcards);
-      localStorage.setItem('flashcards', JSON.stringify(updatedFlashcards));
-    }
-  };
-
   const handleNext = () => {
     if (currentFlashcard < flashcards.length - 1) {
       setCurrentFlashcard(currentFlashcard + 1);
@@ -106,25 +70,13 @@ export default function Home() {
     }
   };
 
-  const handleShortcutChange = (action: string) => {
-    setChangingShortcut(action);
-  };
-
-  const getFriendlyKeyName = (code: string) => {
-    switch (code) {
-      case 'Space':
-        return 'Space';
-      case 'ArrowLeft':
-        return 'Left Arrow';
-      case 'ArrowRight':
-        return 'Right Arrow';
-      default:
-        return code;
-    }
+  const handleFlip = () => {
+    setFlipped(!flipped);
   };
 
   return (
     <div className="min-h-screen bg-gray-400 flex flex-col items-center py-10 relative">
+      <KeyboardShortcuts onFlip={handleFlip} onNext={handleNext} onPrev={handlePrev} />
       <Link href="/deck">
         <button className="absolute top-4 left-4 px-4 py-2 bg-gray-700 text-white rounded">
           Edit Decks
@@ -135,88 +87,36 @@ export default function Home() {
           Dashboard
         </button>
       </Link>
-      <button
-        className="absolute top-4 right-4 px-4 py-2 bg-gray-700 text-white rounded"
-        aria-label="Settings"
-        onClick={() => setShowSettings(true)}
-      >
-        <FaCog />
-      </button>
-      {showSettings && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-2xl mb-4">Change Shortcuts</h2>
-            <div className="mb-4">
-              <label className="block mb-2">Flip Card:</label>
-              <button
-                onClick={() => handleShortcutChange('flip')}
-                className="px-2 py-2 bg-gray-600 text-white rounded"
-              >
-                {changingShortcut === 'flip' ? 'Press any key...' : getFriendlyKeyName(shortcuts.flip)}
-              </button>
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Previous Card:</label>
-              <button
-                onClick={() => handleShortcutChange('prev')}
-                className="px-2 py-2 bg-gray-600 text-white rounded"
-              >
-                {changingShortcut === 'prev' ? 'Press any key...' : getFriendlyKeyName(shortcuts.prev)}
-              </button>
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Next Card:</label>
-              <button
-                onClick={() => handleShortcutChange('next')}
-                className="px-2 py-2 bg-gray-600 text-white rounded"
-              >
-                {changingShortcut === 'next' ? 'Press any key...' : getFriendlyKeyName(shortcuts.next)}
-              </button>
-            </div>
-            <button
-              onClick={() => setShowSettings(false)}
-              className="px-2 py-2 bg-gray-600 text-white rounded"
-            >
-              Close
-            </button>
+      <div className="p-10 rounded-lg w-full max-w-3xl mb-0">
+        <div className="flex flex-col items-center">
+          <div
+            className={`p-32 w-full rounded-lg shadow-lg cursor-pointer ${
+              flipped ? 'bg-white text-black' : 'bg-white text-black'
+            }`}
+            onClick={handleFlip}
+          >
+            {flipped ? (
+              <div className="text-center text-xl font-semibold">
+                {flashcards[currentFlashcard]?.answer}
+              </div>
+            ) : (
+              <div className="text-center text-xl font-semibold">
+                {flashcards[currentFlashcard]?.question}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-4 mt-4 items-center">
+            <button onClick={handlePrev} className="btn btn-primary">Previous</button>
+            <span className="text-sm">
+              {currentFlashcard + 1} / {flashcards.length}
+            </span>
+            <button onClick={handleNext} className="btn btn-primary">Next</button>
           </div>
         </div>
-      )}
-      {flashcards.length > 0 ? (
-        <>
-          <div className="p-10 rounded-lg w-full max-w-3xl mb-0">
-            <div className="flex flex-col items-center">
-              <div
-                className={`p-32 w-full rounded-lg shadow-lg cursor-pointer ${
-                  flipped ? 'bg-white text-black' : 'bg-white text-black'
-                }`}
-                onClick={() => setFlipped(!flipped)}
-              >
-                {flipped ? (
-                  <div className="text-center text-xl font-semibold">
-                    {flashcards[currentFlashcard].answer}
-                  </div>
-                ) : (
-                  <div className="text-center text-xl font-semibold">
-                    {flashcards[currentFlashcard].question}
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-4 mt-4 items-center">
-                <button onClick={handlePrev} className="btn btn-primary">Previous</button>
-                <span className="text-sm">
-                  {currentFlashcard + 1} / {flashcards.length}
-                </span>
-                <button onClick={handleNext} className="btn btn-primary">Next</button>
-              </div>
-            </div>
-          </div>
-          <FlashcardForm onSave={handleAddFlashcard} />
-          <FlashcardList flashcards={flashcards} setFlashcards={setFlashcards} />
-        </>
-      ) : (
-        <p>Loading flashcards...</p>
-      )}
+      </div>
+      <FlashcardList flashcards={flashcards} setFlashcards={setFlashcards} />
     </div>
   );
-}
+};
+
+export default CardPage;
