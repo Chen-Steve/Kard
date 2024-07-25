@@ -26,6 +26,7 @@ export default function Home() {
   const [changingShortcut, setChangingShortcut] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('Loading flashcards...');
     loadFlashcards();
   }, []);
 
@@ -59,13 +60,19 @@ export default function Home() {
   }, [currentFlashcard, flashcards.length, flipped, shortcuts, changingShortcut]);
 
   const loadFlashcards = () => {
-    const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
-    setFlashcards(storedFlashcards);
+    try {
+      const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+      console.log('Stored flashcards:', storedFlashcards);
+      setFlashcards(storedFlashcards);
+    } catch (error) {
+      console.error('Failed to load flashcards from local storage:', error);
+    }
   };
 
   const handleAddFlashcard = (flashcard: Omit<FlashcardType, 'id'>) => {
     const newFlashcard = { ...flashcard, id: Date.now() }; // Ensure id is assigned
     const updatedFlashcards = [...flashcards, newFlashcard];
+    console.log('Adding new flashcard:', newFlashcard);
     setFlashcards(updatedFlashcards);
     localStorage.setItem('flashcards', JSON.stringify(updatedFlashcards));
   };
