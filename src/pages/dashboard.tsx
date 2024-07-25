@@ -35,6 +35,11 @@ const Dashboard = () => {
     };
   }, [router]);
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/signin');
+  };
+
   if (!user) return <p>Loading...</p>;
 
   return (
@@ -51,10 +56,7 @@ const Dashboard = () => {
             </a>
           </Link>
           <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              router.push('/signin');
-            }}
+            onClick={handleSignOut}
             className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-700 transition"
           >
             Sign Out
