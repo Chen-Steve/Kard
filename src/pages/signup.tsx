@@ -8,6 +8,7 @@ import supabase from '../lib/supabaseClient';
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -20,6 +21,11 @@ const SignUp = () => {
 
     if (error) {
       console.error('Error creating account:', error.message);
+      if (error.status === 429) {
+        setErrorMessage('Too many requests. Please try again later.');
+      } else {
+        setErrorMessage(error.message);
+      }
     } else {
       console.log('Account created successfully:', data.user);
       router.push('/signin');
@@ -29,6 +35,7 @@ const SignUp = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col items-center justify-center">
       <h1 className="text-2xl font-semibold mt-4">Create Account</h1>
+      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
