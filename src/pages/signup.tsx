@@ -3,6 +3,7 @@ import '../app/globals.css';
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 
 const SignUp = () => {
@@ -57,6 +58,12 @@ const SignUp = () => {
           Create Account
         </button>
       </form>
+      <p className="mt-4">
+        Already have an account?{' '}
+        <Link href="/signin" legacyBehavior>
+          <a className="text-blue-500 hover:underline">Log in!</a>
+        </Link>
+      </p>
     </div>
   );
 };
