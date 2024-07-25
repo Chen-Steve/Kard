@@ -33,23 +33,27 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
   );
 
   const loadFlashcardsFromDB = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('flashcards')
-        .select('*')
-        .eq('user_id', session?.user?.id);
+    if (session) {
+      try {
+        const { data, error } = await supabase
+          .from('flashcards')
+          .select('*')
+          .eq('user_id', session.user.id);
 
-      if (error) {
-        throw new Error(error.message);
+        if (error) {
+          throw new Error(error.message);
+        }
+        console.log('Loaded flashcards from DB:', data);
+        setFlashcards(data);
+      } catch (error) {
+        console.error('Failed to load flashcards from database:', error);
       }
-      setFlashcards(data);
-    } catch (error) {
-      console.error('Failed to load flashcards:', error);
     }
-  }, [session?.user?.id, setFlashcards]);
+  }, [session, setFlashcards]);
 
   const loadFlashcardsFromLocalStorage = useCallback(() => {
     const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+    console.log('Loaded flashcards from local storage:', storedFlashcards);
     setLocalFlashcards(storedFlashcards);
   }, []);
 

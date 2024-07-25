@@ -3,37 +3,44 @@ import { useSession } from 'next-auth/react';
 import supabase from '../lib/supabaseClient';
 
 interface FlashcardFormProps {
-  onSave: (flashcard: { id?: number; question: string; answer: string; order: number }) => void;
+  onSave: (flashcard: { id: number; question: string; answer: string; order: number }) => void;
 }
 
 const FlashcardForm: React.FC<FlashcardFormProps> = ({ onSave }) => {
   const { data: session } = useSession();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newFlashcard = { question, answer, order: Date.now() }; // Assign a default order value
+    const newFlashcard = { id: Date.now(), question, answer, order: Date.now() };
 
     if (session) {
-      const { data, error } = await supabase
-        .from('flashcards')
-        .insert([{ ...newFlashcard, user_id: session.user.id }]);
+      try {
+        const { data, error } = await supabase
+          .from('flashcards')
+          .insert([{ ...newFlashcard, user_id: session.user.id }])
+          .select(); // Add .select() to ensure data is typed
 
-      if (error) {
-        setMessage('Failed to save flashcard: ' + error.message);
-      } else {
-        if (data && data[0]) {
-          setMessage('Flashcard saved successfully!');
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data && data.length > 0) {
+          console.log('Flashcard saved to DB:', data);
           onSave(data[0]);
         } else {
-          setMessage('Failed to save flashcard: No data returned.');
+          console.error('No data returned from database');
         }
+      } catch (error) {
+        console.error('Failed to save flashcard to database:', error);
       }
     } else {
-      setMessage('Flashcard created locally. It will not be saved permanently.');
+      console.log('Flashcard saved to local storage:', newFlashcard);
       onSave(newFlashcard);
+      const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+      storedFlashcards.push(newFlashcard);
+      localStorage.setItem('flashcards', JSON.stringify(storedFlashcards));
     }
 
     setQuestion('');
@@ -58,7 +65,6 @@ const FlashcardForm: React.FC<FlashcardFormProps> = ({ onSave }) => {
           onChange={(e) => setAnswer(e.target.value)}
         />
         <button type="submit" className="btn btn-primary">Save Flashcard</button>
-        {message && <p className="mt-2 text-red-500">{message}</p>}
       </div>
     </form>
   );

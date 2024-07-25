@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import FlashcardForm from '../components/FlashcardForm';
 import FlashcardList from '../components/FlashcardList';
-import { FaCog } from 'react-icons/fa'; // Import the settings gear icon
+import { FaCog } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
+import supabase from '../lib/supabaseClient';
 
 interface FlashcardType {
   id: number;
@@ -14,6 +16,7 @@ interface FlashcardType {
 }
 
 export default function Home() {
+  const { data: session } = useSession();
   const [flashcards, setFlashcards] = useState<FlashcardType[]>([]);
   const [currentFlashcard, setCurrentFlashcard] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -25,56 +28,68 @@ export default function Home() {
   });
   const [changingShortcut, setChangingShortcut] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log('Loading flashcards...');
-    loadFlashcards();
+  const loadFlashcardsFromDB = useCallback(async () => {
+    if (session) {
+      try {
+        const { data, error } = await supabase
+          .from('flashcards')
+          .select('*')
+          .eq('user_id', session.user.id);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data) {
+          console.log('Loaded flashcards from DB:', data);
+          setFlashcards(data);
+        }
+      } catch (error) {
+        console.error('Failed to load flashcards from database:', error);
+      }
+    }
+  }, [session]);
+
+  const loadFlashcardsFromLocalStorage = useCallback(() => {
+    const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+    console.log('Stored flashcards:', storedFlashcards);
+    setFlashcards(storedFlashcards);
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (changingShortcut) {
-        setShortcuts({ ...shortcuts, [changingShortcut]: event.code });
-        setChangingShortcut(null);
-      } else {
-        if (event.code === shortcuts.prev) {
-          if (currentFlashcard > 0) {
-            setCurrentFlashcard(currentFlashcard - 1);
-            setFlipped(false);
-          }
-        } else if (event.code === shortcuts.next) {
-          if (currentFlashcard < flashcards.length - 1) {
-            setCurrentFlashcard(currentFlashcard + 1);
-            setFlipped(false);
-          }
-        } else if (event.code === shortcuts.flip) {
-          event.preventDefault(); // Prevent default space bar action (like scrolling)
-          setFlipped(!flipped);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [currentFlashcard, flashcards.length, flipped, shortcuts, changingShortcut]);
-
-  const loadFlashcards = () => {
-    try {
-      const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
-      console.log('Stored flashcards:', storedFlashcards);
-      setFlashcards(storedFlashcards);
-    } catch (error) {
-      console.error('Failed to load flashcards from local storage:', error);
+    if (session) {
+      loadFlashcardsFromDB();
+    } else {
+      loadFlashcardsFromLocalStorage();
     }
-  };
+  }, [session, loadFlashcardsFromDB, loadFlashcardsFromLocalStorage]);
 
-  const handleAddFlashcard = (flashcard: Omit<FlashcardType, 'id'>) => {
-    const newFlashcard = { ...flashcard, id: Date.now() }; // Ensure id is assigned
+  const handleAddFlashcard = async (flashcard: Omit<FlashcardType, 'id'>) => {
+    const newFlashcard = { ...flashcard, id: Date.now() };
     const updatedFlashcards = [...flashcards, newFlashcard];
-    console.log('Adding new flashcard:', newFlashcard);
-    setFlashcards(updatedFlashcards);
-    localStorage.setItem('flashcards', JSON.stringify(updatedFlashcards));
+
+    if (session) {
+      try {
+        const { data, error } = await supabase
+          .from('flashcards')
+          .insert([{ ...newFlashcard, user_id: session.user.id }]);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data) {
+          console.log('Flashcard saved to DB:', data);
+          setFlashcards((prev) => [...prev, data[0]]);
+        }
+      } catch (error) {
+        console.error('Failed to save flashcard to database:', error);
+      }
+    } else {
+      console.log('Flashcard saved to local storage:', newFlashcard);
+      setFlashcards(updatedFlashcards);
+      localStorage.setItem('flashcards', JSON.stringify(updatedFlashcards));
+    }
   };
 
   const handleNext = () => {
