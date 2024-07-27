@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import FlashcardList from '../components/FlashcardList';
 import KeyboardShortcuts from '../components/KeyboardShortcuts';
 import { useSession } from 'next-auth/react';
-import supabase from '../lib/supabaseClient';
 
 interface FlashcardType {
   id: number;
@@ -14,47 +13,19 @@ interface FlashcardType {
   order: number;
 }
 
+const exampleFlashcards: FlashcardType[] = [
+  { id: 1, question: "What is the capital of France?", answer: "Paris", order: 1 },
+  { id: 2, question: "Who wrote 'Romeo and Juliet'?", answer: "William Shakespeare", order: 2 },
+  { id: 3, question: "What is the chemical symbol for gold?", answer: "Au", order: 3 },
+  { id: 4, question: "What year did World War II end?", answer: "1945", order: 4 },
+  { id: 5, question: "What is the largest planet in our solar system?", answer: "Jupiter", order: 5 },
+];
+
 const CardPage = () => {
   const { data: session } = useSession();
-  const [flashcards, setFlashcards] = useState<FlashcardType[]>([]);
+  const [flashcards, setFlashcards] = useState<FlashcardType[]>(exampleFlashcards);
   const [currentFlashcard, setCurrentFlashcard] = useState(0);
   const [flipped, setFlipped] = useState(false);
-
-  const loadFlashcardsFromDB = useCallback(async () => {
-    if (session) {
-      try {
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('*')
-          .eq('user_id', session.user.id);
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        if (data) {
-          console.log('Loaded flashcards from DB:', data);
-          setFlashcards(data);
-        }
-      } catch (error) {
-        console.error('Failed to load flashcards from database:', error);
-      }
-    }
-  }, [session]);
-
-  const loadFlashcardsFromLocalStorage = useCallback(() => {
-    const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
-    console.log('Stored flashcards:', storedFlashcards);
-    setFlashcards(storedFlashcards);
-  }, []);
-
-  useEffect(() => {
-    if (session) {
-      loadFlashcardsFromDB();
-    } else {
-      loadFlashcardsFromLocalStorage();
-    }
-  }, [session, loadFlashcardsFromDB, loadFlashcardsFromLocalStorage]);
 
   const handleNext = () => {
     if (currentFlashcard < flashcards.length - 1) {

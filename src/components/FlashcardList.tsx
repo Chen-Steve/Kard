@@ -3,7 +3,6 @@ import { DndContext, useSensor, useSensors, PointerSensor, closestCenter, Keyboa
 import { arrayMove } from '@dnd-kit/sortable';
 import { SortableContext, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import SortableItem from './SortableItem';
-import styled from 'styled-components';
 import { useSession } from 'next-auth/react';
 import supabase from '../lib/supabaseClient';
 
@@ -24,6 +23,8 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
   const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [isDecksVisible, setIsDecksVisible] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [localFlashcards, setLocalFlashcards] = useState<Flashcard[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -32,9 +33,17 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
     })
   );
 
+  useEffect(() => {
+    setIsClient(true);
+    if (flashcards.length > 0) {
+      setLocalFlashcards(flashcards);
+    }
+  }, [flashcards]);
+
   const loadFlashcards = useCallback(async () => {
     if (!session || !session.user) {
       const storedFlashcards = JSON.parse(localStorage.getItem('flashcards') || '[]');
+      setLocalFlashcards(storedFlashcards);
       setFlashcards(storedFlashcards);
       return;
     }
@@ -48,6 +57,7 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
       if (error) {
         console.error('Error loading flashcards from database:', error);
       } else {
+        setLocalFlashcards(data);
         setFlashcards(data);
       }
     } catch (error) {
@@ -56,18 +66,28 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
   }, [session, setFlashcards]);
 
   useEffect(() => {
-    loadFlashcards();
-  }, [loadFlashcards]);
+    if (isClient && localFlashcards.length === 0) {
+      loadFlashcards();
+    }
+  }, [isClient, localFlashcards.length, loadFlashcards]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = flashcards.findIndex((flashcard) => flashcard.id === active.id);
-      const newIndex = flashcards.findIndex((flashcard) => flashcard.id === over.id);
-      setFlashcards(arrayMove(flashcards, oldIndex, newIndex));
+      const oldIndex = localFlashcards.findIndex((flashcard) => flashcard.id === active.id);
+      const newIndex = localFlashcards.findIndex((flashcard) => flashcard.id === over.id);
+      const newFlashcards = arrayMove(localFlashcards, oldIndex, newIndex);
+      setLocalFlashcards(newFlashcards);
+      setFlashcards(newFlashcards);
     }
   };
+
+  useEffect(() => {
+    console.log('Flashcards:', localFlashcards);
+    console.log('isVisible:', isVisible);
+    console.log('isClient:', isClient);
+  }, [localFlashcards, isVisible, isClient]);
 
   return (
     <div className="w-full max-w-4xl mt-8">
@@ -102,11 +122,11 @@ const FlashcardList: React.FC<FlashcardListProps> = ({ flashcards, setFlashcards
         </button>
       </div>
       <hr className="border-t-2 border-gray-300 mb-6" />
-      {isVisible && (
+      {isVisible && isClient && localFlashcards.length > 0 && (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={flashcards.map((flashcard) => flashcard.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={localFlashcards.map((flashcard) => flashcard.id)} strategy={verticalListSortingStrategy}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {flashcards.map((flashcard) => (
+              {localFlashcards.map((flashcard) => (
                 <SortableItem key={flashcard.id} id={flashcard.id}>
                   <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300">
                     <h3 className="text-lg font-semibold mb-2 truncate">{flashcard.question}</h3>
