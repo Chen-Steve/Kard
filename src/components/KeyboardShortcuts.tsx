@@ -9,8 +9,8 @@ interface KeyboardShortcutsProps {
 const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ onFlip, onNext, onPrev }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.code) {
-        case 'Space':
+      switch (event.key) {  // Use event.key instead of event.code for better compatibility
+        case ' ':
           event.preventDefault();
           onFlip();
           break;
