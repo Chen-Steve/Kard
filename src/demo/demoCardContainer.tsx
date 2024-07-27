@@ -1,89 +1,69 @@
-import { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import FlashcardList from './demoList';
 
 interface Flashcard {
   id: string;
-  content: string;
+  question: string;
+  answer: string;
 }
 
-const FlashcardContainer: FC = () => {
-  const [flashcards1, setFlashcards1] = useState<Flashcard[]>([
-    { id: '1', content: 'Flashcard 1' },
-    { id: '2', content: 'Flashcard 2' },
-    { id: '3', content: 'Flashcard 3' },
-  ]);
-
-  const [flashcards2, setFlashcards2] = useState<Flashcard[]>([
-    { id: '4', content: 'Flashcard 4' },
-    { id: '5', content: 'Flashcard 5' },
-  ]);
+const FlashcardContainer: React.FC = () => {
+  const [lists, setLists] = useState<Record<string, Flashcard[]>>({
+    list1: [
+      { id: 'card1', question: 'What is the capital of France?', answer: 'Paris' },
+      { id: 'card2', question: 'What is 2 + 2?', answer: '4' },
+    ],
+    list2: [
+      { id: 'card3', question: 'Who wrote "Romeo and Juliet"?', answer: 'William Shakespeare' },
+      { id: 'card4', question: 'What is the tallest mountain in the world?', answer: 'Mount Everest' },
+    ],
+    list3: [
+      { id: 'card5', question: 'What is the largest ocean on Earth?', answer: 'Pacific Ocean' },
+    ],
+  });
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    if (!result.destination) return;
 
-    if (!destination) {
-      return;
-    }
+    const { source, destination } = result;
+    if (!lists[source.droppableId] || !lists[destination.droppableId]) return;
 
     if (source.droppableId === destination.droppableId) {
-      const items = reorder(
-        source.droppableId === 'flashcards1' ? flashcards1 : flashcards2,
-        source.index,
-        destination.index
-      );
-
-      if (source.droppableId === 'flashcards1') {
-        setFlashcards1(items);
-      } else {
-        setFlashcards2(items);
-      }
+      // Moving within the same list
+      const items = Array.from(lists[source.droppableId]);
+      const [reorderedItem] = items.splice(source.index, 1);
+      items.splice(destination.index, 0, reorderedItem);
+      setLists((prev) => ({ ...prev, [source.droppableId]: items }));
     } else {
-      const result = move(
-        source.droppableId === 'flashcards1' ? flashcards1 : flashcards2,
-        source.droppableId === 'flashcards1' ? flashcards2 : flashcards1,
-        source,
-        destination
-      );
-
-      setFlashcards1(result.flashcards1);
-      setFlashcards2(result.flashcards2);
+      // Moving to a different list
+      const sourceItems = Array.from(lists[source.droppableId]);
+      const destinationItems = Array.from(lists[destination.droppableId]);
+      const [movedItem] = sourceItems.splice(source.index, 1);
+      destinationItems.splice(destination.index, 0, movedItem);
+      setLists((prev) => ({
+        ...prev,
+        [source.droppableId]: sourceItems,
+        [destination.droppableId]: destinationItems,
+      }));
     }
-  };
-
-  const reorder = (list: Flashcard[], startIndex: number, endIndex: number): Flashcard[] => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-
-    return result;
-  };
-
-  const move = (
-    source: Flashcard[],
-    destination: Flashcard[],
-    droppableSource: any,
-    droppableDestination: any
-  ) => {
-    const sourceClone = Array.from(source);
-    const destClone = Array.from(destination);
-    const [removed] = sourceClone.splice(droppableSource.index, 1);
-
-    destClone.splice(droppableDestination.index, 0, removed);
-
-    const result = {
-      flashcards1: droppableSource.droppableId === 'flashcards1' ? sourceClone : destClone,
-      flashcards2: droppableSource.droppableId === 'flashcards2' ? sourceClone : destClone,
-    };
-
-    return result;
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex justify-center space-x-8">
-        <FlashcardList id="flashcards1" flashcards={flashcards1} />
-        <FlashcardList id="flashcards2" flashcards={flashcards2} />
+      <div className="p-4 bg-gray-100 rounded-lg shadow-inner flex space-x-4">
+        <div className="min-w-[300px] w-1/3">
+          <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">Deck 1</h2>
+          <FlashcardList id="lis1" flashcards={lists.list1} />
+        </div>
+        <div className="min-w-[300px] w-1/3">
+          <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">Deck 2</h2>
+          <FlashcardList id="list2" flashcards={lists.list2} />
+        </div>
+        <div className="min-w-[300px] w-1/3">
+          <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">Deck 3</h2>
+          <FlashcardList id="list3" flashcards={lists.list3} />
+        </div>
       </div>
     </DragDropContext>
   );
