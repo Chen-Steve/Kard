@@ -1,4 +1,4 @@
-// pages/api/auth/signup.ts
+// src/pages/api/auth/signup.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
