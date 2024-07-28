@@ -1,48 +1,11 @@
 "use client";
 
 import '../app/globals.css';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-
-const initialCards: Record<string, { id: string; question: string; answer: string }[]> = {
-  list1: [
-    { id: '1', question: 'What is React?', answer: 'A JavaScript library for building user interfaces.' },
-    { id: '2', question: 'What is Next.js?', answer: 'A React framework for production.' },
-  ],
-  list2: [
-    { id: '3', question: 'What is JSX?', answer: 'A syntax extension for JavaScript used in React.' },
-  ],
-  list3: [],
-};
 
 const HomePage: FC = () => {
-  const [cards, setCards] = useState<Record<string, { id: string; question: string; answer: string }[]>>(initialCards);
-  const [flipped, setFlipped] = useState<{ [key: string]: boolean }>({});
-
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-
-    const { source, destination } = result;
-
-    const sourceList = Array.from(cards[source.droppableId]);
-    const [movedItem] = sourceList.splice(source.index, 1);
-
-    const destinationList = Array.from(cards[destination.droppableId]);
-    destinationList.splice(destination.index, 0, movedItem);
-
-    setCards({
-      ...cards,
-      [source.droppableId]: sourceList,
-      [destination.droppableId]: destinationList,
-    });
-  };
-
-  const handleFlip = (id: string) => {
-    setFlipped((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col">
       <header className="w-full text-white p-6 flex justify-between items-center">
@@ -67,39 +30,6 @@ const HomePage: FC = () => {
             Get Started
           </Link>
         </div>
-
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="flex space-x-4">
-            {Object.keys(cards).map((listId) => (
-              <Droppable droppableId={listId} key={listId}>
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="bg-white rounded-lg shadow-lg p-4 w-1/3 min-h-[300px]"
-                  >
-                    {cards[listId].map(({ id, question, answer }, index) => (
-                      <Draggable key={id} draggableId={id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-gray-600 text-white rounded-md p-2 mb-2 cursor-pointer"
-                            onClick={() => handleFlip(id)}
-                          >
-                            {flipped[id] ? answer : question}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))}
-          </div>
-        </DragDropContext>
       </main>
 
       <footer className="w-full text-white p-6 text-center">
