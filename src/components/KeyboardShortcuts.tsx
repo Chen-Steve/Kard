@@ -1,36 +1,24 @@
-import { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 
 interface KeyboardShortcutsProps {
-  onFlip: () => void;
+  onPrevious: () => void;
   onNext: () => void;
-  onPrev: () => void;
+  onFlip: () => void;
 }
 
-const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ onFlip, onNext, onPrev }) => {
+const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ onPrevious, onNext, onFlip }) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') onPrevious();
+    if (e.key === 'ArrowRight') onNext();
+    if (e.key === ' ') onFlip();
+  }, [onPrevious, onNext, onFlip]);
+
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {  // Use event.key instead of event.code for better compatibility
-        case ' ':
-          event.preventDefault();
-          onFlip();
-          break;
-        case 'ArrowRight':
-          onNext();
-          break;
-        case 'ArrowLeft':
-          onPrev();
-          break;
-        default:
-          break;
-      }
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onFlip, onNext, onPrev]);
+  }, [handleKeyDown]);
 
   return null;
 };

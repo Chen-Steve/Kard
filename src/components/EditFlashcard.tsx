@@ -1,158 +1,79 @@
-import '../app/globals.css';
-import { useState, useEffect, useCallback } from 'react';
-
-interface Flashcard {
-  id: number;
-  question: string;
-  answer: string;
-  order: number;
-}
+import React, { useState } from 'react';
 
 interface EditFlashcardProps {
-  deckId: number;
+  id: string;
+  question: string;
+  answer: string;
+  onSave: (id: string, updatedQuestion: string, updatedAnswer: string) => void;
 }
 
-const EditFlashcard: React.FC<EditFlashcardProps> = ({ deckId }) => {
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
-  const [editingFlashcardId, setEditingFlashcardId] = useState<number | null>(null);
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
+const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onSave }) => {
+  const [editQuestion, setEditQuestion] = useState(question);
+  const [editAnswer, setEditAnswer] = useState(answer);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const loadFlashcards = useCallback(async () => {
-    try {
-      const response = await fetch(`/decks/${deckId}/flashcards`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setFlashcards(data);
-      console.log('Loaded flashcards:', data);
-    } catch (error) {
-      console.error('Failed to load flashcards:', error);
-    }
-  }, [deckId]);
-
-  useEffect(() => {
-    loadFlashcards();
-  }, [loadFlashcards]);
-
-  const handleDeleteClick = async (id: number) => {
-    await fetch(`/flashcards/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    loadFlashcards();
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (question && answer) {
-      await fetch('/flashcards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, answer, deckId })
-      });
-      setQuestion('');
-      setAnswer('');
-      loadFlashcards();
-    }
-  };
-
-  const handleFlashcardChange = (id: number, field: 'question' | 'answer', value: string) => {
-    setFlashcards((prevFlashcards) =>
-      prevFlashcards.map((flashcard) =>
-        flashcard.id === id ? { ...flashcard, [field]: value } : flashcard
-      )
-    );
-  };
-
-  const handleFlashcardSave = async (flashcard: Flashcard) => {
-    await fetch(`/flashcards/${flashcard.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: flashcard.question, answer: flashcard.answer })
-    });
-    loadFlashcards();
-  };
-
-  const autoResizeTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = 'auto';
-    e.target.style.height = `${e.target.scrollHeight}px`;
+  const handleSave = () => {
+    onSave(id, editQuestion, editAnswer);
+    setIsEditing(false);
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center py-10 px-4">
-      <div className="w-full max-w-4xl flex justify-start mb-4">
-      </div>
-      <h1 className="text-4xl font-bold text-black mb-10">Edit Flashcards</h1>
-      <form onSubmit={handleFormSubmit} className="w-full max-w-4xl mb-8">
-        <div className="flex flex-col gap-2">
-          <textarea
-            className="input input-bordered border-2 border-black p-2 text-black w-full"
-            placeholder="Question"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            rows={1}
-            style={{ resize: 'none' }}
-          />
-          <textarea
-            className="input input-bordered border-2 border-black p-2 text-black w-full"
-            placeholder="Answer"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            rows={1}
-            style={{ resize: 'none' }}
-          />
-          <button type="submit" className="btn btn-primary mt-2">Save Flashcard</button>
-        </div>
-      </form>
-      <div className="w-full max-w-4xl">
-        {flashcards.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {flashcards.map((flashcard, index) => (
-              <div key={flashcard.id} className="bg-white text-black p-4 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-center">
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                  <span className="text-2xl font-bold">{index + 1}</span>
-                  <div className="flex flex-col mr-10">
-                    <textarea
-                      className="input input-bordered border-2 border-black p-2 text-black w-full"
-                      placeholder="Question"
-                      value={flashcard.question}
-                      onChange={(e) => {
-                        handleFlashcardChange(flashcard.id, 'question', e.target.value);
-                        autoResizeTextarea(e);
-                      }}
-                      rows={1}
-                      style={{ resize: 'none', overflow: 'hidden' }}
-                    />
-                    <span className="text-sm text-gray-400 mt-0">TERM</span>
-                  </div>
-                  <div className="flex flex-col ml-10 mb-4 md:mb-0">
-                    <textarea
-                      className="input input-bordered border-2 border-black p-2 text-black w-full"
-                      placeholder="Answer"
-                      value={flashcard.answer}
-                      onChange={(e) => {
-                        handleFlashcardChange(flashcard.id, 'answer', e.target.value);
-                        autoResizeTextarea(e);
-                      }}
-                      rows={1}
-                      style={{ resize: 'none', overflow: 'hidden' }}
-                    />
-                    <span className="text-sm text-gray-400 mt-0">DEFINITION</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 mt-4 md:mt-0">
-                  <button onClick={() => handleFlashcardSave(flashcard)} className="btn btn-primary">Save</button>
-                  <button onClick={() => handleDeleteClick(flashcard.id)} className="btn btn-danger">🗑️</button>
-                </div>
-              </div>
-            ))}
+    <div className="mb-4 p-4 bg-gray-100 rounded shadow flex justify-between items-center">
+      {isEditing ? (
+        <>
+          <div className="flex w-full space-x-4">
+            <textarea
+              value={editQuestion}
+              onChange={(e) => setEditQuestion(e.target.value)}
+              className="block w-1/2 p-2 border rounded resize-none"
+              rows={1}
+              aria-label="Question"
+              placeholder="Question"
+              style={{ minHeight: '2rem', overflow: 'hidden' }}
+              onInput={(e) => {
+                e.currentTarget.style.height = 'auto';
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px';
+              }}
+            />
+            <textarea
+              value={editAnswer}
+              onChange={(e) => setEditAnswer(e.target.value)}
+              className="block w-1/2 p-2 border rounded resize-none"
+              rows={1}
+              aria-label="Answer"
+              placeholder="Answer"
+              style={{ minHeight: '2rem', overflow: 'hidden' }}
+              onInput={(e) => {
+                e.currentTarget.style.height = 'auto';
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px';
+              }}
+            />
           </div>
-        ) : (
-          <p className="text-black">Loading flashcards...</p>
-        )}
-      </div>
+          <button
+            onClick={handleSave}
+            className="ml-4 px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Save
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="flex w-full space-x-4">
+            <div className="w-1/2">
+              <p className="font-bold">{question}</p>
+            </div>
+            <div className="w-1/2">
+              <p className="font-bold">{answer}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="ml-4 px-4 py-2 bg-gray-300 rounded"
+          >
+            Edit
+          </button>
+        </>
+      )}
     </div>
   );
 };

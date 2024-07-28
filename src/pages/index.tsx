@@ -23,9 +23,6 @@ const HomePage: FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
-          <Link href="/card" className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-100 transition duration-300 ease-in-out transform hover:-translate-y-1">
-            Create Flashcards
-          </Link>
           <Link href="/signup" className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1">
             Get Started
           </Link>
