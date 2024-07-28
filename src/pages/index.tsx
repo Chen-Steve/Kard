@@ -29,12 +29,12 @@ const HomePage: FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
-            <a
+            <div
               className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleButtonClick}
             >
               Get Started
-            </a>
+            </div>
           </Link>
         </div>
       </main>

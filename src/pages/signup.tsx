@@ -3,6 +3,7 @@ import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import supabase from '../lib/supabaseClient';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -13,21 +14,20 @@ const SignUp = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Error creating account:', data.error);
-      setErrorMessage(data.error);
+    if (error) {
+      console.error('Error creating account:', error.message);
+      if (error.status === 429) {
+        setErrorMessage('Too many requests. Please try again later.');
+      } else {
+        setErrorMessage(error.message);
+      }
     } else {
-      console.log('Account created successfully:', data);
+      console.log('Account created successfully:', data.user);
       router.push('/signin');
     }
   };

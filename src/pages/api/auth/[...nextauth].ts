@@ -1,10 +1,42 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
+import EmailProvider from 'next-auth/providers/email';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../lib/prisma';
 
 const options: NextAuthOptions = {
-  providers: [],
+  providers: [
+    EmailProvider({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
+    }),
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      authorize: async (credentials) => {
+        if (!credentials) {
+          console.error("No credentials provided");
+          return null;
+        }
+        try {
+          const user = await authenticateUser(credentials.email, credentials.password);
+          if (user) {
+            return user;
+          } else {
+            console.error("Invalid email or password");
+            return null;
+          }
+        } catch (error) {
+          console.error("Error in authorize function", error);
+          return null;
+        }
+      }
+    })
+  ],
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
@@ -13,13 +45,13 @@ const options: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id as string || '';
-      session.user.email = token.email as string || '';
+      if (token.id) {
+        session.user.id = token.id.toString();
+      }
       return session;
     },
     async redirect({ url, baseUrl }) {
@@ -49,3 +81,19 @@ const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default authHandler;
+
+async function authenticateUser(email: string, password: string) {
+  console.log("Authenticating user:", email);
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user && user.password === password) {
+      return user;
+    } else {
+      console.error("Invalid email or password");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in authenticateUser:", error);
+    return null;
+  }
+}
