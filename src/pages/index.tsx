@@ -4,8 +4,13 @@ import '../app/globals.css';
 import { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import trackEvent from '@vercel/analytics';
 
 const HomePage: FC = () => {
+  const handleButtonClick = () => {
+    trackEvent.track('button_click', { label: 'Get Started' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col">
       <header className="w-full text-white p-6 flex justify-between items-center">
@@ -23,8 +28,13 @@ const HomePage: FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
-          <Link href="/signup" className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1">
-            Get Started
+          <Link href="/signup">
+            <a
+              className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              onClick={handleButtonClick}
+            >
+              Get Started
+            </a>
           </Link>
         </div>
       </main>
