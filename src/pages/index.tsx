@@ -1,23 +1,54 @@
 "use client";
 
 import '../app/globals.css';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import FlashcardContainer from '../demo/demoCardContainer';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+
+const initialCards: Record<string, { id: string; question: string; answer: string }[]> = {
+  list1: [
+    { id: '1', question: 'What is React?', answer: 'A JavaScript library for building user interfaces.' },
+    { id: '2', question: 'What is Next.js?', answer: 'A React framework for production.' },
+  ],
+  list2: [
+    { id: '3', question: 'What is JSX?', answer: 'A syntax extension for JavaScript used in React.' },
+  ],
+  list3: [],
+};
 
 const HomePage: FC = () => {
+  const [cards, setCards] = useState<Record<string, { id: string; question: string; answer: string }[]>>(initialCards);
+  const [flipped, setFlipped] = useState<{ [key: string]: boolean }>({});
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+
+    const sourceList = Array.from(cards[source.droppableId]);
+    const [movedItem] = sourceList.splice(source.index, 1);
+
+    const destinationList = Array.from(cards[destination.droppableId]);
+    destinationList.splice(destination.index, 0, movedItem);
+
+    setCards({
+      ...cards,
+      [source.droppableId]: sourceList,
+      [destination.droppableId]: destinationList,
+    });
+  };
+
+  const handleFlip = (id: string) => {
+    setFlipped((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col">
       <header className="w-full text-white p-6 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Image src="/logo.png" alt="Kard Logo" width={40} height={40} className="rounded-full" />
+          <Image src="/logo.png" alt="Kard Logo" width={50} height={50} className="rounded-full" />
         </div>
-        <nav>
-          <Link href="/signin" className="text-white hover:text-blue-200 transition">
-            Sign In
-          </Link>
-        </nav>
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
@@ -37,10 +68,38 @@ const HomePage: FC = () => {
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg p-8 max-w-4xl w-full">
-          <h2 className="text-3xl font-semibold text-white mb-6 text-center">Try Our Demo</h2>
-          <FlashcardContainer />
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="flex space-x-4">
+            {Object.keys(cards).map((listId) => (
+              <Droppable droppableId={listId} key={listId}>
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="bg-white rounded-lg shadow-lg p-4 w-1/3 min-h-[300px]"
+                  >
+                    {cards[listId].map(({ id, question, answer }, index) => (
+                      <Draggable key={id} draggableId={id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="bg-gray-600 text-white rounded-md p-2 mb-2 cursor-pointer"
+                            onClick={() => handleFlip(id)}
+                          >
+                            {flipped[id] ? answer : question}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </div>
+        </DragDropContext>
       </main>
 
       <footer className="w-full text-white p-6 text-center">
