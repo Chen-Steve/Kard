@@ -3,7 +3,7 @@ import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
+import supabase from '../lib/supabaseClient';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -14,17 +14,16 @@ const SignIn = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const result = await signIn('credentials', {
-      redirect: false,
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (result?.error) {
-      console.error('Error signing in:', result.error);
-      setErrorMessage(result.error);
+    if (error) {
+      console.error('Error signing in:', error.message);
+      setErrorMessage(error.message);
     } else {
-      console.log('Signed in successfully:', result);
+      console.log('Signed in successfully:', data);
       router.push('/dashboard');
     }
   };

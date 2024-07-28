@@ -1,42 +1,10 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
-import EmailProvider from 'next-auth/providers/email';
-import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../lib/prisma';
 
 const options: NextAuthOptions = {
-  providers: [
-    EmailProvider({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-    }),
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
-      },
-      authorize: async (credentials, req) => {
-        if (!credentials) {
-          console.error("No credentials provided");
-          return null;
-        }
-        try {
-          const user = await authenticateUser(credentials.email, credentials.password);
-          if (user) {
-            return { id: user.id, email: user.email }; // Ensure id is a string
-          } else {
-            console.error("Invalid email or password");
-            return null;
-          }
-        } catch (error) {
-          console.error("Error in authorize function", error);
-          return null;
-        }
-      }
-    })
-  ],
+  providers: [],
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
@@ -81,19 +49,3 @@ const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default authHandler;
-
-async function authenticateUser(email: string, password: string) {
-  console.log("Authenticating user:", email);
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (user && user.password === password) {
-      return { id: user.id, email: user.email }; // Ensure id is a string
-    } else {
-      console.error("Invalid email or password");
-      return null;
-    }
-  } catch (error) {
-    console.error("Error in authenticateUser:", error);
-    return null;
-  }
-}
