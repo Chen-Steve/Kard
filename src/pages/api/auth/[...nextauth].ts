@@ -17,7 +17,7 @@ const options: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" }
       },
-      authorize: async (credentials) => {
+      authorize: async (credentials, req) => {
         if (!credentials) {
           console.error("No credentials provided");
           return null;
@@ -25,7 +25,7 @@ const options: NextAuthOptions = {
         try {
           const user = await authenticateUser(credentials.email, credentials.password);
           if (user) {
-            return user;
+            return { id: user.id, email: user.email }; // Ensure id is a string
           } else {
             console.error("Invalid email or password");
             return null;
@@ -45,13 +45,13 @@ const options: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token.id) {
-        session.user.id = token.id as number;
-      }
+      session.user.id = token.id as string || '';
+      session.user.email = token.email as string || '';
       return session;
     },
     async redirect({ url, baseUrl }) {
@@ -87,7 +87,7 @@ async function authenticateUser(email: string, password: string) {
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (user && user.password === password) {
-      return user;
+      return { id: user.id, email: user.email }; // Ensure id is a string
     } else {
       console.error("Invalid email or password");
       return null;
