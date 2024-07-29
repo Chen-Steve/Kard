@@ -85,6 +85,7 @@ export default authHandler;
 async function authenticateUser(email: string, password: string) {
   console.log("Authenticating user:", email);
   try {
+    // Ensure to include the password in the select statement
     const user = await prisma.user.findUnique({
       where: { email },
       select: { id: true, email: true, name: true, password: true },

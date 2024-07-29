@@ -17,7 +17,6 @@ interface Flashcard {
 }
 
 const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
-  console.log("User ID:", userId);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -25,10 +24,19 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const fetchFlashcards = useCallback(async () => {
     try {
-      const response = await fetch(`/api/flashcards?userId=${userId}`);
+      const response = await fetch(`/api/flashcard?userId=${userId}`);
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to fetch flashcards: ${errorData.error}, ${errorData.details}`);
+        if (response.status === 404) {
+          throw new Error('Flashcards not found for this user');
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const errorData = await response.json();
+          throw new Error(`Failed to fetch flashcards: ${errorData.error}, ${errorData.details}`);
+        } else {
+          const text = await response.text();
+          throw new Error(`Failed to fetch flashcards: ${response.status} ${response.statusText}\n${text}`);
+        }
       }
       const data = await response.json();
       setFlashcards(data);
@@ -63,7 +71,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const handleAddCard = async () => {
     try {
-      const response = await fetch('/api/flashcards', {
+      const response = await fetch('/api/flashcard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -95,7 +103,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const handleSaveCard = async (id: string, updatedQuestion: string, updatedAnswer: string) => {
     try {
-      const response = await fetch('/api/flashcards', {
+      const response = await fetch('/api/flashcard', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, question: updatedQuestion, answer: updatedAnswer }),
@@ -132,7 +140,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
     try {
       await Promise.all(
         updatedWithOrder.map((card) =>
-          fetch('/api/flashcards', {
+          fetch('/api/flashcard', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: card.id, question: card.question, answer: card.answer, order: card.order }),
