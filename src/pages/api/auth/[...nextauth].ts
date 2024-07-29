@@ -85,7 +85,10 @@ export default authHandler;
 async function authenticateUser(email: string, password: string) {
   console.log("Authenticating user:", email);
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, name: true, password: true },
+    });
     if (user && user.password === password) {
       return user;
     } else {

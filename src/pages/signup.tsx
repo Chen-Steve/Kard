@@ -28,6 +28,14 @@ const SignUp = () => {
       }
     } else {
       console.log('Account created successfully:', data.user);
+
+      // Create user in Prisma database
+      await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
       router.push('/signin');
     }
   };
