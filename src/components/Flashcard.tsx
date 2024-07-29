@@ -71,12 +71,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const handleAddCard = async () => {
     try {
+      const newCardOrder = flashcards.length;
       const response = await fetch('/api/flashcard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          question: 'Term', 
-          answer: 'Definition', 
+        body: JSON.stringify({
+          question: 'Term',
+          answer: 'Definition',
+          order: newCardOrder,
           userId: userId
         }),
       });
@@ -102,11 +104,21 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
   };
 
   const handleSaveCard = async (id: string, updatedQuestion: string, updatedAnswer: string) => {
+    const cardToUpdate = flashcards.find(card => card.id === id);
+    if (!cardToUpdate) {
+      setError('Flashcard not found');
+      return;
+    }
     try {
       const response = await fetch('/api/flashcard', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, question: updatedQuestion, answer: updatedAnswer }),
+        body: JSON.stringify({ 
+          id, 
+          question: updatedQuestion, 
+          answer: updatedAnswer,
+          order: cardToUpdate.order,
+        }),
       });
       if (!response.ok) {
         const errorData = await response.json();

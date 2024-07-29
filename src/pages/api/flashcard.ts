@@ -5,7 +5,38 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
+  if (req.method === 'POST') {
+    const { question, answer, order, userId } = req.body;
+
+    if (!question || !answer || order === undefined || !userId) {
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
+    try {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+
+      if (!user) {
+        res.status(404).json({ error: 'Not Found', details: 'User not found' });
+        return;
+      }
+
+      const newFlashcard = await prisma.flashcard.create({
+        data: {
+          question,
+          answer,
+          order,
+          userId,
+        },
+      });
+      res.status(201).json(newFlashcard);
+    } catch (error) {
+      console.error('POST flashcard error:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    } finally {
+      await prisma.$disconnect();
+    }
+  } else if (req.method === 'GET') {
     const userId = req.query.userId as string;
 
     if (!userId) {
@@ -25,51 +56,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } finally {
       await prisma.$disconnect();
     }
-  } else if (req.method === 'POST') {
-    try {
-      const { question, answer, userId } = req.body;
-
-      if (!userId) {
-        res.status(400).json({ error: 'Bad Request', details: 'userId is required' });
-        return;
-      }
-
-      const user = await prisma.user.findUnique({ where: { id: userId } });
-
-      if (!user) {
-        res.status(404).json({ error: 'Not Found', details: 'User not found' });
-        return;
-      }
-
-      const flashcardsCount = await prisma.flashcard.count({ where: { userId } });
-      const newFlashcard = await prisma.flashcard.create({
-        data: { 
-          question, 
-          answer, 
-          order: flashcardsCount, 
-          userId 
-        },
-      });
-      res.status(201).json(newFlashcard);
-    } catch (error) {
-      console.error('POST flashcard error:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'PUT') {
+    const { id, question, answer, order } = req.body;
+
+    if (!id || !question || !answer || order === undefined) {
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
     try {
-      const { id, question, answer, order } = req.body;
-
-      if (!id) {
-        res.status(400).json({ error: 'Bad Request', details: 'Flashcard id is required' });
-        return;
-      }
-
       const updatedFlashcard = await prisma.flashcard.update({
         where: { id },
-        data: { 
-          question, 
+        data: {
+          question,
           answer,
           order,
         },
