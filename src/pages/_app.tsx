@@ -4,8 +4,6 @@ import '../app/globals.css';
 import '../lib/fontAwesome';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
-import Head from 'next/head';
-import { useEffect } from 'react';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const handleDragEnd = () => {
@@ -15,9 +13,6 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Head>
-          <title>My App</title>
-        </Head>
         <Component {...pageProps} />
         <Analytics />
       </DragDropContext>

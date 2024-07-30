@@ -1,4 +1,3 @@
-// src/pages/api/flashcard.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 
@@ -80,27 +79,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } finally {
       await prisma.$disconnect();
     }
-  } else if (req.method === 'DELETE') {
-    const { id } = req.body;
-
-    if (!id) {
-      res.status(400).json({ error: 'Missing required fields' });
-      return;
-    }
-
-    try {
-      await prisma.flashcard.delete({
-        where: { id },
-      });
-      res.status(204).end();
-    } catch (error) {
-      console.error('DELETE flashcard error:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
