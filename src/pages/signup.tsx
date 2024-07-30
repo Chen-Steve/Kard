@@ -1,4 +1,3 @@
-// src/pages/signup.tsx
 import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
@@ -29,14 +28,25 @@ const SignUp = () => {
     } else if (data.user) {
       console.log('Account created successfully:', data.user);
   
-      // Create user in Prisma database
-      await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: data.user.id, email, password }),
-      });
-  
-      router.push('/signin');
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: data.user.id, email, password }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create user in database');
+        }
+
+        const result = await response.json();
+        console.log('User created in database:', result);
+
+        router.push('/dashboard'); // Redirecting to a welcome page after signup
+      } catch (error) {
+        console.error('Error creating user in database:', error);
+        setErrorMessage('An error occurred while creating your account. Please try again.');
+      }
     } else {
       console.error('User data is null');
       setErrorMessage('An unexpected error occurred. Please try again.');

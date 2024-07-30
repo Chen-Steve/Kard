@@ -33,21 +33,6 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      // Send welcome email
-      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/api/send-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: email,
-          subject: 'Welcome to Our App!',
-          text: 'Thank you for signing up!'
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        console.error('Failed to send welcome email');
-      }
-
       res.status(201).json(user);
     } catch (error) {
       console.error('Signup error:', error);
