@@ -42,7 +42,7 @@ const SignUp = () => {
         const result = await response.json();
         console.log('User created in database:', result);
 
-        router.push('/dashboard'); // Redirecting to a welcome page after signup
+        router.push('/dashboard');
       } catch (error) {
         console.error('Error creating user in database:', error);
         setErrorMessage('An error occurred while creating your account. Please try again.');
