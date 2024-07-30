@@ -1,5 +1,5 @@
 {
-  "name": "flashcard-app",
+  "name": "kard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -31,7 +31,6 @@
     "react-toastify": "^10.0.5"
   },
   "devDependencies": {
-    "@types/next-auth": "^3.13.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

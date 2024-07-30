@@ -32,8 +32,8 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.status(201).json(user);
     } catch (error) {
-      console.error('Signup error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Signup error:', error as Error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     } finally {
       await prisma.$disconnect();
     }
