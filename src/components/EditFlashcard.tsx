@@ -52,7 +52,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
           </div>
           <button
             onClick={handleSave}
-            className="ml-4 px-4 py-2 bg-blue-500 text-white rounded"
+            className="ml-4 px-3 py-2 bg-green-700 text-white rounded"
           >
             Save
           </button>

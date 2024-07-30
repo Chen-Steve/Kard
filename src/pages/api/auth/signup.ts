@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { email, password, supabaseUserId } = req.body;
+    const { id, email, password } = req.body;
 
-    if (!email || !password || !supabaseUserId) {
-      res.status(400).json({ error: 'Email, password, and Supabase user ID are required' });
+    if (!id || !email || !password) {
+      res.status(400).json({ error: 'ID, email, and password are required' });
       return;
     }
 
@@ -24,10 +24,10 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create the user with Supabase user ID
+      // Create the user
       const user = await prisma.user.create({
         data: {
-          id: supabaseUserId,
+          id,
           email,
           password: hashedPassword,
         },

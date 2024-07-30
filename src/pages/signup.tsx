@@ -1,3 +1,4 @@
+// src/pages/signup.tsx
 import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
@@ -12,12 +13,12 @@ const SignUp = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+  
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
-
+  
     if (error) {
       console.error('Error creating account:', error.message);
       if (error.status === 429) {
@@ -25,20 +26,23 @@ const SignUp = () => {
       } else {
         setErrorMessage(error.message);
       }
-    } else if (data.user) { // Add null check for data.user
+    } else if (data.user) {
       console.log('Account created successfully:', data.user);
-
-      // Create user in Prisma database with Supabase user ID
+  
+      // Create user in Prisma database
       await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, supabaseUserId: data.user.id }),
+        body: JSON.stringify({ id: data.user.id, email, password }),
       });
-
+  
       router.push('/signin');
+    } else {
+      console.error('User data is null');
+      setErrorMessage('An unexpected error occurred. Please try again.');
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col items-center justify-center px-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
