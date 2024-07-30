@@ -1,4 +1,3 @@
-// src/pages/signup.tsx
 import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
@@ -26,14 +25,14 @@ const SignUp = () => {
       } else {
         setErrorMessage(error.message);
       }
-    } else {
+    } else if (data.user) { // Add null check for data.user
       console.log('Account created successfully:', data.user);
 
-      // Create user in Prisma database
+      // Create user in Prisma database with Supabase user ID
       await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, supabaseUserId: data.user.id }),
       });
 
       router.push('/signin');
