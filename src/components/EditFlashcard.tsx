@@ -5,9 +5,10 @@ interface EditFlashcardProps {
   question: string;
   answer: string;
   onSave: (id: string, updatedQuestion: string, updatedAnswer: string) => void;
+  onDelete: (id: string) => void;
 }
 
-const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onSave }) => {
+const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onSave, onDelete }) => {
   const [editQuestion, setEditQuestion] = useState(question);
   const [editAnswer, setEditAnswer] = useState(answer);
   const [isEditing, setIsEditing] = useState(false);
@@ -68,9 +69,15 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
           </div>
           <button
             onClick={() => setIsEditing(true)}
-            className="ml-4 px-4 py-2 bg-gray-300 rounded"
+            className="ml-4 px-3 py-2 bg-gray-300 rounded"
           >
             Edit
+          </button>
+          <button
+            onClick={() => onDelete(id)}
+            className="ml-4 px-1 py-2 bg-red-500 text-white rounded"
+          >
+            Delete
           </button>
         </>
       )}
