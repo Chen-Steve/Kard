@@ -70,6 +70,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
   };
 
   const handleAddCard = async () => {
+    console.log('Adding card for userId:', userId);
     try {
       const newCardOrder = flashcards.length;
       const response = await fetch('/api/flashcard', {
