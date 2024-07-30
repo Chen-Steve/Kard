@@ -1,4 +1,3 @@
-// src/pages/signup.tsx
 import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
