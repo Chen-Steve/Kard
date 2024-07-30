@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 declare global {
   interface Window {
@@ -23,12 +22,14 @@ const Hcaptcha: React.FC<HcaptchaProps> = ({ onChange }) => {
     }
 
     window.hcaptchaOnLoad = () => {
-      window.hcaptcha.render('captcha-container', {
-        sitekey: siteKey,
-        size: 'compact',
-        theme: 'light',
-        'error-callback': window.onError,
-      });
+      if (window.hcaptcha) {
+        window.hcaptcha.render('captcha-container', {
+          sitekey: siteKey,
+          size: 'compact',
+          theme: 'light',
+          'error-callback': window.onError,
+        });
+      }
     };
 
     window.onError = (error: any) => {
@@ -36,11 +37,20 @@ const Hcaptcha: React.FC<HcaptchaProps> = ({ onChange }) => {
     };
 
     // Dynamically load the hCaptcha script if not already present
-    if (!document.querySelector(`script[src="https://js.hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit&recaptchacompat=off"]`)) {
+    const scriptSrc = `https://js.hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit&recaptchacompat=off`;
+    if (!document.querySelector(`script[src="${scriptSrc}"]`)) {
       const script = document.createElement('script');
-      script.src = `https://js.hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit&recaptchacompat=off`;
+      script.src = scriptSrc;
       script.async = true;
       script.defer = true;
+      script.onload = () => {
+        if (window.hcaptchaOnLoad) {
+          window.hcaptchaOnLoad();
+        }
+      };
+      script.onerror = (error) => {
+        console.error('Failed to load hCaptcha script:', error);
+      };
       document.body.appendChild(script);
     }
   }, [siteKey]);
