@@ -4,15 +4,24 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Hcaptcha from '../components/hCaptcha';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [HcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!HcaptchaToken) {
+      toast.error('Please complete the hCaptcha');
+      return;
+    }
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -30,18 +39,28 @@ const SignUp = () => {
       console.log('Account created successfully:', data.user);
 
       // Create user in Prisma database
-      await fetch('/api/auth/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, HcaptchaToken }),
       });
 
-      router.push('/signin');
+      if (response.status === 400) {
+        const result = await response.json();
+        if (result.error === 'User already exists') {
+          toast.error('There is already an account with this email. Please sign in!');
+        } else {
+          setErrorMessage(result.error);
+        }
+      } else {
+        router.push('/signin');
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col items-center justify-center px-4">
+      <ToastContainer />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Join Kard</h1>
         {errorMessage && (
@@ -80,6 +99,7 @@ const SignUp = () => {
               required
             />
           </div>
+          <Hcaptcha onChange={setHcaptchaToken} />
           <button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

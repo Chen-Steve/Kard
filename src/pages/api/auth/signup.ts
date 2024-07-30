@@ -2,30 +2,34 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import { verifyHcaptcha } from '../../../utils/verifyHcaptcha';
 
 const prisma = new PrismaClient();
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { email, password } = req.body;
+    const { email, password, HcaptchaToken } = req.body;
 
-    if (!email || !password) {
-      res.status(400).json({ error: 'Email and password are required' });
+    if (!email || !password || !HcaptchaToken) {
+      res.status(400).json({ error: 'Email, password, and hCaptcha token are required' });
+      return;
+    }
+
+    const isHcaptchaValid = await verifyHcaptcha(HcaptchaToken);
+    if (!isHcaptchaValid) {
+      res.status(400).json({ error: 'Invalid hCaptcha token' });
       return;
     }
 
     try {
-      // Check if user already exists
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
         res.status(400).json({ error: 'User already exists' });
         return;
       }
 
-      // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create the user
       const user = await prisma.user.create({
         data: {
           email,

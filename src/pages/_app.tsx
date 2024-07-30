@@ -4,6 +4,8 @@ import '../app/globals.css';
 import '../lib/fontAwesome';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
+import Head from 'next/head';
+import Script from 'next/script';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const handleDragEnd = () => {
@@ -13,6 +15,13 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
       <DragDropContext onDragEnd={handleDragEnd}>
+        <Head>
+          <title>My App</title>
+        </Head>
+        <Script
+          src={`https://js.hcaptcha.com/1/api.js?render=${process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}`}
+          strategy="afterInteractive"
+        />
         <Component {...pageProps} />
         <Analytics />
       </DragDropContext>
