@@ -43,15 +43,18 @@ const SignUp = () => {
         body: JSON.stringify({ email, password, recaptchaToken }),
       });
 
+      const result = await response.json();
+
       if (response.status === 400) {
-        const result = await response.json();
         if (result.error === 'User already exists') {
           toast.error('There is already an account with this email. Please sign in!');
         } else {
           setErrorMessage(result.error);
         }
-      } else {
+      } else if (response.status === 201) {
         router.push('/signin');
+      } else {
+        setErrorMessage('An unknown error occurred. Please try again.');
       }
     }
   };

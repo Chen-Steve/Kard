@@ -1,3 +1,4 @@
+// utils/verifyHcaptcha.ts
 import axios from 'axios';
 
 const SECRET_KEY = process.env.HCAPTCHA_SECRET_KEY;

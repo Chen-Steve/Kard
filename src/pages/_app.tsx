@@ -12,6 +12,10 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     // Handle the drag end event
   };
 
+  const hcaptchaOnLoad = () => {
+    console.log('hCaptcha is ready.');
+  };
+
   return (
     <SessionProvider session={session}>
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -19,7 +23,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
           <title>My App</title>
         </Head>
         <Script
-          src={`https://js.hcaptcha.com/1/api.js?render=${process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}`}
+          src={`https://js.hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit&recaptchacompat=off`}
           strategy="afterInteractive"
         />
         <Component {...pageProps} />
