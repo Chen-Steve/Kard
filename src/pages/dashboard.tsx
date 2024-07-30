@@ -57,6 +57,7 @@ const Dashboard = () => {
       </header>
       <main className="flex-grow p-4">
         <Flashcard userId={user.id} />
+        <hr className="border-t-2 border-black w-1/2 mx-auto" />
       </main>
       <footer className="w-full bg-white-700 text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
