@@ -167,6 +167,25 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
     }
   };
 
+  const handleDeleteCard = async (id: string) => {
+    try {
+      const response = await fetch('/api/flashcard', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to delete flashcard: ${errorData.error}, ${errorData.details}`);
+      }
+      setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== id));
+      setError(null);
+    } catch (error) {
+      console.error('Error deleting flashcard:', error);
+      setError('Failed to delete flashcard. Please try again.');
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-3xl">
       <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlip} />
@@ -218,6 +237,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
           <FaPlus className="mr-2" /> Add Flashcard
         </button>
       </div>
+      <hr className="border-t-2 border-black w-1/2 mx-auto" />
 
       <div className="mt-2">
         <DragDropContext onDragEnd={handleDrop}>
@@ -237,6 +257,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
                           question={card.question}
                           answer={card.answer}
                           onSave={handleSaveCard}
+                          onDelete={handleDeleteCard}
                         />
                       </div>
                     )}
