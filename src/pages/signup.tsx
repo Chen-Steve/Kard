@@ -6,22 +6,15 @@ import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Hcaptcha from '../components/hCaptcha';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!recaptchaToken) {
-      toast.error('Please complete the hCaptcha');
-      return;
-    }
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -41,7 +34,7 @@ const SignUp = () => {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, recaptchaToken }),
+        body: JSON.stringify({ email, password }),
       });
 
       const result = await response.json();
@@ -101,7 +94,6 @@ const SignUp = () => {
               required
             />
           </div>
-          <Hcaptcha onChange={setRecaptchaToken} />
           <button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
