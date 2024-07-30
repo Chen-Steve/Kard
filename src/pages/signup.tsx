@@ -1,4 +1,3 @@
-// src/pages/signup.tsx
 import '../app/globals.css';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
@@ -11,14 +10,14 @@ import Hcaptcha from '../components/hCaptcha';
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [HcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!HcaptchaToken) {
+    if (!recaptchaToken) {
       toast.error('Please complete the hCaptcha');
       return;
     }
@@ -38,11 +37,10 @@ const SignUp = () => {
     } else {
       console.log('Account created successfully:', data.user);
 
-      // Create user in Prisma database
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, HcaptchaToken }),
+        body: JSON.stringify({ email, password, recaptchaToken }),
       });
 
       if (response.status === 400) {
@@ -99,7 +97,7 @@ const SignUp = () => {
               required
             />
           </div>
-          <Hcaptcha onChange={setHcaptchaToken} />
+          <Hcaptcha onChange={setRecaptchaToken} />
           <button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

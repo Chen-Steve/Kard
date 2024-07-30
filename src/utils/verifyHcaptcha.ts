@@ -1,4 +1,3 @@
-// utils/verifyHcaptcha.ts
 import axios from 'axios';
 
 const SECRET_KEY = process.env.HCAPTCHA_SECRET_KEY;
@@ -6,7 +5,6 @@ const SECRET_KEY = process.env.HCAPTCHA_SECRET_KEY;
 interface HcaptchaRequestBody {
   secret: string;
   response: string;
-  sitekey?: string;
 }
 
 interface HcaptchaResponse {

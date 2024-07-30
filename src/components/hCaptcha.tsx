@@ -1,3 +1,4 @@
+// components/hCaptcha.tsx
 import React from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
@@ -7,6 +8,11 @@ type HcaptchaProps = {
 
 const Hcaptcha: React.FC<HcaptchaProps> = ({ onChange }) => {
   const siteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || '';
+
+  if (!siteKey) {
+    console.error('Missing site key for hCaptcha');
+    return null;
+  }
 
   return (
     <HCaptcha

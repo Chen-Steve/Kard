@@ -1,4 +1,3 @@
-// pages/api/auth/signup.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
@@ -8,15 +7,15 @@ const prisma = new PrismaClient();
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { email, password, HcaptchaToken } = req.body;
+    const { email, password, recaptchaToken } = req.body;
 
-    if (!email || !password || !HcaptchaToken) {
+    if (!email || !password || !recaptchaToken) {
       res.status(400).json({ error: 'Email, password, and hCaptcha token are required' });
       return;
     }
 
-    const isHcaptchaValid = await verifyHcaptcha(HcaptchaToken);
-    if (!isHcaptchaValid) {
+    const isRecaptchaValid = await verifyHcaptcha(recaptchaToken);
+    if (!isRecaptchaValid) {
       res.status(400).json({ error: 'Invalid hCaptcha token' });
       return;
     }
