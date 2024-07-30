@@ -4,6 +4,7 @@ import KeyboardShortcuts from './KeyboardShortcuts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './EditFlashcard';
+import { debounce } from 'lodash';
 
 interface FlashcardProps {
   userId: string;
@@ -71,29 +72,37 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const handleAddCard = async () => {
     console.log('Adding card for userId:', userId);
+    const newCardOrder = flashcards.length;
+    const newCard = {
+      id: `temp-${newCardOrder}`,
+      question: 'Term',
+      answer: 'Definition',
+      order: newCardOrder,
+      userId: userId,
+    };
+
+    setFlashcards((prevFlashcards) => [...prevFlashcards, newCard]);
+    setCurrentCardIndex(flashcards.length);
+    setError(null);
+
     try {
-      const newCardOrder = flashcards.length;
       const response = await fetch('/api/flashcard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: 'Term',
-          answer: 'Definition',
-          order: newCardOrder,
-          userId: userId
-        }),
+        body: JSON.stringify(newCard),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
       }
-      const newCard = await response.json();
-      setFlashcards((prevFlashcards) => [...prevFlashcards, newCard]);
-      setCurrentCardIndex(flashcards.length);
-      setError(null);
+      const savedCard = await response.json();
+      setFlashcards((prevFlashcards) =>
+        prevFlashcards.map((card) => (card.id === newCard.id ? savedCard : card))
+      );
     } catch (error) {
       console.error('Error adding flashcard:', error);
       setError('Failed to add flashcard. Please try again.');
+      setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== newCard.id));
     }
   };
 
@@ -104,7 +113,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
     return flashcards[currentCardIndex];
   };
 
-  const handleSaveCard = async (id: string, updatedQuestion: string, updatedAnswer: string) => {
+  const debouncedSaveCard = debounce(async (id: string, updatedQuestion: string, updatedAnswer: string) => {
     const cardToUpdate = flashcards.find(card => card.id === id);
     if (!cardToUpdate) {
       setError('Flashcard not found');
@@ -134,6 +143,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       console.error('Error updating flashcard:', error);
       setError('Failed to update flashcard. Please try again.');
     }
+  }, 300);
+
+  const handleSaveCard = (id: string, updatedQuestion: string, updatedAnswer: string) => {
+    debouncedSaveCard(id, updatedQuestion, updatedAnswer);
   };
 
   const handleDrop = async (result: DropResult) => {
@@ -169,6 +182,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
   };
 
   const handleDeleteCard = async (id: string) => {
+    const originalFlashcards = [...flashcards];
+    setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== id));
+    setError(null);
+
     try {
       const response = await fetch('/api/flashcard', {
         method: 'DELETE',
@@ -179,11 +196,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
         const errorData = await response.json();
         throw new Error(`Failed to delete flashcard: ${errorData.error}, ${errorData.details}`);
       }
-      setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== id));
-      setError(null);
     } catch (error) {
       console.error('Error deleting flashcard:', error);
       setError('Failed to delete flashcard. Please try again.');
+      setFlashcards(originalFlashcards);
     }
   };
 
