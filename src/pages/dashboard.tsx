@@ -45,7 +45,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-300 flex flex-col">
       <header className="w-full bg-white-700 text-black p-4 flex justify-center items-center relative">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold mt-4">Dashboard</h1>
+          <h1 className="text-2xl font-semibold mt-4">WorkSpace</h1>
           <p>Welcome, {user.email}!</p>
         </div>
         <button
