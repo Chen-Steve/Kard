@@ -3,7 +3,6 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { v4 as uuidv4 } from 'uuid';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -13,14 +12,12 @@ const SignUp = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const avatarSeed = uuidv4(); // Generate a random seed for the avatar
-
+  
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
-
+  
     if (error) {
       console.error('Error creating account:', error.message);
       if (error.status === 429) {
@@ -30,12 +27,12 @@ const SignUp = () => {
       }
     } else if (data.user) {
       console.log('Account created successfully:', data.user);
-
+  
       try {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: data.user.id, email, password, avatarSeed }),
+          body: JSON.stringify({ id: data.user.id, email, password }),
         });
 
         if (!response.ok) {
@@ -55,7 +52,7 @@ const SignUp = () => {
       setErrorMessage('An unexpected error occurred. Please try again.');
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col items-center justify-center px-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
