@@ -12,22 +12,22 @@ const SignUp = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
-  
+
     if (error) {
-      console.error('Error creating account:', error.message);
-      if (error.status === 429) {
+      console.error('Error creating account:', (error as Error).message);
+      if ((error as any).status === 429) {
         setErrorMessage('Too many requests. Please try again later.');
       } else {
-        setErrorMessage(error.message);
+        setErrorMessage((error as Error).message);
       }
     } else if (data.user) {
       console.log('Account created successfully:', data.user);
-  
+
       try {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
@@ -36,6 +36,8 @@ const SignUp = () => {
         });
 
         if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error response from API:', errorData);
           throw new Error('Failed to create user in database');
         }
 
@@ -44,7 +46,7 @@ const SignUp = () => {
 
         router.push('/dashboard');
       } catch (error) {
-        console.error('Error creating user in database:', error);
+        console.error('Error creating user in database:', (error as Error).message);
         setErrorMessage('An error occurred while creating your account. Please try again.');
       }
     } else {

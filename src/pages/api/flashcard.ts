@@ -3,9 +3,9 @@ import prisma from '../../lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { question, answer, order, userId } = req.body;
+    const { question, answer, userId } = req.body;
 
-    if (!question || !answer || order === undefined || !userId) {
+    if (!question || !answer || !userId) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
@@ -17,11 +17,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
+      const flashcardCount = await prisma.flashcard.count({ where: { userId } });
+
       const newFlashcard = await prisma.flashcard.create({
         data: {
           question,
           answer,
-          order,
+          order: flashcardCount + 1,
           userId,
         },
       });
@@ -49,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'PUT') {
+    console.log('PUT request body:', req.body); // Add this line to log the request body
     const { id, question, answer, order } = req.body;
 
     if (!id || !question || !answer || order === undefined) {

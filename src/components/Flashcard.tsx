@@ -40,7 +40,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
         }
       }
       const data = await response.json();
-      setFlashcards(data);
+      setFlashcards(data.sort((a: Flashcard, b: Flashcard) => a.order - b.order));
       setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
@@ -72,7 +72,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
   const handleAddCard = async () => {
     console.log('Adding card for userId:', userId);
-    const newCardOrder = flashcards.length;
+    const newCardOrder = flashcards.length + 1; // Ensure order starts from 1
     const newCard = {
       id: `temp-${newCardOrder}`,
       question: 'Term',
@@ -160,7 +160,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
 
     const updatedWithOrder = updatedFlashcards.map((card, index) => ({
       ...card,
-      order: index,
+      order: index + 1, // Ensure order starts from 1
     }));
 
     try {
@@ -169,7 +169,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
           fetch('/api/flashcard', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: card.id, question: card.question, answer: card.answer, order: card.order }),
+            body: JSON.stringify({
+              id: card.id,
+              question: card.question,
+              answer: card.answer,
+              order: card.order,
+            }),
           })
         )
       );

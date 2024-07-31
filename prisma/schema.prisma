@@ -9,17 +9,22 @@ generator client {
 
 model User {
   id        String     @id
-  email     String     @unique
-  name      String?
-  password  String?
+  email     String     @unique @db.Text
+  name      String?    @db.Text
+  password  String?    @db.Text
+  avatarUrl String?    @db.Text @map("avatar_url")
   flashcards Flashcard[]
+
+  @@map("users")
 }
 
 model Flashcard {
   id        String   @id @default(uuid())
-  question  String
-  answer    String
+  question  String   @db.Text
+  answer    String   @db.Text
   order     Int
-  userId    String
+  userId    String   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("flashcards")
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import Flashcard from '../components/Flashcard';
+import Image from 'next/image';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -15,7 +16,18 @@ const Dashboard = () => {
       if (!session) {
         router.push('/signin');
       } else {
-        setUser(session.user);
+        // Fetch user data including avatarUrl
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user data:', error);
+        } else {
+          setUser(userData);
+        }
       }
     };
 
@@ -25,7 +37,22 @@ const Dashboard = () => {
       if (event === 'SIGNED_OUT') {
         router.push('/signin');
       } else {
-        setUser(session?.user || null);
+        // Fetch user data including avatarUrl
+        const fetchUserData = async () => {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session?.user.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching user data:', error);
+          } else {
+            setUser(userData);
+          }
+        };
+
+        fetchUserData();
       }
     });
 
@@ -44,9 +71,20 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col">
       <header className="w-full bg-white-700 text-black p-4 flex justify-center items-center relative">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold mt-4">WorkSpace</h1>
-          <p>Welcome, {user.email}!</p>
+        <div className="text-center flex items-center">
+          {user.avatarUrl && (
+            <Image
+              src={user.avatarUrl}
+              alt="User Avatar"
+              width={40}
+              height={40}
+              className="rounded-full mr-4"
+            />
+          )}
+          <div>
+            <h1 className="text-2xl font-semibold mt-4">WorkSpace</h1>
+            <p>Welcome, {user.email}!</p>
+          </div>
         </div>
         <button
           onClick={handleSignOut}

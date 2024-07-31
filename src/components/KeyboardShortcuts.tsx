@@ -8,6 +8,9 @@ interface KeyboardShortcutsProps {
 
 const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ onPrevious, onNext, onFlip }) => {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.target instanceof HTMLTextAreaElement) {
+      return; // Allow default behavior for text areas
+    }
     if (e.key === 'ArrowLeft') onPrevious();
     if (e.key === 'ArrowRight') onNext();
     if (e.key === ' ') {
