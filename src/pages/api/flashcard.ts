@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
-        res.status(404).json({ error: 'Not Found', details: 'User not found' });
+        res.status(404).json({ error: 'User not found' });
         return;
       }
 
@@ -70,8 +70,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('PUT flashcard error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
+  } else if (req.method === 'DELETE') {
+    const { id } = req.body;
+
+    if (!id) {
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
+    try {
+      await prisma.flashcard.delete({ where: { id } });
+      res.status(204).end();
+    } catch (error) {
+      console.error('DELETE flashcard error:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST', 'PUT']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
