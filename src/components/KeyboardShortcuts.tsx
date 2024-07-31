@@ -10,7 +10,10 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ onPrevious, onNex
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft') onPrevious();
     if (e.key === 'ArrowRight') onNext();
-    if (e.key === ' ') onFlip();
+    if (e.key === ' ') {
+      e.preventDefault();
+      onFlip();
+    }
   }, [onPrevious, onNext, onFlip]);
 
   useEffect(() => {
