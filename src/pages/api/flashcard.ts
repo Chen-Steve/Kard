@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -31,8 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('POST flashcard error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    } finally {
-      await prisma.$disconnect();
     }
   } else if (req.method === 'GET') {
     const userId = req.query.userId as string;
@@ -51,8 +47,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('GET flashcards error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    } finally {
-      await prisma.$disconnect();
     }
   } else if (req.method === 'PUT') {
     const { id, question, answer, order } = req.body;
@@ -75,8 +69,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('PUT flashcard error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    } finally {
-      await prisma.$disconnect();
     }
   } else {
     res.setHeader('Allow', ['GET', 'POST', 'PUT']);
