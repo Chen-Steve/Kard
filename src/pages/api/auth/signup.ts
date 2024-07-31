@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { id, email, password } = req.body;
+    const { id, email, password, avatarSeed } = req.body;
 
-    if (!id || !email || !password) {
-      res.status(400).json({ error: 'ID, email, and password are required' });
+    if (!id || !email || !password || !avatarSeed) {
+      res.status(400).json({ error: 'ID, email, password, and avatarSeed are required' });
       return;
     }
 
@@ -27,6 +27,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           id,
           email,
           password: hashedPassword,
+          avatarSeed,
         },
       });
 

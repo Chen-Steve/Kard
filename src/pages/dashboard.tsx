@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import Flashcard from '../components/Flashcard';
+import Avatar from '../components/Avatar';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -48,6 +49,7 @@ const Dashboard = () => {
           <h1 className="text-2xl font-semibold mt-4">WorkSpace</h1>
           <p>Welcome, {user.email}!</p>
         </div>
+        <Avatar seed={user.avatarSeed} />
         <button
           onClick={handleSignOut}
           className="bg-red-500 text-white px-2 py-2 rounded-md shadow-md hover:bg-red-700 transition absolute right-4 top-4"
