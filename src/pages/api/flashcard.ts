@@ -54,8 +54,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } finally {
       await prisma.$disconnect();
     }
+  } else if (req.method === 'PUT') {
+    const { id, question, answer, order } = req.body;
+
+    if (!id || !question || !answer || order === undefined) {
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
+    try {
+      const updatedFlashcard = await prisma.flashcard.update({
+        where: { id },
+        data: {
+          question,
+          answer,
+          order,
+        },
+      });
+      res.status(200).json(updatedFlashcard);
+    } catch (error) {
+      console.error('PUT flashcard error:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    } finally {
+      await prisma.$disconnect();
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
