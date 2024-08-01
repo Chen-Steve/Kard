@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import Flashcard from '../components/Flashcard';
-import Image from 'next/image';
+import UserAvatar from '../components/UserAvatar';
+import { getGravatarUrl } from '../utils/gravatar';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -26,6 +27,8 @@ const Dashboard = () => {
         if (error) {
           console.error('Error fetching user data:', error);
         } else {
+          console.log('Fetched user data:', userData); // Debug statement
+          userData.avatarUrl = getGravatarUrl(userData.email);
           setUser(userData);
         }
       }
@@ -48,6 +51,8 @@ const Dashboard = () => {
           if (error) {
             console.error('Error fetching user data:', error);
           } else {
+            console.log('Fetched user data:', userData); // Debug statement
+            userData.avatarUrl = getGravatarUrl(userData.email);
             setUser(userData);
           }
         };
@@ -70,21 +75,15 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col">
-      <header className="w-full bg-white-700 text-black p-4 flex justify-center items-center relative">
-        <div className="text-center flex items-center">
+      <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center relative">
+        <div className="absolute top-4 left-4 flex items-center">
           {user.avatarUrl && (
-            <Image
-              src={user.avatarUrl}
-              alt="User Avatar"
-              width={40}
-              height={40}
-              className="rounded-full mr-4"
-            />
+            <UserAvatar avatarUrl={user.avatarUrl} alt="User Avatar" />
           )}
-          <div>
-            <h1 className="text-2xl font-semibold mt-4">WorkSpace</h1>
-            <p>Welcome, {user.email}!</p>
-          </div>
+        </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center mt-12">
+          <h1 className="text-2xl font-bold mt-4">WorkSpace</h1>
+          <p>Welcome, {user.email}!</p>
         </div>
         <button
           onClick={handleSignOut}
@@ -93,7 +92,7 @@ const Dashboard = () => {
           Sign Out
         </button>
       </header>
-      <main className="flex-grow p-4">
+      <main className="flex-grow p-4 mt-10">
         <Flashcard userId={user.id} />
       </main>
       <footer className="w-full bg-white-700 text-black p-6 text-center">
