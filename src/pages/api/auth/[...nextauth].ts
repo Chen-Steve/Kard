@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../lib/prisma';
+import bcrypt from 'bcrypt';
 
 const options: NextAuthOptions = {
   providers: [
@@ -13,10 +14,11 @@ const options: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       authorize: async (credentials) => {
-        if (!credentials) {
-          console.error("No credentials provided");
+        if (!credentials || typeof credentials.email !== 'string' || typeof credentials.password !== 'string') {
+          console.error("Invalid credentials provided");
           return null;
         }
+
         try {
           const user = await authenticateUser(credentials.email, credentials.password);
           if (user) {
@@ -85,7 +87,8 @@ async function authenticateUser(email: string, password: string) {
       where: { email },
       select: { id: true, email: true, name: true, password: true },
     });
-    if (user && user.password === password) {
+
+    if (user && user.password && await bcrypt.compare(password, user.password)) {
       return user;
     } else {
       console.error("Invalid email or password");
