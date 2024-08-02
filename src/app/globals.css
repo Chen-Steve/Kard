@@ -149,7 +149,7 @@ nav {
   font-size: 1.5em; /* Reduced font size */
   line-height: 50px; /* Adjusted line-height */
   font-weight: 700;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
   cursor: pointer;
   padding: 0 10px; /* Reduced padding */
 }

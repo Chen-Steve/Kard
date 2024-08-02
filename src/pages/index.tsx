@@ -3,7 +3,6 @@
 import '../app/globals.css';
 import { FC } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
 
@@ -19,15 +18,18 @@ const HomePage: FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col relative">
+      <div className="absolute top-0 left-20 h-full border-l-2 border-black"></div>
       <header className="w-full text-white p-6 flex justify-center items-center">
         <nav className="flex space-x-20">
           <Link href="/" className="kard">Kard</Link>
           <div className="inner-nav hover:lighten-effect">
-            <Link href="/contact" className="nav-item text-white">Learn More</Link>
+            <Link href="/" className="nav-item text-white">Learn More</Link>
           </div>
         </nav>
       </header>
+
+      <hr className="border-t-2 border-black w-full" />
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">

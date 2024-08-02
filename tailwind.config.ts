@@ -16,6 +16,12 @@ const config: Config = {
       width: {
         '128': '32rem', // Example custom width
       },
+      spacing: {
+        '20': '5rem', // existing value
+        '30': '8rem', // new custom value
+        '40': '10rem', // new custom value
+        // Add more custom values as needed
+      },
     },
   },
   plugins: [],

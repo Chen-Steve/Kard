@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -30,7 +31,12 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="absolute top-20 left-20">
+        <Link href="/">
+          <FaArrowLeft className="text-white text-2xl" />
+        </Link>
+      </div>
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border-4 border-black">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Welcome Back to Kard</h1>
         {errorMessage && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
