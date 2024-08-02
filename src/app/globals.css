@@ -86,3 +86,100 @@ body {
 .wiggle-effect:hover {
   animation: wiggle 0.3s ease-in-out;
 }
+
+
+.-sticky {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 12px; /* Will stick at this point */
+  display: flex;
+  justify-content: center;
+}
+
+nav {
+  width: fit-content;
+  height: 60px; /* Increased height */
+  background: rgba(255, 255, 255, 0.5); /* Increased opacity for more white */
+  backdrop-filter: blur(10px); /* Blur effect for glass look */
+  border-radius: 30px; /* Adjusted border-radius for larger height */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+  padding: 0 10px; /* Reduced padding */
+  box-sizing: border-box;
+  z-index: 9999;
+  display: flex;
+  justify-content: center; /* Center items horizontally */
+  align-items: center;
+  margin: 0 auto; /* Center the nav element */
+}
+
+.inner-nav {
+  background: black;
+  border-radius: 30px;
+  padding: 0px 2px; /* Reduced padding */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inner-nav:hover {
+  background: #333; /* Slightly lighter background on hover */
+}
+
+.lighten-effect:hover .nav-item {
+  color: #e0e0e0; /* Slightly lighter text color on hover */
+}
+
+.nav-item {
+  color: black;
+  text-decoration: none;
+  text-transform: capitalize; /* Changed from uppercase to capitalize */
+  font-size: 1em; /* Reduced font size */
+  line-height: 50px; /* Adjusted line-height */
+  font-weight: 700;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  padding: 0 10px; /* Reduced padding */
+}
+
+.kard {
+  color: black;
+  text-decoration: none;
+  text-transform: uppercase; /* Changed from uppercase to capitalize */
+  font-size: 1.5em; /* Reduced font size */
+  line-height: 50px; /* Adjusted line-height */
+  font-weight: 700;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  padding: 0 10px; /* Reduced padding */
+}
+
+.nav-item:hover {
+  color: #f6f6f6;
+}
+
+/* 3d logo effect */
+.wiggle-effect {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+.nav-item-3d {
+  color: black;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1.25em; /* Slightly larger font size for emphasis */
+  font-weight: 700;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+  padding: 0 15px; /* Add padding to each item for spacing */
+  text-shadow: 1px 1px 0 #ccc, 2px 2px 0 #bbb, 3px 3px 0 #aaa, 4px 4px 0 #999, 5px 5px 0 #888;
+}
+
+.nav-item-3d:hover {
+  color: #f6f6f6;
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.text-white {
+  color: #ffffff;
+}

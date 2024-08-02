@@ -20,19 +20,22 @@ const HomePage: FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col">
-      <header className="w-full text-white p-6 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Image src="/logo.png" alt="Kard Logo" width={50} height={50} className="rounded-full wiggle-effect" />
-        </div>
+      <header className="w-full text-white p-6 flex justify-center items-center">
+        <nav className="flex space-x-20">
+          <Link href="/" className="kard">Kard</Link>
+          <div className="inner-nav hover:lighten-effect">
+            <Link href="/contact" className="nav-item text-white">Learn More</Link>
+          </div>
+        </nav>
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4">
+          <h1 className="text-5xl font-bold text-black mb-4">
             {text}
             <Cursor />
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-black-100 max-w-2xl mx-auto">
             Elevate your learning experience with custom flashcards. Create, manage, and master your knowledge.
           </p>
         </div>
@@ -40,7 +43,7 @@ const HomePage: FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
             <div
-              className="bg-purple-600 text-white px-6 py-3 rounded-md font-semibold shadow-lg shine-effect hover:bg-purple-700 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="bg-black text-white px-6 py-3 rounded-full font-semibold shadow-lg shine-effect hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleButtonClick}
             >
               Get Started
@@ -49,7 +52,7 @@ const HomePage: FC = () => {
         </div>
       </main>
 
-      <footer className="w-full text-white p-6 text-center">
+      <footer className="w-full text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
     </div>
