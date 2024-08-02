@@ -4,10 +4,11 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import Flashcard from '../components/Flashcard';
 import UserAvatar from '../components/UserAvatar';
-import { getGravatarUrl } from '../utils/gravatar';
+import { getMicahAvatarSvg } from '../utils/avatar';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const Dashboard = () => {
           console.error('Error fetching user data:', error);
         } else {
           console.log('Fetched user data:', userData); // Debug statement
-          userData.avatarUrl = getGravatarUrl(userData.email);
+          userData.avatarUrl = getMicahAvatarSvg(userData.email);
           setUser(userData);
         }
       }
@@ -52,7 +53,7 @@ const Dashboard = () => {
             console.error('Error fetching user data:', error);
           } else {
             console.log('Fetched user data:', userData); // Debug statement
-            userData.avatarUrl = getGravatarUrl(userData.email);
+            userData.avatarUrl = getMicahAvatarSvg(userData.email);
             setUser(userData);
           }
         };
@@ -76,21 +77,31 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col">
       <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center relative">
-        <div className="absolute top-4 left-4 flex items-center">
+        <div className="absolute top-4 right-4 flex items-center">
           {user.avatarUrl && (
-            <UserAvatar avatarUrl={user.avatarUrl} alt="User Avatar" />
+            <div className="relative">
+              <UserAvatar
+                avatarSvg={user.avatarUrl}
+                alt="User Avatar"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              />
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-4 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
         <div className="absolute inset-0 flex flex-col items-center justify-center mt-12">
           <h1 className="text-2xl font-bold mt-4">WorkSpace</h1>
           <p>Welcome, {user.email}!</p>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="bg-red-500 text-white px-2 py-2 rounded-md shadow-md hover:bg-red-700 transition absolute right-4 top-4"
-        >
-          Sign Out
-        </button>
       </header>
       <main className="flex-grow p-4 mt-10">
         <Flashcard userId={user.id} />

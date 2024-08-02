@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import prisma from '../../../lib/prisma';
-import { getGravatarUrl } from '../../../utils/gravatar';
+import { getMicahAvatarSvg } from '../../../utils/avatar';
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -26,15 +26,15 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Generate Gravatar URL
-      const avatarUrl = getGravatarUrl(email);
+      // Generate Micah avatar SVG with email as seed
+      const avatarSvg = getMicahAvatarSvg(email);
 
       const user = await prisma.user.create({
         data: {
           id,
           email,
           password: hashedPassword,
-          avatarUrl,
+          avatarUrl: avatarSvg,
         },
       });
 

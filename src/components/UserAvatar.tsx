@@ -1,18 +1,15 @@
-// components/UserAvatar.tsx
-import Image from 'next/image';
-
 interface UserAvatarProps {
-  avatarUrl: string;
+  avatarSvg: string;
   alt: string;
+  onClick?: () => void;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ avatarUrl, alt }) => (
-  <Image
-    src={avatarUrl}
-    alt={alt}
-    width={50} // or the desired width
-    height={50} // or the desired height
-    className="rounded-full"
+const UserAvatar: React.FC<UserAvatarProps> = ({ avatarSvg, alt, onClick }) => (
+  <div
+    onClick={onClick}
+    dangerouslySetInnerHTML={{ __html: avatarSvg }}
+    aria-label={alt}
+    className="rounded-full w-12 h-12 cursor-pointer"
   />
 );
 
