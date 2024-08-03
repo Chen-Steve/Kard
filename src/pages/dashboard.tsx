@@ -8,6 +8,7 @@ import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
 import { RiTimerFill, RiMenu4Fill  } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
+import NavMenu from '../components/NavMenu';
 
 
 
@@ -96,9 +97,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col">
       <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center relative">
-        <button className="absolute top-4 left-4 p-2" aria-label="Menu">
-        <RiMenu4Fill className="text-4xl text-black" />
-        </button>
+        <NavMenu />
         <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>

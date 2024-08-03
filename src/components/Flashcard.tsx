@@ -5,6 +5,8 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './EditFlashcard';
 import { debounce } from 'lodash';
+import { toast } from 'react-toastify';
+import { MdSettings } from "react-icons/md";
 
 interface FlashcardProps {
   userId: string;
@@ -103,7 +105,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       );
     } catch (error) {
       console.error('Error adding flashcard:', error);
-      setError('Failed to add flashcard. Please try again.');
+      toast.error('Failed to add flashcard. Please try again.');
       setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== newCard.id));
     }
   };
@@ -227,7 +229,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
             <p className="text-xl text-gray-500">No cards</p>
           )}
         </div>
-        <div className="flex items-center">
+        <div className="flex justify-end w-full mt-0">
+          <MdSettings className="text-3xl text-gray-600 cursor-pointer" />
+        </div>
+        <div className="flex items-center mt-0">
           <button
             type="button"
             onClick={handlePrevious}

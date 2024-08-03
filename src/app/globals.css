@@ -158,43 +158,6 @@ nav {
   color: #f6f6f6;
 }
 
-/* 3d logo effect */
-.wiggle-effect {
-  animation: wiggle 1s ease-in-out infinite;
-}
-
-.nav-item-3d {
-  color: black;
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 1.25em; /* Slightly larger font size for emphasis */
-  font-weight: 700;
-  transition: color 0.3s ease, transform 0.3s ease;
-  cursor: pointer;
-  padding: 0 15px; /* Add padding to each item for spacing */
-  text-shadow: 1px 1px 0 #ccc, 2px 2px 0 #bbb, 3px 3px 0 #aaa, 4px 4px 0 #999, 5px 5px 0 #888;
-}
-
-.nav-item-3d:hover {
-  color: #f6f6f6;
-  transform: translateY(-2px); /* Slight lift effect on hover */
-}
-
 .text-white {
   color: #ffffff;
-}
-
-.fixed-button {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background-color: #1f2937; /* Tailwind's gray-800 */
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px; /* Full rounded */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  z-index: 1000; /* Ensure it stays above other elements */
 }

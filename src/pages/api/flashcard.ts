@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
+import { toast } from 'react-toastify';
 
 async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number = 1000): Promise<T> {
   let lastError: Error | null = null;
@@ -48,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(201).json(newFlashcard);
     } catch (error) {
       console.error('POST flashcard error:', error);
+      toast.error('Internal Server Error: ' + (error as Error).message);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'GET') {
@@ -66,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(flashcards);
     } catch (error) {
       console.error('GET flashcards error:', error);
+      toast.error('Internal Server Error: ' + (error as Error).message);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'PUT') {
@@ -89,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(updatedFlashcard);
     } catch (error) {
       console.error('PUT flashcard error:', error);
+      toast.error('Internal Server Error: ' + (error as Error).message);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {
@@ -104,6 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(204).end();
     } catch (error) {
       console.error('DELETE flashcard error:', error);
+      toast.error('Internal Server Error: ' + (error as Error).message);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else {

@@ -27,7 +27,7 @@ const HomePage: FC = () => {
       <div className="absolute top-0 left-20 h-full border-l-2 border-black"></div>
       <header className="w-full text-white p-6 flex justify-center items-center">
         <nav className="flex space-x-20">
-          <Link href="/" className="kard">Kard</Link>
+          <Link href="/" className="kard wiggle-effect">Kard</Link>
           <div className="inner-nav hover:lighten-effect">
             <Link href="/" className="nav-item text-white">Learn More</Link>
           </div>
