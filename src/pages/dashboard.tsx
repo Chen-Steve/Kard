@@ -5,7 +5,7 @@ import supabase from '../lib/supabaseClient';
 import UserAvatar from '../components/UserAvatar';
 import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
-import { RiTimerFill, RiMenu4Fill  } from "react-icons/ri";
+import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
@@ -134,21 +134,29 @@ const Dashboard = () => {
         </div>
       </header>
       <main className="flex-grow p-4 mt-12">
-        <div className="flex justify-center space-x-4 mb-2">
-          <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
-            <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-            <span className="text-xl font-semibold mb-1">Learn</span>
-          </button>
-          <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
-            <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-            <span className="text-xl font-semibold mb-1">Test</span>
-          </button>
-          <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
-            <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-            <span className="text-xl font-semibold mb-1">Match</span>
-          </button>
-        </div>
-        {selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} />}
+        {decks.length > 0 && (
+          <div className="flex justify-center space-x-4 mb-2">
+            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+              <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+              <span className="text-xl font-semibold mb-1">Learn</span>
+            </button>
+            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+              <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
+              <span className="text-xl font-semibold mb-1">Test</span>
+            </button>
+            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+              <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
+              <span className="text-xl font-semibold mb-1">Match</span>
+            </button>
+          </div>
+        )}
+        {decks.length === 0 ? (
+          <div className="flex justify-center mt-20 items-center h-full">
+            <p className="text-xl font-semibold text-gray-700">Go to your library and create some decks!</p>
+          </div>
+        ) : (
+          selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} />
+        )}
       </main>
       <footer className="w-full bg-white-700 text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
