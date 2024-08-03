@@ -2,19 +2,19 @@ import '../app/globals.css';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
-import Flashcard from '../components/Flashcard';
 import UserAvatar from '../components/UserAvatar';
 import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
 import { RiTimerFill, RiMenu4Fill  } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import NavMenu from '../components/NavMenu';
-
-
+import FlashcardComponent from '../components/Flashcard';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [decks, setDecks] = useState<any[]>([]);
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +25,6 @@ const Dashboard = () => {
       if (!session) {
         router.push('/signin');
       } else {
-        // Fetch user data including avatarUrl
         const { data: userData, error } = await supabase
           .from('users')
           .select('*')
@@ -35,9 +34,22 @@ const Dashboard = () => {
         if (error) {
           console.error('Error fetching user data:', error);
         } else {
-          console.log('Fetched user data:', userData); // Debug statement
           userData.avatarUrl = getMicahAvatarSvg(userData.email);
           setUser(userData);
+        }
+
+        const { data: decksData, error: decksError } = await supabase
+          .from('decks')
+          .select('*')
+          .eq('userId', session.user.id);
+
+        if (decksError) {
+          console.error('Error fetching decks:', decksError);
+        } else {
+          setDecks(decksData);
+          if (decksData.length > 0) {
+            setSelectedDeckId(decksData[0].id);
+          }
         }
       }
     };
@@ -48,7 +60,6 @@ const Dashboard = () => {
       if (event === 'SIGNED_OUT') {
         router.push('/signin');
       } else {
-        // Fetch user data including avatarUrl
         const fetchUserData = async () => {
           const { data: userData, error } = await supabase
             .from('users')
@@ -59,7 +70,6 @@ const Dashboard = () => {
           if (error) {
             console.error('Error fetching user data:', error);
           } else {
-            console.log('Fetched user data:', userData); // Debug statement
             userData.avatarUrl = getMicahAvatarSvg(userData.email);
             setUser(userData);
           }
@@ -138,7 +148,7 @@ const Dashboard = () => {
             <span className="text-xl font-semibold mb-1">Match</span>
           </button>
         </div>
-        <Flashcard userId={user.id} />
+        {selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} />}
       </main>
       <footer className="w-full bg-white-700 text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>

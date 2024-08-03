@@ -14,6 +14,7 @@ model User {
   password  String?    @db.Text
   avatarUrl String?    @db.Text @map("avatar_url")
   flashcards Flashcard[]
+  decks      Deck[]
 
   @@map("users")
 }
@@ -25,6 +26,20 @@ model Flashcard {
   order     Int
   userId    String   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deckId    String
 
   @@map("flashcards")
+}
+
+model Deck {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+  flashcards  Flashcard[]
 }

@@ -10,6 +10,8 @@ import { MdSettings } from "react-icons/md";
 
 interface FlashcardProps {
   userId: string;
+  deckId: string;
+  decks: Deck[]; // New prop for decks
 }
 
 interface Flashcard {
@@ -19,17 +21,24 @@ interface Flashcard {
   order: number;
 }
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
+interface Deck {
+  id: string;
+  name: string;
+}
+
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [] }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true); // New state for toggling definitions
   const [showList, setShowList] = useState(true); // New state for toggling list visibility
+  const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
+  const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
 
   const fetchFlashcards = useCallback(async () => {
     try {
-      const response = await fetch(`/api/flashcard?userId=${userId}`);
+      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${selectedDeckId}`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Flashcards not found for this user');
@@ -50,7 +59,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
     }
-  }, [userId]);
+  }, [userId, selectedDeckId]);
 
   useEffect(() => {
     fetchFlashcards();
@@ -83,6 +92,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       answer: 'Definition',
       order: newCardOrder,
       userId: userId,
+      deckId: selectedDeckId, // Include deckId
     };
 
     setFlashcards((prevFlashcards) => [...prevFlashcards, newCard]);
@@ -147,42 +157,30 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       console.error('Error updating flashcard:', error);
       setError('Failed to update flashcard. Please try again.');
     }
-  }, 300);
-
-  const handleSaveCard = (id: string, updatedQuestion: string, updatedAnswer: string) => {
-    debouncedSaveCard(id, updatedQuestion, updatedAnswer);
-  };
+  }, 500);
 
   const handleDrop = async (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
+    if (!result.destination) return;
 
-    const updatedFlashcards = Array.from(flashcards);
-    const [removed] = updatedFlashcards.splice(result.source.index, 1);
-    updatedFlashcards.splice(result.destination.index, 0, removed);
+    const reorderedFlashcards = Array.from(flashcards);
+    const [movedCard] = reorderedFlashcards.splice(result.source.index, 1);
+    reorderedFlashcards.splice(result.destination.index, 0, movedCard);
 
-    const updatedWithOrder = updatedFlashcards.map((card, index) => ({
+    const updatedWithOrder = reorderedFlashcards.map((card, index) => ({
       ...card,
-      order: index + 1, // Ensure order starts from 1
+      order: index + 1,
     }));
 
+    setFlashcards(updatedWithOrder);
+
     try {
-      await Promise.all(
-        updatedWithOrder.map((card) =>
-          fetch('/api/flashcard', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: card.id,
-              question: card.question,
-              answer: card.answer,
-              order: card.order,
-            }),
-          })
-        )
-      );
-      setFlashcards(updatedWithOrder);
+      await Promise.all(updatedWithOrder.map(card => 
+        fetch('/api/flashcard', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(card),
+        })
+      ));
       setError(null);
     } catch (error) {
       console.error('Error updating flashcard order:', error);
@@ -229,7 +227,38 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
             <p className="text-xl text-gray-500">No cards</p>
           )}
         </div>
-        <div className="flex justify-end w-full mt-0">
+        <div className="flex justify-between w-full mt-0">
+          <div className="flex items-center">
+            <button
+              onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
+              className="bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Select Deck
+            </button>
+            {isDeckSelectVisible && (
+              <>
+                <label htmlFor="deck-select" className="sr-only">Select Deck</label>
+                <select
+                  id="deck-select"
+                  value={selectedDeckId}
+                  onChange={(e) => setSelectedDeckId(e.target.value)}
+                  className="p-2 border border-gray-300 rounded ml-2"
+                >
+                  {decks.length > 0 ? (
+                    decks.map((deck) => (
+                      <option key={deck.id} value={deck.id}>
+                        {deck.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>
+                      No decks available
+                    </option>
+                  )}
+                </select>
+              </>
+            )}
+          </div>
           <MdSettings className="text-3xl text-gray-600 cursor-pointer" />
         </div>
         <div className="flex items-center mt-0">
@@ -291,7 +320,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
                             id={card.id}
                             question={card.question}
                             answer={showDefinitions ? card.answer : ''}
-                            onSave={handleSaveCard}
+                            onSave={debouncedSaveCard}
                             onDelete={handleDeleteCard}
                           />
                         </div>
@@ -306,7 +335,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
         </div>
       )}
 
-      {/* Conditional rendering of the button */}
       {flashcards.length > 0 && (
         <button
           onClick={() => setShowDefinitions(!showDefinitions)}

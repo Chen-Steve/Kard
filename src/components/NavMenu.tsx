@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RiMenu4Fill } from "react-icons/ri";
 import { FaFolderOpen } from "react-icons/fa";
+import Link from 'next/link';
 
 const NavMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +38,9 @@ const NavMenu = () => {
           {isOpen && (
             <div className="flex items-center text-black">
               <FaFolderOpen className="text-2xl" />
-              <span className="ml-2 text-xl">Your Library</span>
+              <Link href="/decks" className="ml-2 text-xl">
+                Your Library
+              </Link>
             </div>
           )}
           {/* Add more sidebar content here */}

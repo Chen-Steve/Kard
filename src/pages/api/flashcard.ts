@@ -22,9 +22,9 @@ async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { question, answer, userId } = req.body;
+    const { question, answer, userId, deckId } = req.body;
 
-    if (!question || !answer || !userId) {
+    if (!question || !answer || !userId || !deckId) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
-      const flashcardCount = await retry(() => prisma.flashcard.count({ where: { userId } }));
+      const flashcardCount = await retry(() => prisma.flashcard.count({ where: { deckId } }));
 
       const newFlashcard = await retry(() => prisma.flashcard.create({
         data: {
@@ -44,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           answer,
           order: flashcardCount + 1,
           userId,
+          deckId,
         },
       }));
       res.status(201).json(newFlashcard);
@@ -53,16 +54,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'GET') {
-    const userId = req.query.userId as string;
+    const { userId, deckId } = req.query;
 
-    if (!userId) {
-      res.status(400).json({ error: 'Bad Request', details: 'userId is required' });
+    if (!userId || !deckId) {
+      res.status(400).json({ error: 'Bad Request', details: 'userId and deckId are required' });
       return;
     }
 
     try {
       const flashcards = await retry(() => prisma.flashcard.findMany({
-        where: { userId },
+        where: { userId: userId as string, deckId: deckId as string },
         orderBy: { order: 'asc' },
       }));
       res.status(200).json(flashcards);
