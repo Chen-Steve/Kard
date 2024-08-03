@@ -183,3 +183,18 @@ nav {
 .text-white {
   color: #ffffff;
 }
+
+.fixed-button {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: #1f2937; /* Tailwind's gray-800 */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px; /* Full rounded */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000; /* Ensure it stays above other elements */
+}

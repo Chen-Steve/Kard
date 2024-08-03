@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
@@ -22,6 +22,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDefinitions, setShowDefinitions] = useState(true); // New state for toggling definitions
 
   const fetchFlashcards = useCallback(async () => {
     try {
@@ -213,9 +214,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlip} />
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <div className="flex flex-col items-center mb-8">
-        <h2 className="text-2xl font-bold mb-4">Flashcards</h2>
         <div
-          className="w-128 h-64 bg-white shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+          className="w-184 h-88 bg-white shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
           onClick={handleFlip}
         >
           {getCurrentCard() ? (
@@ -223,7 +223,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
               {isFlipped ? getCurrentCard()?.answer : getCurrentCard()?.question}
             </p>
           ) : (
-            <p className="text-xl text-gray-500">No cards available</p>
+            <p className="text-xl text-gray-500">No cards</p>
           )}
         </div>
         <div className="flex items-center">
@@ -254,7 +254,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
       <div className="flex space-x-4">
         <button
           onClick={handleAddCard}
-          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
+          className="bg-[#1B2B4F] text-white px-4 py-2 rounded flex items-center"
         >
           <FaPlus className="mr-2" /> Add Flashcard
         </button>
@@ -277,7 +277,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
                         <EditFlashcard
                           id={card.id}
                           question={card.question}
-                          answer={card.answer}
+                          answer={showDefinitions ? card.answer : ''}
                           onSave={handleSaveCard}
                           onDelete={handleDeleteCard}
                         />
@@ -291,6 +291,17 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
           </Droppable>
         </DragDropContext>
       </div>
+
+      {/* Conditional rendering of the button */}
+      {flashcards.length > 0 && (
+        <button
+          onClick={() => setShowDefinitions(!showDefinitions)}
+          className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg flex items-center"
+        >
+          {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
+          {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
+        </button>
+      )}
     </div>
   );
 };
