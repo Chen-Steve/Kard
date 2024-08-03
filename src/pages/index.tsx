@@ -5,6 +5,7 @@ import { FC } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
+import { RiFeedbackFill } from "react-icons/ri";
 
 const HomePage: FC = () => {
   const handleButtonClick = () => {
@@ -63,9 +64,10 @@ const HomePage: FC = () => {
       </footer>
 
       <button
-        className="fixed bottom-4 right-4 bg-white text-black text-bold px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition duration-300"
+        className="fixed bottom-4 right-4 bg-white text-black text-md font-bold px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition duration-300 flex items-center"
         onClick={handleSupportClick}
       >
+        <RiFeedbackFill className="mr-2" />
         Feedback
       </button>
     </div>
