@@ -1,6 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
 
+async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number = 1000): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Retrying due to error: ${lastError.message}`);
+      if (i < retries - 1) {
+        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { question, answer, userId } = req.body;
@@ -17,16 +35,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
-      const flashcardCount = await prisma.flashcard.count({ where: { userId } });
+      const flashcardCount = await retry(() => prisma.flashcard.count({ where: { userId } }));
 
-      const newFlashcard = await prisma.flashcard.create({
+      const newFlashcard = await retry(() => prisma.flashcard.create({
         data: {
           question,
           answer,
           order: flashcardCount + 1,
           userId,
         },
-      });
+      }));
       res.status(201).json(newFlashcard);
     } catch (error) {
       console.error('POST flashcard error:', error);
@@ -41,10 +59,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const flashcards = await prisma.flashcard.findMany({
+      const flashcards = await retry(() => prisma.flashcard.findMany({
         where: { userId },
         orderBy: { order: 'asc' },
-      });
+      }));
       res.status(200).json(flashcards);
     } catch (error) {
       console.error('GET flashcards error:', error);
@@ -60,14 +78,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const updatedFlashcard = await prisma.flashcard.update({
+      const updatedFlashcard = await retry(() => prisma.flashcard.update({
         where: { id },
         data: {
           question,
           answer,
           order,
         },
-      });
+      }));
       res.status(200).json(updatedFlashcard);
     } catch (error) {
       console.error('PUT flashcard error:', error);
@@ -82,7 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      await prisma.flashcard.delete({ where: { id } });
+      await retry(() => prisma.flashcard.delete({ where: { id } }));
       res.status(204).end();
     } catch (error) {
       console.error('DELETE flashcard error:', error);

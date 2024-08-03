@@ -16,7 +16,7 @@ type ShirtType = 'collared' | 'crew' | 'open';
 interface MicahOptions {
   seed: string;
   flip?: boolean;
-  rotate?: number;
+  //rotate?: number;
   scale?: number;
   radius?: number;
   size?: number;
@@ -57,7 +57,7 @@ interface MicahOptions {
 const backgroundColors: string[] = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"];
 const randomOptions: Omit<MicahOptions, 'seed'> = {
   flip: getRandomValue([true, false]),
-  rotate: getRandomValue([0, 90, 180, 270]),
+  //rotate: getRandomValue([0, 90, 180, 270]),
   scale: getRandomValue([100]),
   radius: getRandomValue([30]),
   size: getRandomValue([64]),

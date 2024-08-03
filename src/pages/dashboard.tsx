@@ -77,7 +77,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col">
       <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center relative">
-        <div className="absolute top-4 right-4 flex items-center">
+        <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
             <div className="relative">
               <UserAvatar
