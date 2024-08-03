@@ -11,6 +11,10 @@ const HomePage: FC = () => {
     trackEvent.track('button_click', { label: 'Get Started' });
   };
 
+  const handleSupportClick = () => {
+    window.open('https://forms.gle/bP14r8vtGhmj8s7S7', '_blank');
+  };
+
   const [text] = useTypewriter({
     words: ['Welcome to Kard', 'Elevate your learning', 'Create, manage, master'],
     loop: true,
@@ -57,6 +61,13 @@ const HomePage: FC = () => {
       <footer className="w-full text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
+
+      <button
+        className="fixed bottom-4 right-4 bg-white text-black text-bold px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition duration-300"
+        onClick={handleSupportClick}
+      >
+        Feedback
+      </button>
     </div>
   );
 };
