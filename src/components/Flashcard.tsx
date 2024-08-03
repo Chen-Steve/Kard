@@ -23,6 +23,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true); // New state for toggling definitions
+  const [showList, setShowList] = useState(true); // New state for toggling list visibility
 
   const fetchFlashcards = useCallback(async () => {
     try {
@@ -251,46 +252,54 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId }) => {
         </div>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex justify-between space-x-4">
         <button
           onClick={handleAddCard}
           className="bg-[#1B2B4F] text-white px-4 py-2 rounded flex items-center"
         >
           <FaPlus className="mr-2" /> Add Flashcard
         </button>
+        <button
+          onClick={() => setShowList(!showList)}
+          className="bg-[#1B2B4F] text-white px-4 py-2 rounded flex items-center"
+        >
+          {showList ? 'Hide List' : 'Show List'}
+        </button>
       </div>
-      <hr className="border-t-2 border-black w-1/2 mx-auto" />
+      <hr className="border-t-2 border-black w-full mx-auto mt-2" />
 
-      <div className="mt-2">
-        <DragDropContext onDragEnd={handleDrop}>
-          <Droppable droppableId="flashcards">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {flashcards.map((card, index) => (
-                  <Draggable key={card.id} draggableId={card.id} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <EditFlashcard
-                          id={card.id}
-                          question={card.question}
-                          answer={showDefinitions ? card.answer : ''}
-                          onSave={handleSaveCard}
-                          onDelete={handleDeleteCard}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </div>
+      {showList && (
+        <div className="mt-2">
+          <DragDropContext onDragEnd={handleDrop}>
+            <Droppable droppableId="flashcards">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {flashcards.map((card, index) => (
+                    <Draggable key={card.id} draggableId={card.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <EditFlashcard
+                            id={card.id}
+                            question={card.question}
+                            answer={showDefinitions ? card.answer : ''}
+                            onSave={handleSaveCard}
+                            onDelete={handleDeleteCard}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+      )}
 
       {/* Conditional rendering of the button */}
       {flashcards.length > 0 && (
