@@ -23,8 +23,8 @@ const HomePage: FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col relative">
-      <div className="absolute top-0 left-20 h-full border-l-2 border-black"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-white flex flex-col relative">
+      <div className="hidden md:block absolute top-0 left-20 h-full border-l-2 border-black"></div>
       <header className="w-full text-white p-6 flex justify-center items-center">
         <nav className="flex space-x-20">
           <Link href="/" className="kard wiggle-effect">Kard</Link>
@@ -34,7 +34,7 @@ const HomePage: FC = () => {
         </nav>
       </header>
 
-      <hr className="border-t-2 border-black w-full" />
+      <hr className="hidden md:block border-t-2 border-black w-full" />
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">
