@@ -9,7 +9,6 @@ import Spinner from '../components/Spinner'; // Import Spinner component
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // Add loading state
@@ -39,7 +38,7 @@ const SignUp = () => {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: data.user.id, email, password, rememberMe }),
+          body: JSON.stringify({ id: data.user.id, email, password }),
         });
 
         if (!response.ok) {
@@ -120,18 +119,6 @@ const SignUp = () => {
                     {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="rememberMe"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-black">
-                  Remember me for 30 days
-                </label>
               </div>
               <button
                 type="submit"
