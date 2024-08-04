@@ -136,7 +136,10 @@ const Dashboard = () => {
       <main className="flex-grow p-4 mt-12">
         {decks.length > 0 && (
           <div className="flex justify-center space-x-4 mb-2">
-            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+            <button
+              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              disabled
+            >
               <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
               <span className="text-xl font-semibold mb-1">Learn</span>
             </button>

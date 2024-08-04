@@ -1,55 +1,80 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
 
-const config: Config = {
+const config = {
+  darkMode: ["class"],
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+	],
+  prefix: "",
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
-      width: {
-        '42': '10.5rem',
-        '50': '12.5rem',
-        '128': '32rem', 
-        '144': '36rem', 
-        '160': '40rem', 
-        '176': '44rem',
-        '184': '46rem',
-        '192': '48rem', 
-        '208': '52rem', 
-        '224': '56rem', 
-        '240': '60rem', 
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
-      height: {
-        '50': '12.5rem',
-        '55': '13.75rem',
-        '64': '16rem',
-        '80': '20rem',
-        '88': '22rem',
-        '96': '24rem',
-        '112': '28rem',
-        '128': '32rem', 
-        '144': '36rem', 
-        '160': '40rem', 
-        '176': '44rem', 
-        '192': '48rem', 
-        '208': '52rem', 
-        '224': '56rem', 
-        '240': '60rem', 
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
-      spacing: {
-        '20': '5rem', 
-        '30': '8rem', 
-        '40': '10rem', 
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [],
-};
-export default config;
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config
+
+export default config

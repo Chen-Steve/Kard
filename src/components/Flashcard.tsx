@@ -11,7 +11,7 @@ import { MdSettings } from "react-icons/md";
 interface FlashcardProps {
   userId: string;
   deckId: string;
-  decks: Deck[]; // New prop for decks
+  decks: Deck[];
 }
 
 interface Flashcard {
@@ -223,22 +223,22 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <div className="flex flex-col items-center mb-8">
         <div
-          className="w-184 h-88 bg-white shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+          className="w-full h-96 bg-card shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
           onClick={handleFlip}
         >
           {getCurrentCard() ? (
-            <p className="text-2xl font-semibold">
+            <p className="text-2xl font-semibold text-card-foreground">
               {isFlipped ? getCurrentCard()?.answer : getCurrentCard()?.question}
             </p>
           ) : (
-            <p className="text-xl text-gray-500">No cards</p>
+            <p className="text-xl text-muted-foreground">No cards</p>
           )}
         </div>
         <div className="flex justify-between w-full mt-0">
           <div className="flex items-center">
             <button
               onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
-              className="bg-gray-600 text-white px-2 py-2 rounded"
+              className="bg-primary text-primary-foreground px-2 py-2 rounded"
             >
               Select Deck
             </button>
@@ -251,13 +251,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                     placeholder="Search decks..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-1 ml-2 border-2 border-gray-500 rounded"
+                    className="p-1 ml-2 border-2 border-input rounded"
                   />
                   <select
                     id="deck-select"
                     value={selectedDeckId}
                     onChange={(e) => setSelectedDeckId(e.target.value)}
-                    className="p-1 border-2 border-gray-500 rounded"
+                    className="p-1 border-2 border-input rounded"
                   >
                     {filteredDecks.length > 0 ? (
                       filteredDecks.map((deck) => (
@@ -275,7 +275,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               </>
             )}
           </div>
-          <MdSettings className="text-3xl text-gray-600 cursor-pointer" />
+          <MdSettings className="text-3xl text-muted-foreground cursor-pointer" />
         </div>
         <div className="flex items-center mt-0">
           <button
@@ -287,7 +287,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           >
             <FaChevronLeft />
           </button>
-          <span className="text-lg">
+          <span className="text-lg text-foreground">
             {getCurrentCard() ? `${currentCardIndex + 1} / ${flashcards.length}` : '0 / 0'}
           </span>
           <button
@@ -305,18 +305,18 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       <div className="flex justify-between space-x-4">
         <button
           onClick={handleAddCard}
-          className="bg-[#1B2B4F] text-white px-4 py-2 rounded flex items-center"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded flex items-center"
         >
           <FaPlus className="mr-2" /> Add Flashcard
         </button>
         <button
           onClick={() => setShowList(!showList)}
-          className="bg-[#1B2B4F] text-white px-4 py-2 rounded flex items-center"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded flex items-center"
         >
           {showList ? 'Hide List' : 'Show List'}
         </button>
       </div>
-      <hr className="border-t-2 border-black w-full mx-auto mt-2" />
+      <hr className="border-t-2 border-border w-full mx-auto mt-2" />
 
       {showList && (
         <div className="mt-2">
@@ -354,7 +354,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       {flashcards.length > 0 && (
         <button
           onClick={() => setShowDefinitions(!showDefinitions)}
-          className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg flex items-center"
+          className="fixed bottom-4 right-4 bg-muted text-muted-foreground px-4 py-2 rounded-full shadow-lg flex items-center"
         >
           {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
           {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
