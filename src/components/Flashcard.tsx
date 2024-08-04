@@ -31,8 +31,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDefinitions, setShowDefinitions] = useState(true); // New state for toggling definitions
-  const [showList, setShowList] = useState(true); // New state for toggling list visibility
+  const [showDefinitions, setShowDefinitions] = useState(true); 
+  const [showList, setShowList] = useState(true);
   const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
   const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +58,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         }
       }
       const data = await response.json();
-      setFlashcards(data.sort((a: Flashcard, b: Flashcard) => a.order - b.order));
+      setFlashcards(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
@@ -179,13 +179,15 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     setFlashcards(updatedWithOrder);
 
     try {
-      await Promise.all(updatedWithOrder.map(card => 
-        fetch('/api/flashcard', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(card),
-        })
-      ));
+      const response = await fetch('/api/flashcard', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flashcards: updatedWithOrder }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update flashcards: ${errorData.error}, ${errorData.details}`);
+      }
       setError(null);
     } catch (error) {
       console.error('Error updating flashcard order:', error);
@@ -236,7 +238,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           <div className="flex items-center">
             <button
               onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
-              className="bg-gray-600 text-white px-4 py-2 rounded"
+              className="bg-gray-600 text-white px-2 py-2 rounded"
             >
               Select Deck
             </button>

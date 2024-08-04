@@ -62,10 +62,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const flashcards = await retry(() => prisma.flashcard.findMany({
-        where: { userId: userId as string, deckId: deckId as string },
+      const flashcards = await prisma.flashcard.findMany({
+        where: { userId: String(userId), deckId: String(deckId) },
         orderBy: { order: 'asc' },
-      }));
+      });
       res.status(200).json(flashcards);
     } catch (error) {
       console.error('GET flashcards error:', error);
@@ -112,8 +112,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       toast.error('Internal Server Error: ' + (error as Error).message);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
+  } else if (req.method === 'PATCH') {
+    const { flashcards } = req.body;
+
+    if (!Array.isArray(flashcards) || flashcards.length === 0) {
+      res.status(400).json({ error: 'Invalid flashcards data' });
+      return;
+    }
+
+    try {
+      const updatePromises = flashcards.map(card =>
+        retry(() => prisma.flashcard.update({
+          where: { id: card.id },
+          data: { order: card.order },
+        }))
+      );
+      await Promise.all(updatePromises);
+      res.status(200).json({ message: 'Flashcards updated successfully' });
+    } catch (error) {
+      console.error('PATCH flashcards error:', error);
+      toast.error('Internal Server Error: ' + (error as Error).message);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
