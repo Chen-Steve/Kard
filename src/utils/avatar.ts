@@ -71,7 +71,7 @@ export const getMicahAvatarSvg = (email: string): string => {
     clip: getRandomValue([true, false], email),
     randomizeIds: true,
     base: [getRandomValue(["standard"], email)],
-    baseColor: [getRandomValue(["77311d", "ac6651", "f9c9b6"], email)],
+    baseColor: [getRandomValue(["77311d", "ac6651", "fad3c3", "c5c7f0", "b2fcae"], email)],
     earringColor: [getRandomValue(["000000", "6bd9e9", "9287ff"], email)],
     earrings: [getRandomValue(["hoop", "stud"] as EarringType[], email)],
     earringsProbability: getRandomValue([0, 100], email),

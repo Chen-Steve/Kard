@@ -1,0 +1,113 @@
+{
+  "privacy": {
+    "title": "Privacy Policy",
+    "sections": [
+      {
+        "paragraphs": [
+          "At our website, we are committed to protecting your privacy and providing you with a transparent and secure online experience. This Privacy Policy outlines how we use cookies and collect and process your personal data."
+        ]
+      },
+      {
+        "header": "Your Rights and Choices",
+        "paragraphs": [
+          "You have the right to access, rectify, and delete your personal data that we collect. If you have any questions or concerns about our use of cookies or your personal data, please contact us at ",
+          "privacy@example.com"
+        ]
+      },
+      {
+        "header": "Information We Get Automatically When You Use the Service",
+        "paragraphs": [
+          "We automatically collect information about you and how you use the Service, like when you create a study set, join a class, or view and interact with your or other users' content. This information we collect includes:",
+          "Device information. Like most website operators, Kard collects information about how users visit our site and the devices they use. We collect device-specific information (such as your hardware model, operating system version, device identifiers like IDFA and UDID, and mobile network information). Kard may associate your device identifiers or other device information with your Kard Account to help us provide consistent services across your devices.",
+          "Geolocation information. We may use your IP address to generate a general approximation of where you are located in order to provide you with an improved experience. We do not request access to or collect location sensor information, such as GPS or Bluetooth beacons, from your mobile device while downloading or using our mobile apps or services.",
+          "Log information. When you use Kard, we automatically collect and store certain information about this activity. This data includes details of how you used our service, like your search queries, clicks and site navigation information, or study activity. It also may include data such as:",
+          "Browser type",
+          "Language preference and time zone",
+          "Referring site, and the date and time of each visitor request",
+          "Connection information like ISP or mobile operator",
+          "Internet Protocol (IP) address",
+          "Log-in and Log-out times"
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Cookies Policy",
+    "sections": [
+      {
+        "paragraphs": [
+          "We collect personal information about users over time and across different websites when you use this website, app or service. To do this, we use several common tracking tools. Our vendors or third parties may place and use these tools on our sites or apps. In this policy \"we\" and \"us\" refers to Kard and our affiliates. It also includes our vendors and third parties who place tools on our sites or apps.",
+          "We use third-party service providers collect information such as your IP address, identifiers associated with your device, other applications on your device, the browsers you use to access the Service, the pages viewed, how much time you spend on a page or Kard overall, links you clicked, and activity information (for example, study sessions you have completed) to provide site metrics and other analytics services. This information is used by Kard and third-party service providers on behalf of Kard to analyze and track usage of the Service, determine the popularity of certain content, and better understand how you use the Service.",
+          "The tools these providers use may include browser cookies. We also use other technologies that function similarly to cookies. For instance, we may also use web beacons, flash cookies, and similar technologies. We also use local storage, which allows data to be stored locally on your browser or device and includes HTML5 local storage and browser cache. Our website includes social media features and widgets, such as the \"Share This\" button. These features may collect your IP address, which page you are visiting on our site, and may set a cookie to enable the feature to function properly. Social Media Features and widgets are either hosted by a third party or hosted directly on our site. To learn more about what tracking tools are and how they work visit here."
+        ]
+      },
+      {
+        "header": null,
+        "paragraphs": [
+          "Cookies are small text files that are placed on your device by the websites you visit. They help us to improve your experience by remembering your preferences, analyzing how you use our website, and providing you with relevant content and advertisements."
+        ]
+      },
+      {
+        "header": null,
+        "table": {
+          "headers": ["Cookie Type", "Purpose", "Duration"],
+          "rows": [
+            ["Strictly Necessary", "These cookies are essential for the website to function properly and cannot be disabled.", "Session"],
+            ["Functional", "These cookies help to improve the functionality and personalization of the website.", "Session or Persistent"],
+            ["Performance", "These cookies collect information about how you use the website, which helps us to improve its performance.", "Persistent"]
+          ]
+        }
+      }
+    ]
+  },
+  "terms": [
+    {
+      "content": "The Kard, Inc. ('Kard') website and its applications are a hosted service operated by Kard, Inc. ('Service'). Any use of the Service is subject to the following Terms and Conditions of Service ('Terms of Service' or 'Terms'), as well as to Kard's Privacy Policy, Kard's Community Guidelines, and Kard's Honor Code, all of which are incorporated by reference into these Terms of Service. Your use of the Service will constitute your acceptance of these Terms of Service."
+    },
+    {
+      "title": "Eligibility",
+      "content": "Use of the Service is void where prohibited. The Service is intended for users over the age of 13, but is open to all ages. For children age 13 or younger (or other age of consent where required by local law), Kard offers a restricted feature set and website experience that removes certain features. By using the Service, you represent and warrant that (a) all registration information you submit is truthful and accurate; (b) you will maintain the accuracy of such information; and (c) your use of the Service does not violate any applicable law or regulation.",
+      "effectiveDate": "Effective Date: August 3 2024; Last Updated: August 3, 2024"
+    },
+    {
+      "title": "Your Kard Account and Data",
+      "content": "If you create an account on the Service, you are responsible for maintaining the security of your account and data, and you are fully responsible for all activities that occur under the account. Accounts are for individual, not organizational, use by a single person only. You may not share your account with any other person. You must notify Kard immediately of any unauthorized uses of your data, your account or any other breaches of security. Kard will not be liable for any acts or omissions by you, including any damages of any kind incurred as a result of such acts or omissions. Kard may from time to time set storage limits for your data, or take any other measures it considers appropriate to manage the Service. Kard may also from time to time change its policies on offering commercial content or displaying advertising, and may do this without notice.",
+      "effectiveDate": "Effective Date: August 3 2024; Last Updated: August 3, 2024"
+    }
+  ],
+  "copyright": {
+    "title": "Copyright Infringement and DMCA Policy",
+    "sections": [
+      {
+        "header": null,
+        "paragraphs": [
+          "Kard is committed to protecting the intellectual property rights of third parties.",
+          "The fastest and easiest way to submit a copyright infringement notification to us is through our website.",
+          "Click here to submit a copyright infringement notification. We review and take action on these reports promptly.",
+          "If you do not wish to submit your DMCA notice using our online form, you may also send a copyright infringement notification to us by email or mail. Your request must include the following information per Section 512(c)(3) of the Digital Millennium Copyright Act:",
+          "Valid contact information for you or a representative authorized to act on your behalf. You need to provide information that will allow us and the uploaders of any sets, classes, folders, or other removed content to contact you regarding the complaint. In general, contact information must include:",
+          "Full legal name (a first and last name, not a company name)",
+          "Email address",
+          "Physical address",
+          "Telephone number",
+          "A description of the work being infringed. You must clearly and completely describe the copyrighted content you are seeking to protect. If multiple copyrighted works are covered in the complaint, the law allows you to include a representative list of such works.",
+          "Each allegedly infringing piece of content's specific URL. You should always include the specific URL of the content believed to infringe on your copyright(s). General information about the content, such as a folder, search term or username, is usually not sufficient unless also accompanied by a detailed explanation that allows us to identify the content in question clearly and unambiguously (e.g., a statement that all public content created by the user is infringing). In general, however, submissions should identify content via a specific URL in one of the following formats:",
+          "www.Kard.com/#####/xxxxxx",
+          "www.Kard.com/class/###### (with an accompanying detailed explanation)",
+          "www.Kard.com/username/folders/xxxxxx (with an accompanying detailed explanation)",
+          "You must agree to and/or include the following statements:",
+          "“I have a good faith belief that the use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.”",
+          "“The information in this notification is accurate, and under penalty of perjury, I am the owner, or an agent authorized to act on behalf of the owner, of an exclusive right that is allegedly infringed.”",
+          "The request must include your signature: Complete complaints require your physical or electronic signature or the signature of a representative authorized to act on your behalf. To satisfy this requirement, you (or your representative) may type your full legal name to act as your signature at the bottom of the complaint or in the Kard DMCA submission form.",
+          "You can submit your DMCA notice by email to dmca@Kard.com or by mail to:",
+          "Kard, Inc.",
+          "ATTN: DMCA Agent",
+          "123 Townsend Street, Suite 600",
+          "San Francisco CA, 94107 USA",
+          "In accordance with the DMCA, Kard has developed and maintains a policy to terminate the accounts of repeat infringers.",
+          "In addition, please note that Kard may send your original notice to the alleged infringer or, if we have reason to suspect the validity of your complaint, to the rights holder."
+        ]
+      }
+    ]
+  }
+}

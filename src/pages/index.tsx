@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
 import { RiFeedbackFill } from "react-icons/ri";
+import { FaCookieBite } from "react-icons/fa6";
+import CookieConsent from '../components/CookieConsent';
 
 const HomePage: FC = () => {
   const handleButtonClick = () => {
@@ -70,6 +72,9 @@ const HomePage: FC = () => {
         <RiFeedbackFill className="mr-2" />
         Feedback
       </button>
+
+      <CookieConsent />
+
     </div>
   );
 };

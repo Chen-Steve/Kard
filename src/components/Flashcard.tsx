@@ -35,6 +35,11 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [showList, setShowList] = useState(true); // New state for toggling list visibility
   const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
   const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredDecks = decks.filter(deck =>
+    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const fetchFlashcards = useCallback(async () => {
     try {
@@ -238,24 +243,33 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             {isDeckSelectVisible && (
               <>
                 <label htmlFor="deck-select" className="sr-only">Select Deck</label>
-                <select
-                  id="deck-select"
-                  value={selectedDeckId}
-                  onChange={(e) => setSelectedDeckId(e.target.value)}
-                  className="p-2 border border-gray-300 rounded ml-2"
-                >
-                  {decks.length > 0 ? (
-                    decks.map((deck) => (
-                      <option key={deck.id} value={deck.id}>
-                        {deck.name}
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search decks..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="p-1 ml-2 border-2 border-gray-500 rounded"
+                  />
+                  <select
+                    id="deck-select"
+                    value={selectedDeckId}
+                    onChange={(e) => setSelectedDeckId(e.target.value)}
+                    className="p-1 border-2 border-gray-500 rounded"
+                  >
+                    {filteredDecks.length > 0 ? (
+                      filteredDecks.map((deck) => (
+                        <option key={deck.id} value={deck.id}>
+                          {deck.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>
+                        No decks available
                       </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No decks available
-                    </option>
-                  )}
-                </select>
+                    )}
+                  </select>
+                </div>
               </>
             )}
           </div>
