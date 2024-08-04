@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import Link from 'next/link';
 import { ArrowLeft, Trash2, Plus, RefreshCw, Search } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '../components/ui/dialog';
+} from '../components/ui/Dialog';
 
 interface Deck {
   id: string;
