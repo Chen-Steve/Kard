@@ -27,7 +27,7 @@ const HomePage: FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-300 to-white flex flex-col relative">
       <div className="hidden md:block absolute top-0 left-20 h-full border-l-2 border-black"></div>
-      <header className="w-full text-white p-6 flex justify-center items-center">
+      <header className="w-full text-foreground p-6 flex justify-center items-center">
         <nav className="flex space-x-20">
           <Link href="/" className="kard wiggle-effect">Kard</Link>
           <div className="inner-nav hover:lighten-effect">
@@ -40,11 +40,11 @@ const HomePage: FC = () => {
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-black mb-4">
+          <h1 className="text-5xl font-bold text-foreground mb-4">
             {text}
             <Cursor />
           </h1>
-          <p className="text-xl text-black-100 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Elevate your learning experience with custom flashcards. Create, manage, and master your knowledge.
           </p>
         </div>
@@ -52,7 +52,7 @@ const HomePage: FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
             <div
-              className="bg-black text-white px-6 py-3 rounded-full font-semibold shadow-lg shine-effect hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="bg-foreground text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleButtonClick}
             >
               Get Started
@@ -61,12 +61,12 @@ const HomePage: FC = () => {
         </div>
       </main>
 
-      <footer className="w-full text-black p-6 text-center">
+      <footer className="w-full text-foreground p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
 
       <button
-        className="fixed bottom-4 right-4 bg-white text-black text-md font-bold px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition duration-300 flex items-center"
+        className="fixed bottom-4 right-4 bg-background text-foreground text-md font-bold px-4 py-2 rounded-full shadow-lg hover:bg-gray-200 transition duration-300 flex items-center"
         onClick={handleSupportClick}
       >
         <RiFeedbackFill className="mr-2" />
@@ -74,7 +74,6 @@ const HomePage: FC = () => {
       </button>
 
       <CookieConsent />
-
     </div>
   );
 };
