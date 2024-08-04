@@ -2,10 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import prisma from '../../../lib/prisma';
 import { getMicahAvatarSvg } from '../../../utils/avatar';
+import rateLimit from '../../../middleware/rateLimit';
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const { id, email, password } = req.body;
+    await rateLimit(req, res); // Apply rate limiting
+    const { id, email, password, rememberMe } = req.body;
 
     if (!id || !email || !password) {
       res.status(400).json({ error: 'ID, email, and password are required' });
@@ -38,7 +40,12 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      res.status(201).json(user);
+      if (rememberMe) {
+        // Set a longer session duration, e.g., 30 days
+        res.setHeader('Set-Cookie', `session=${user.id}; Max-Age=${30 * 24 * 60 * 60}; Path=/; HttpOnly`);
+      }
+
+      res.status(201).json({ user, rememberMe });
     } catch (error) {
       console.error('Signup error:', (error as Error).message);
       if ((error as Error).message.includes('does not exist in the current database')) {

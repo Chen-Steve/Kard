@@ -44,11 +44,12 @@ const DeckPage = () => {
   return (
     <div className="min-h-screen bg-gray-300 flex flex-col items-center p-4">
       <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center">
-        <Link href="/decks" className="text-blue-500">
+        <Link href="/decks" className="text-black">
           <FaArrowLeft className="text-2xl" />
         </Link>
       </header>
       <main className="flex-grow w-full max-w-3xl">
+      <h1 className="text-3xl font-bold text-center my-4">Edit Flashcards</h1>
         <FlashcardComponent userId={userId} deckId={deckId as string} decks={decks} />
       </main>
     </div>
