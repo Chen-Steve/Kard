@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { FaArrowLeft, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
+import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Spinner from '../components/Spinner'; 
 
 const SignUp = () => {
@@ -63,24 +63,6 @@ const SignUp = () => {
       setLoading(false);
     }
   };
-
-  const handleGoogleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback/google`, 
-      },
-    });
-  
-    if (error) {
-      console.error('Error signing in with Google:', error.message);
-      setErrorMessage(error.message);
-    } else if (data?.url) {
-      window.location.href = data.url; // Redirect to the OAuth provider's authentication endpoint
-    }
-  };
-  
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -147,14 +129,6 @@ const SignUp = () => {
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
-            <div className="mt-2">
-              <button
-                onClick={handleGoogleSignIn}
-                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                <FaGoogle className="mr-2" /> Sign up with Google
-              </button>
-            </div>
           </div>
           <p className="text-center text-sm font-semibold text-black">
             Already have an account?{' '}

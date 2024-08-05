@@ -32,7 +32,11 @@ const Dashboard = () => {
           .single();
 
         if (error) {
-          console.error('Error fetching user data:', error);
+          if (error.code === 'PGRST116') {
+            console.error('No user data found for this ID');
+          } else {
+            console.error('Error fetching user data:', error);
+          }
         } else {
           userData.avatarUrl = getMicahAvatarSvg(userData.email);
           setUser(userData);
