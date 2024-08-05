@@ -62,6 +62,11 @@ const DecksPage = () => {
   }, [fetchDecks]);
 
   const handleCreateDeck = async () => {
+    if (!newDeckName || !newDeckDescription) {
+      console.error('Deck name and description are required');
+      return;
+    }
+
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !session) {
@@ -111,8 +116,8 @@ const DecksPage = () => {
     }
   };
 
-  const filteredDecks = decks.filter((deck) =>
-    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDecks = decks.filter(
+    (deck) => deck && deck.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;

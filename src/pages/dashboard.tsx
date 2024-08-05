@@ -105,8 +105,8 @@ const Dashboard = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-300 flex flex-col">
-      <header className="w-full bg-white-700 text-black p-4 flex justify-between items-center relative">
+    <div className="min-h-screen bg-gray-200 flex flex-col">
+      <header className="w-full background bg-white-700 text-black p-4 flex justify-between items-center relative">
         <NavMenu />
         <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
@@ -135,7 +135,7 @@ const Dashboard = () => {
       </header>
       <main className="flex-grow p-4 mt-12">
         {decks.length > 0 && (
-          <div className="flex justify-center space-x-4 mb-2">
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
             <button
               className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
               disabled

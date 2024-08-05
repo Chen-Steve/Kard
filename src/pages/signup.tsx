@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaArrowLeft, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import Spinner from '../components/Spinner'; // Import Spinner component
 
 const SignUp = () => {
@@ -59,13 +59,26 @@ const SignUp = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (error) {
+      console.error('Error signing in with Google:', error.message);
+      setErrorMessage(error.message);
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
       {loading ? (
-        <Spinner /> // Display spinner when loading
+        <Spinner />
       ) : (
         <>
-          <div className="absolute top-20 left-20">
+          <div className="absolute top-4 left-4 sm:top-20 sm:left-20">
             <Link href="/">
               <FaArrowLeft className="text-white text-2xl" />
             </Link>
@@ -119,13 +132,21 @@ const SignUp = () => {
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                disabled={loading} // Disable button when loading
+                disabled={loading}
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
+            <div className="mt-2">
+              <button
+                onClick={handleGoogleSignIn}
+                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <FaGoogle className="mr-2" /> Sign up with Google
+              </button>
+            </div>
           </div>
-          <p className="mt-8 text-center text-sm font-semibold text-black">
+          <p className="text-center text-sm font-semibold text-black">
             Already have an account?{' '}
             <Link href="/signin" className="font-medium text-black underline hover:text-gray-800">
               Sign in
