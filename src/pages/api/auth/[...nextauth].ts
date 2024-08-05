@@ -37,23 +37,17 @@ const options: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // Default to 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.rememberMe = user.rememberMe;
       }
-      // Set the maxAge based on rememberMe
-      token.maxAge = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
       return token;
     },
     async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id.toString();
-        session.rememberMe = token.rememberMe as boolean;
-        session.maxAge = token.maxAge as number;
       }
       return session;
     },

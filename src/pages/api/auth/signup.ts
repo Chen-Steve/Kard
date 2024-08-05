@@ -7,7 +7,7 @@ import rateLimit from '../../../middleware/rateLimit';
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`Received ${req.method} request at /api/auth/signup`);
   if (req.method === 'POST') {
-    await rateLimit(req, res); // Apply rate limiting
+    await rateLimit(req, res, () => {}); // Apply rate limiting
     const { id, email, password } = req.body;
 
     if (!id || !email || !password) {
@@ -41,9 +41,10 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      res.status(201).json({ user });
+      console.log('User created in database:', user); // Add logging here
+      res.status(201).json(user);
     } catch (error) {
-      console.error('Signup error:', (error as Error).message);
+      console.error('Signup error:', error as any); // Log the full error
       if ((error as Error).message.includes('does not exist in the current database')) {
         res.status(500).json({ error: 'Table not found', details: (error as Error).message });
       } else {

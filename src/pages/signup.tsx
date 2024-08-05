@@ -16,7 +16,6 @@ const SignUp = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true); // Set loading state
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -24,13 +23,12 @@ const SignUp = () => {
     });
 
     if (error) {
-      console.error('Error creating account:', (error as Error).message);
-      if ((error as any).status === 429) {
+      console.error('Error creating account:', error.message);
+      if (error.status === 429) {
         setErrorMessage('Too many requests. Please try again later.');
       } else {
-        setErrorMessage((error as Error).message);
+        setErrorMessage(error.message);
       }
-      setLoading(false); // Reset loading state
     } else if (data.user) {
       console.log('Account created successfully:', data.user);
 
@@ -51,15 +49,13 @@ const SignUp = () => {
         console.log('User created in database:', result);
 
         router.push('/dashboard');
-      } catch (error) {
+      } catch (error: any) { 
         console.error('Error creating user in database:', (error as Error).message);
         setErrorMessage('An error occurred while creating your account. Please try again.');
-        setLoading(false); // Reset loading state
       }
     } else {
       console.error('User data is null');
       setErrorMessage('An unexpected error occurred. Please try again.');
-      setLoading(false); // Reset loading state
     }
   };
 
