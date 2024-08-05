@@ -10,12 +10,12 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     await rateLimit(req, res, () => {}); // Apply rate limiting
     const { id, email, password } = req.body;
 
-    if (!id || !email || !password) {
-      res.status(400).json({ error: 'ID, email, and password are required' });
+    if (!id || !email) {
+      res.status(400).json({ error: 'ID and email are required' });
       return;
     }
 
-    if (email.length > 255 || password.length > 255 || id.length > 255) {
+    if (email.length > 255 || (password && password.length > 255) || id.length > 255) {
       res.status(400).json({ error: 'ID, email, and password must be 255 characters or less' });
       return;
     }
@@ -27,7 +27,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
       // Generate Micah avatar SVG with email as seed
       const avatarSvg = getMicahAvatarSvg(email);

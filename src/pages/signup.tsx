@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
-import Spinner from '../components/Spinner'; // Import Spinner component
+import Spinner from '../components/Spinner'; 
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +16,7 @@ const SignUp = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -29,6 +30,7 @@ const SignUp = () => {
       } else {
         setErrorMessage(error.message);
       }
+      setLoading(false);
     } else if (data.user) {
       console.log('Account created successfully:', data.user);
 
@@ -49,28 +51,35 @@ const SignUp = () => {
         console.log('User created in database:', result);
 
         router.push('/dashboard');
-      } catch (error: any) { 
+      } catch (error: any) {
         console.error('Error creating user in database:', (error as Error).message);
         setErrorMessage('An error occurred while creating your account. Please try again.');
+      } finally {
+        setLoading(false);
       }
     } else {
       console.error('User data is null');
       setErrorMessage('An unexpected error occurred. Please try again.');
+      setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback`,
+      },
     });
-
+  
     if (error) {
       console.error('Error signing in with Google:', error.message);
       setErrorMessage(error.message);
-    } else {
-      router.push('/dashboard');
+    } else if (data?.url) {
+      window.location.href = data.url; // Redirect to the OAuth provider's authentication endpoint
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
