@@ -9,6 +9,7 @@ import Spinner from '../components/Spinner';
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // Add loading state
@@ -38,7 +39,7 @@ const SignUp = () => {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: data.user.id, email, password }),
+          body: JSON.stringify({ id: data.user.id, email, password, name }),
         });
 
         if (!response.ok) {
@@ -95,6 +96,21 @@ const SignUp = () => {
                   className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400
                              focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="you@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-black">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400
+                             focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="Your username"
                   required
                 />
               </div>

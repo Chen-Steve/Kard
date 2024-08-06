@@ -8,22 +8,29 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`Received ${req.method} request at /api/auth/signup`);
   if (req.method === 'POST') {
     await rateLimit(req, res, () => {}); // Apply rate limiting
-    const { id, email, password } = req.body;
+    const { id, email, password, name } = req.body;
 
-    if (!id || !email) {
-      res.status(400).json({ error: 'ID and email are required' });
+    if (!id || !email || !name) {
+      res.status(400).json({ error: 'ID, email, and name are required' });
       return;
     }
 
-    if (email.length > 255 || (password && password.length > 255) || id.length > 255) {
-      res.status(400).json({ error: 'ID, email, and password must be 255 characters or less' });
+    if (email.length > 255 || (password && password.length > 255) || id.length > 255 || name.length > 255) {
+      res.status(400).json({ error: 'ID, email, password, and name must be 255 characters or less' });
       return;
     }
 
     try {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email },
+            { name }
+          ]
+        }
+      });
       if (existingUser) {
-        res.status(400).json({ error: 'User already exists' });
+        res.status(400).json({ error: 'User with this email or name already exists' });
         return;
       }
 
@@ -37,6 +44,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           id,
           email,
           password: hashedPassword,
+          name,
           avatarUrl: avatarSvg,
         },
       });

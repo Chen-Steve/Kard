@@ -115,7 +115,17 @@ const Dashboard = () => {
   const handleDeleteAccount = () => {
     toast({
       title: 'Account Deletion Disabled',
-      description: 'Account deletion is currently disabled.',
+      description: (
+        <span>
+          Account deletion is currently disabled.{' '}
+          <button
+            onClick={() => window.open('https://forms.gle/H3ZL5o3ccN2R6WYPA', '_blank')}
+            className="text-blue-500 underline"
+          >
+            Request here
+          </button>
+        </span>
+      ),
       action: (
         <button
           onClick={() => dismiss()}
@@ -168,20 +178,23 @@ const Dashboard = () => {
               />
               {dropdownOpen && (
                 <div className="absolute right-2 mt-6 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Log Out
-                  </button>
-                  <button
-                    onClick={handleDeleteAccount}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100"
-                  >
-                    Delete Account
-                  </button>
+                  <div className="px-4 py-2 text-sm text-gray-700">
+                    <span className="block font-medium">{user.name}</span>
+                    <span className="block">{user.email}</span>
+                  </div>
                   <div className="border-t border-gray-200">
-                    <p className="block w-full text-left px-4 py-2 text-sm text-gray-700">{user.email}</p>
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Log Out
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100"
+                    >
+                      Delete Account
+                    </button>
                   </div>
                 </div>
               )}
