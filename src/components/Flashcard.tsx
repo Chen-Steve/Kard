@@ -332,7 +332,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="bg-gray-200 dark:bg-gray-800 p-2 rounded mb-2"
+                          className="bg-gray-200 dark:bg-gray-800 rounded"
                         >
                           <EditFlashcard
                             id={card.id}
