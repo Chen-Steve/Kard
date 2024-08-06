@@ -19,14 +19,14 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
   };
 
   return (
-    <div className="mb-4 p-4 bg-gray-100 rounded shadow flex justify-between items-center">
+    <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-600 rounded shadow flex justify-between items-center">
       {isEditing ? (
         <>
           <div className="flex w-full space-x-4">
             <textarea
               value={editQuestion}
               onChange={(e) => setEditQuestion(e.target.value)}
-              className="block w-1/2 p-2 border rounded resize-none"
+              className="block w-1/2 p-2 border rounded resize-none bg-white dark:bg-gray-700 text-black dark:text-white"
               rows={1}
               aria-label="Question"
               placeholder="Question"
@@ -39,7 +39,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
             <textarea
               value={editAnswer}
               onChange={(e) => setEditAnswer(e.target.value)}
-              className="block w-1/2 p-2 border rounded resize-none"
+              className="block w-1/2 p-2 border rounded resize-none bg-white dark:bg-gray-700 text-black dark:text-white"
               rows={1}
               aria-label="Answer"
               placeholder="Answer"
@@ -61,15 +61,15 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
         <>
           <div className="flex w-full space-x-4">
             <div className="w-1/2">
-              <p className="font-bold">{question}</p>
+              <p className="font-bold text-black dark:text-white">{question}</p>
             </div>
             <div className="w-1/2">
-              <p className="font-bold">{answer}</p>
+              <p className="font-bold text-black dark:text-white">{answer}</p>
             </div>
           </div>
           <button
             onClick={() => setIsEditing(true)}
-            className="ml-4 px-3 py-2 bg-gray-300 rounded"
+            className="ml-4 px-3 py-2 bg-gray-300 dark:bg-gray-600 rounded"
           >
             Edit
           </button>

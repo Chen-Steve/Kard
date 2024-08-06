@@ -121,7 +121,7 @@ const Profile = () => {
           </button>
           <button
             onClick={() => dismiss()}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             Cancel
           </button>
@@ -130,56 +130,21 @@ const Profile = () => {
     });
   };
 
-  // const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (!file) return;
-
-  //   setUploading(true);
-
-  //   const fileExt = file.name.split('.').pop();
-  //   const fileName = `${user.id}.${fileExt}`;
-  //   const filePath = `avatars/${fileName}`;
-
-  //   let { error: uploadError } = await supabase.storage
-  //     .from('avatars')
-  //     .upload(filePath, file, { upsert: true });
-
-  //   if (uploadError) {
-  //     console.error('Error uploading avatar:', uploadError);
-  //     setUploading(false);
-  //     return;
-  //   }
-
-  //   const { data } = supabase.storage
-  //     .from('avatars')
-  //     .getPublicUrl(filePath);
-
-  //   if (!data) {
-  //     console.error('Error getting public URL');
-  //     setUploading(false);
-  //     return;
-  //   }
-
-  //   setSelectedAvatar(data.publicUrl);
-  //   setUploading(false);
-  //   console.log('Uploaded avatar URL:', data.publicUrl); // Debugging uploaded avatar URL
-  // };
-
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <p className="text-black dark:text-white">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mb-4">
-        <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center">
+        <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:text-white">
           <FaArrowLeft className="mr-2" /> Back to Dashboard
         </Button>
       </div>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white dark:bg-gray-700">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Profile</CardTitle>
+            <CardTitle className="text-black dark:text-white">Profile</CardTitle>
             {!isEditing && (
-              <Button variant="outline" onClick={handleEdit}>
+              <Button variant="outline" onClick={handleEdit} className="text-black dark:text-white">
                 Edit
               </Button>
             )}
@@ -189,55 +154,43 @@ const Profile = () => {
           <div className="flex flex-col items-center">
             <UserAvatar avatarSvg={selectedAvatar || user.avatar_url} alt="User Avatar" />
             <div className="w-full mt-4">
-              <label className="block text-sm font-medium text-gray-700">Username</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
               {isEditing ? (
                 <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full"
+                  className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
                 />
               ) : (
-                <p className="mt-1 text-gray-600">{user.name}</p>
+                <p className="mt-1 text-gray-600 dark:text-gray-300">{user.name}</p>
               )}
             </div>
             <div className="w-full mt-4">
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
               {isEditing ? (
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full"
+                  className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
                 />
               ) : (
-                <p className="mt-1 text-gray-600">{user.email}</p>
+                <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
               )}
             </div>
-            {/* {isEditing && (
-              <div className="w-full mt-4">
-                <label className="block text-sm font-medium text-gray-700">Upload an Avatar</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="mt-2"
-                />
-                {uploading && <p>Uploading...</p>}
-              </div>
-            )} */}
           </div>
         </CardContent>
         {isEditing && (
           <CardFooter className="flex justify-end">
-            <Button variant="outline" onClick={() => setIsEditing(false)} className="mr-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="mr-2 text-black dark:text-white">
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave} className="text-black dark:text-white">Save</Button>
           </CardFooter>
         )}
         <CardFooter className="flex justify-end">
-          <Button variant="outline" onClick={handleDeleteAccount} className="mr-2 text-red-600">
+          <Button variant="outline" onClick={handleDeleteAccount} className="mr-2 text-red-600 dark:text-red-400">
             Delete Account
           </Button>
         </CardFooter>
@@ -245,14 +198,14 @@ const Profile = () => {
       <Toaster />
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Confirm Changes</h2>
-            <p>Are you sure you want to save these changes?</p>
+          <div className="bg-white dark:bg-gray-700 p-4 rounded shadow-lg">
+            <h2 className="text-lg font-bold mb-4 text-black dark:text-white">Confirm Changes</h2>
+            <p className="text-black dark:text-white">Are you sure you want to save these changes?</p>
             <div className="flex justify-end mt-4">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="mr-2">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="mr-2 text-black dark:text-white">
                 Cancel
               </Button>
-              <Button onClick={handleConfirmSave}>Confirm</Button>
+              <Button onClick={handleConfirmSave} className="text-black dark:text-white">Confirm</Button>
             </div>
           </div>
         </div>

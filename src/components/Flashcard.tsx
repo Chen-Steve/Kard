@@ -221,25 +221,25 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   return (
     <div className="container mx-auto p-4 max-w-3xl">
       <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlip} />
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
       <div className="flex flex-col items-center mb-8">
         <div
-          className="w-full h-96 bg-card shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+          className="w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
           onClick={handleFlip}
         >
           {getCurrentCard() ? (
-            <p className="text-2xl font-semibold text-card-foreground">
+            <p className="text-2xl font-semibold text-card-foreground dark:text-gray-200">
               {isFlipped ? getCurrentCard()?.answer : getCurrentCard()?.question}
             </p>
           ) : (
-            <p className="text-xl text-muted-foreground">No cards</p>
+            <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
           )}
         </div>
         <div className="flex justify-between w-full mt-0">
           <div className="flex items-center">
             <button
               onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
-              className="bg-primary text-primary-foreground px-2 py-2 rounded"
+              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-2 rounded"
             >
               Select Deck
             </button>
@@ -252,10 +252,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                     placeholder="Search decks..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-1 ml-2 border-2 border-black rounded"
+                    className="p-1 ml-2 border-2 border-black dark:border-gray-600 rounded"
                   />
                   <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
-                    <SelectTrigger className="p-2 border-1 border-black" />
+                    <SelectTrigger className="p-2 border-1 border-black dark:border-gray-600" />
                     {(searchTerm || filteredDecks.length > 0) && (
                       <SelectContent>
                         {filteredDecks.length > 0 ? (
@@ -276,25 +276,25 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               </>
             )}
           </div>
-          <MdSettings className="text-3xl text-muted-foreground cursor-pointer" />
+          <MdSettings className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer" />
         </div>
         <div className="flex items-center mt-0">
           <button
             type="button"
             onClick={handlePrevious}
-            className="mr-4 text-2xl"
+            className="mr-4 text-2xl text-black dark:text-white"
             aria-label="Previous"
             disabled={currentCardIndex === 0}
           >
             <FaChevronLeft />
           </button>
-          <span className="text-lg text-foreground">
+          <span className="text-lg text-foreground dark:text-gray-200">
             {getCurrentCard() ? `${currentCardIndex + 1} / ${flashcards.length}` : '0 / 0'}
           </span>
           <button
             type="button"
             onClick={handleNext}
-            className="ml-4 text-2xl"
+            className="ml-4 text-2xl text-black dark:text-white"
             aria-label="Next"
             disabled={currentCardIndex === flashcards.length - 1}
           >
@@ -306,18 +306,18 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       <div className="flex justify-between space-x-4">
         <button
           onClick={handleAddCard}
-          className="bg-primary text-primary-foreground px-4 py-2 rounded flex items-center"
+          className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
         >
           <FaPlus className="mr-2" /> Add Flashcard
         </button>
         <button
           onClick={() => setShowList(!showList)}
-          className="bg-primary text-primary-foreground px-4 py-2 rounded flex items-center"
+          className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
         >
           {showList ? 'Hide List' : 'Show List'}
         </button>
       </div>
-      <hr className="border-t-2 border-border w-full mx-auto mt-2" />
+      <hr className="border-t-2 border-border dark:border-gray-600 w-full mx-auto mt-2" />
 
       {showList && (
         <div className="mt-2">
@@ -332,6 +332,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
+                          className="bg-gray-200 dark:bg-gray-800 p-2 rounded mb-2"
                         >
                           <EditFlashcard
                             id={card.id}
@@ -355,7 +356,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       {flashcards.length > 0 && (
         <button
           onClick={() => setShowDefinitions(!showDefinitions)}
-          className="fixed bottom-4 right-4 bg-muted text-muted-foreground px-4 py-2 rounded-full shadow-lg flex items-center"
+          className="fixed bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
         >
           {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
           {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}

@@ -1,7 +1,8 @@
+import '../app/globals.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
-import { Card, CardHeader, CardContent } from '../components/ui/Card';
+import { Card, CardContent } from '../components/ui/Card';
 
 interface Flashcard {
   id: string;
@@ -91,12 +92,12 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-3xl">
+    <div className="container mx-auto p-8 max-w-3xl bg-gray-100 dark:bg-black text-black dark:text-gray-200">
       {!gameStarted && !gameEnded && (
-        <div className="cover-screen fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-          <div className="absolute top-40 left-100">
+        <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-700 z-50 flex flex-col items-center justify-center">
+          <div className="absolute top-40 left-100 bg-gray-100 dark:bg-gray-700">
             <Link href="/dashboard" passHref>
-              <span className="text-black-500 hover:text-gray-800 cursor-pointer flex items-center">
+              <span className="text-black dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer flex items-center">
                 <FaArrowLeft className="mr-2" /> Back to Dashboard
               </span>
             </Link>
@@ -107,17 +108,17 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           </p>
           <button
             onClick={startGame}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 dark:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Start game
           </button>
         </div>
       )}
       {gameEnded && (
-        <div className="cover-screen fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-          <div className="absolute top-40 left-100">
+        <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-700 z-50 flex flex-col items-center justify-center">
+          <div className="absolute top-40 left-100 bg-gray-100 dark:bg-gray-700">
             <Link href="/dashboard" passHref>
-              <span className="text-black-500 hover:text-gray-800 cursor-pointer flex items-center">
+              <span className="text-black dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer flex items-center">
                 <FaArrowLeft className="mr-2" /> Back to Dashboard
               </span>
             </Link>
@@ -136,16 +137,16 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           </ul>
           <button
             onClick={startGame}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 dark:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Play Again
           </button>
         </div>
       )}
       <div className={`game-content ${gameStarted && !gameEnded ? 'transition-curtain' : ''}`}>
-        <div className="mb-4">
+        <div className="mb-4 dark:bg-gray-700">
           <Link href="/dashboard" passHref>
-            <span className="text-black-500 hover:text-gray-800 cursor-pointer flex items-center">
+            <span className="text-black dark:text-gray-200 dark:bg-black hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
               <FaArrowLeft className="mr-2" /> Back to Dashboard
             </span>
           </Link>
@@ -163,10 +164,10 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                 <Card
                   onClick={() => handleCardClick(card)}
                   className={`cursor-pointer transition-colors flex items-center justify-center text-center 
-                    ${isMatched ? 'bg-green-500' : 
-                    isSelected ? 'bg-blue-300' : 
-                    'hover:bg-gray-200'}
-                    ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-300' : ''}`}
+                    ${isMatched ? 'bg-green-300 dark:bg-green-500' : 
+                    isSelected ? 'bg-blue-100 dark:bg-blue-300' : 
+                    'hover:bg-gray-200 dark:hover:bg-gray-400'}
+                    ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-100 dark:bg-orange-300' : ''}`}
                   style={{ height: '150px', width: '150px' }}
                 >
                   <CardContent>

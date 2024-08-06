@@ -17,10 +17,10 @@ const NavMenu = () => {
         aria-label="Menu"
         onClick={toggleSidebar}
       >
-        <RiMenu4Fill className="text-4xl text-black" />
+        <RiMenu4Fill className="text-4xl text-black dark:text-white" />
       </button>
       <div
-        className={`fixed top-0 left-0 bg-gray rounded-sm transition-width duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 bg-gray-200 dark:bg-gray-800 rounded-sm transition-width duration-300 ease-in-out ${
           isOpen ? "w-50 h-64" : "w-0 h-64"
         } overflow-hidden h-full`}
       >
@@ -31,12 +31,12 @@ const NavMenu = () => {
               aria-label="Close Menu"
               onClick={toggleSidebar}
             >
-              <RiMenu4Fill className="text-4xl text-black" />
+              <RiMenu4Fill className="text-4xl text-black dark:text-white" />
             </button>
           )}
-          <hr className="my-4 border-gray-600" />
+          <hr className="my-4 border-gray-600 dark:border-gray-400" />
           {isOpen && (
-            <div className="flex items-center text-black">
+            <div className="flex items-center text-black dark:text-white">
               <FaFolderOpen className="text-2xl" />
               <Link href="/decks" className="ml-2 text-xl">
                 Your Library

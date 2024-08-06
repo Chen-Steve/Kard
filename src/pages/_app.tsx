@@ -27,6 +27,13 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
     // Handle the drag end event
   };
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
   return (
     <SessionProvider session={initialSession}>
       <AuthWrapper>

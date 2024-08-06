@@ -7,6 +7,7 @@ import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
 import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
+import { MdDarkMode } from "react-icons/md"; // Import the dark mode icon
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
@@ -15,6 +16,7 @@ import { Toaster } from '../components/ui/toaster';
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
@@ -106,6 +108,25 @@ const Dashboard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(darkMode);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode.toString());
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/signin');
@@ -139,8 +160,8 @@ const Dashboard = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col">
-      <header className="w-full background bg-white-700 text-black p-4 flex justify-between items-center relative">
+    <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col">
+      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
         <NavMenu />
         <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
@@ -151,25 +172,34 @@ const Dashboard = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               />
               {dropdownOpen && (
-                <div className="absolute right-2 mt-6 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  <div className="px-4 py-2 text-sm text-gray-700">
+                <div className="absolute right-2 mt-6 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
+                  <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="block font-medium">{user.name}</span>
                     <span className="block">{user.email}</span>
                   </div>
-                  <div className="border-t border-gray-200">
+                  <div className="border-t border-gray-200 dark:border-gray-600">
                     <button
                       onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       Log Out
                     </button>
                   </div>
-                  <div className="border-t border-gray-200">
+                  <div className="border-t border-gray-200 dark:border-gray-600">
                     <button
                       onClick={() => router.push('/profile')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       Profile
+                    </button>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-600">
+                    <button
+                      onClick={toggleDarkMode}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                    >
+                      <MdDarkMode className="mr-2" />
+                      {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                     </button>
                   </div>
                 </div>
@@ -182,21 +212,21 @@ const Dashboard = () => {
         {decks.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
             <button
-              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={handleLearnClick}
             >
               <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
               <span className="text-xl font-semibold mb-1">Learn</span>
             </button>
             <button
-              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={handleTestClick}
             >
               <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-              <span className="text-xl font-semibold  mb-1">Test</span>
+              <span className="text-xl font-semibold mb-1">Test</span>
             </button>
             <button
-              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={handleMatchClick}
             >
               <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
@@ -206,13 +236,13 @@ const Dashboard = () => {
         )}
         {decks.length === 0 ? (
           <div className="flex justify-center mt-20 items-center h-full">
-            <p className="text-xl font-semibold text-gray-700">Go to your library and create some decks!</p>
+            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">Go to your library and create some decks!</p>
           </div>
         ) : (
           selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} />
         )}
       </main>
-      <footer className="w-full bg-white-700 text-black p-6 text-center">
+      <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
       <Toaster />
