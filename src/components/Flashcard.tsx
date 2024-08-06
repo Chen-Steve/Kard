@@ -7,6 +7,7 @@ import EditFlashcard from './EditFlashcard';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
 import { MdSettings } from "react-icons/md";
+import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 
 interface FlashcardProps {
   userId: string;
@@ -251,26 +252,26 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                     placeholder="Search decks..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-1 ml-2 border-2 border-input rounded"
+                    className="p-1 ml-2 border-2 border-black rounded"
                   />
-                  <select
-                    id="deck-select"
-                    value={selectedDeckId}
-                    onChange={(e) => setSelectedDeckId(e.target.value)}
-                    className="p-1 border-2 border-input rounded"
-                  >
-                    {filteredDecks.length > 0 ? (
-                      filteredDecks.map((deck) => (
-                        <option key={deck.id} value={deck.id}>
-                          {deck.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="" disabled>
-                        No decks available
-                      </option>
+                  <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
+                    <SelectTrigger className="p-2 border-1 border-black" />
+                    {(searchTerm || filteredDecks.length > 0) && (
+                      <SelectContent>
+                        {filteredDecks.length > 0 ? (
+                          filteredDecks.map((deck) => (
+                            <SelectItem key={deck.id} value={deck.id}>
+                              {deck.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-decks" disabled>
+                            No decks available
+                          </SelectItem>
+                        )}
+                      </SelectContent>
                     )}
-                  </select>
+                  </Select>
                 </div>
               </>
             )}
@@ -360,6 +361,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
         </button>
       )}
+
     </div>
   );
 };

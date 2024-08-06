@@ -9,6 +9,9 @@ import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
+import { toast, useToast } from '../components/ui/use-toast';
+import { Toaster } from '../components/ui/toaster';
+import MatchingGame from '../components/MatchingGame';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -17,43 +20,46 @@ const Dashboard = () => {
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { dismiss } = useToast();
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-      if (!session) {
+      if (error || !session) {
+        console.error('No active session found.');
         router.push('/signin');
-      } else {
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        return;
+      }
 
-        if (error) {
-          if (error.code === 'PGRST116') {
-            console.error('No user data found for this ID');
-          } else {
-            console.error('Error fetching user data:', error);
-          }
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (userError) {
+        if (userError.code === 'PGRST116') {
+          console.error('No user data found for this ID');
         } else {
-          userData.avatarUrl = getMicahAvatarSvg(userData.email);
-          setUser(userData);
+          console.error('Error fetching user data:', userError);
         }
+      } else {
+        userData.avatarUrl = getMicahAvatarSvg(userData.email);
+        setUser(userData);
+      }
 
-        const { data: decksData, error: decksError } = await supabase
-          .from('decks')
-          .select('*')
-          .eq('userId', session.user.id);
+      const { data: decksData, error: decksError } = await supabase
+        .from('decks')
+        .select('*')
+        .eq('userId', session.user.id);
 
-        if (decksError) {
-          console.error('Error fetching decks:', decksError);
-        } else {
-          setDecks(decksData);
-          if (decksData.length > 0) {
-            setSelectedDeckId(decksData[0].id);
-          }
+      if (decksError) {
+        console.error('Error fetching decks:', decksError);
+      } else {
+        setDecks(decksData);
+        if (decksData.length > 0) {
+          setSelectedDeckId(decksData[0].id);
         }
       }
     };
@@ -106,6 +112,46 @@ const Dashboard = () => {
     router.push('/signin');
   };
 
+  const handleDeleteAccount = () => {
+    toast({
+      title: 'Account Deletion Disabled',
+      description: 'Account deletion is currently disabled.',
+      action: (
+        <button
+          onClick={() => dismiss()}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          OK
+        </button>
+      ),
+    });
+  };
+
+  const handleLearnClick = () => {
+    toast({
+      title: 'Coming Soon!',
+      description: 'The Learn feature is coming soon.',
+    });
+  };
+
+  const handleTestClick = () => {
+    toast({
+      title: 'Coming Soon!',
+      description: 'The Test feature is coming soon.',
+    });
+  };
+
+  const handleMatchClick = () => {
+    if (selectedDeckId) {
+      router.push(`/matching-game/${user.id}/${selectedDeckId}`);
+    } else {
+      toast({
+        title: 'No Deck Selected',
+        description: 'Please select a deck to play the matching game.',
+      });
+    }
+  };
+
   if (!user) return <p>Loading...</p>;
 
   return (
@@ -128,6 +174,12 @@ const Dashboard = () => {
                   >
                     Log Out
                   </button>
+                  <button
+                    onClick={handleDeleteAccount}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100"
+                  >
+                    Delete Account
+                  </button>
                   <div className="border-t border-gray-200">
                     <p className="block w-full text-left px-4 py-2 text-sm text-gray-700">{user.email}</p>
                   </div>
@@ -142,16 +194,22 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
             <button
               className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
-              disabled
+              onClick={handleLearnClick}
             >
               <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
               <span className="text-xl font-semibold mb-1">Learn</span>
             </button>
-            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+            <button
+              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              onClick={handleTestClick}
+            >
               <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-              <span className="text-xl font-semibold mb-1">Test</span>
+              <span className="text-xl font-semibold  mb-1">Test</span>
             </button>
-            <button className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100">
+            <button
+              className="flex items-center space-x-4 bg-white shadow-md rounded-lg p-4 h-12 hover:bg-gray-100"
+              onClick={handleMatchClick}
+            >
               <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
               <span className="text-xl font-semibold mb-1">Match</span>
             </button>
@@ -168,6 +226,7 @@ const Dashboard = () => {
       <footer className="w-full bg-white-700 text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
+      <Toaster />
     </div>
   );
 };
