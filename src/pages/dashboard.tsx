@@ -11,7 +11,6 @@ import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
-import MatchingGame from '../components/MatchingGame';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -112,31 +111,6 @@ const Dashboard = () => {
     router.push('/signin');
   };
 
-  const handleDeleteAccount = () => {
-    toast({
-      title: 'Account Deletion Disabled',
-      description: (
-        <span>
-          Account deletion is currently disabled.{' '}
-          <button
-            onClick={() => window.open('https://forms.gle/H3ZL5o3ccN2R6WYPA', '_blank')}
-            className="text-blue-500 underline"
-          >
-            Request here
-          </button>
-        </span>
-      ),
-      action: (
-        <button
-          onClick={() => dismiss()}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          OK
-        </button>
-      ),
-    });
-  };
-
   const handleLearnClick = () => {
     toast({
       title: 'Coming Soon!',
@@ -189,11 +163,13 @@ const Dashboard = () => {
                     >
                       Log Out
                     </button>
+                  </div>
+                  <div className="border-t border-gray-200">
                     <button
-                      onClick={handleDeleteAccount}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100"
+                      onClick={() => router.push('/profile')}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Delete Account
+                      Profile
                     </button>
                   </div>
                 </div>
