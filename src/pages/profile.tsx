@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import UserAvatar from '../components/UserAvatar';
-import { getMicahAvatarSvg } from '../utils/avatar';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -15,6 +14,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [uploading, setUploading] = useState(false); // Commented out
   const router = useRouter();
   const { dismiss } = useToast();
 
@@ -37,10 +39,11 @@ const Profile = () => {
       if (userError) {
         console.error('Error fetching user data:', userError);
       } else {
-        userData.avatarUrl = getMicahAvatarSvg(userData.email);
         setUser(userData);
         setName(userData.name);
         setEmail(userData.email);
+        setSelectedAvatar(userData.avatar_url);
+        console.log('Fetched user data:', userData); // Debugging fetched user data
       }
     };
 
@@ -51,27 +54,41 @@ const Profile = () => {
     setIsEditing(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
 
+    console.log('Saving user data:', {
+      name: trimmedName,
+      email: trimmedEmail,
+      avatar_url: selectedAvatar,
+    }); // Debugging data to be saved
+
     // Check if there are any changes
-    if (trimmedName === user.name && trimmedEmail === user.email) {
+    if (trimmedName === user.name && trimmedEmail === user.email && selectedAvatar === user.avatar_url) {
       setIsEditing(false);
+      setIsModalOpen(false);
       return;
     }
 
     // Save the updated user data
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('users')
-      .update({ name: trimmedName, email: trimmedEmail })
-      .eq('id', user.id);
+      .update({ name: trimmedName, email: trimmedEmail, avatar_url: selectedAvatar })
+      .eq('id', user.id)
+      .select();
 
     if (error) {
       console.error('Error updating user data:', error);
     } else {
-      setUser({ ...user, name: trimmedName, email: trimmedEmail });
+      console.log('User data updated successfully:', data); // Debugging successful update
+      setUser({ ...user, name: trimmedName, email: trimmedEmail, avatar_url: selectedAvatar });
       setIsEditing(false);
+      setIsModalOpen(false);
     }
   };
 
@@ -113,6 +130,41 @@ const Profile = () => {
     });
   };
 
+  // const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (!file) return;
+
+  //   setUploading(true);
+
+  //   const fileExt = file.name.split('.').pop();
+  //   const fileName = `${user.id}.${fileExt}`;
+  //   const filePath = `avatars/${fileName}`;
+
+  //   let { error: uploadError } = await supabase.storage
+  //     .from('avatars')
+  //     .upload(filePath, file, { upsert: true });
+
+  //   if (uploadError) {
+  //     console.error('Error uploading avatar:', uploadError);
+  //     setUploading(false);
+  //     return;
+  //   }
+
+  //   const { data } = supabase.storage
+  //     .from('avatars')
+  //     .getPublicUrl(filePath);
+
+  //   if (!data) {
+  //     console.error('Error getting public URL');
+  //     setUploading(false);
+  //     return;
+  //   }
+
+  //   setSelectedAvatar(data.publicUrl);
+  //   setUploading(false);
+  //   console.log('Uploaded avatar URL:', data.publicUrl); // Debugging uploaded avatar URL
+  // };
+
   if (!user) return <p>Loading...</p>;
 
   return (
@@ -135,7 +187,7 @@ const Profile = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center">
-            <UserAvatar avatarSvg={user.avatarUrl} alt="User Avatar" />
+            <UserAvatar avatarSvg={selectedAvatar || user.avatar_url} alt="User Avatar" />
             <div className="w-full mt-4">
               <label className="block text-sm font-medium text-gray-700">Username</label>
               {isEditing ? (
@@ -162,6 +214,18 @@ const Profile = () => {
                 <p className="mt-1 text-gray-600">{user.email}</p>
               )}
             </div>
+            {/* {isEditing && (
+              <div className="w-full mt-4">
+                <label className="block text-sm font-medium text-gray-700">Upload an Avatar</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="mt-2"
+                />
+                {uploading && <p>Uploading...</p>}
+              </div>
+            )} */}
           </div>
         </CardContent>
         {isEditing && (
@@ -179,6 +243,20 @@ const Profile = () => {
         </CardFooter>
       </Card>
       <Toaster />
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h2 className="text-lg font-bold mb-4">Confirm Changes</h2>
+            <p>Are you sure you want to save these changes?</p>
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="mr-2">
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmSave}>Confirm</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
