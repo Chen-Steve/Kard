@@ -129,7 +129,7 @@ const DecksPage = () => {
           <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
             <ArrowLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-2xl font-semibold text-gray-900">My Decks</h1>
+          <h1 className="text-2xl font-light text-[#39594D]">My Decks</h1>
           <div className="flex space-x-2">
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>

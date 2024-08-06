@@ -37,6 +37,7 @@ const options: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {
