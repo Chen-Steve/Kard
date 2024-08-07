@@ -10,7 +10,7 @@ type EyesType = 'eyes' | 'eyesShadow' | 'round' | 'smiling' | 'smilingShadow';
 type FacialHairType = 'beard' | 'scruff';
 type GlassesType = 'round' | 'square';
 type HairType = 'dannyPhantom' | 'dougFunny' | 'fonze';
-type MouthType = 'frown' | 'laughing' | 'nervous' | 'pucker' | 'sad' | 'smile' | 'smirk' | 'surprised';
+type MouthType = 'laughing' | 'nervous' | 'pucker' | 'smile' | 'smirk' | 'surprised';
 type NoseType = 'curve' | 'pointed' | 'tound';
 type ShirtType = 'collared' | 'crew' | 'open';
 
@@ -71,7 +71,7 @@ export const getMicahAvatarSvg = (email: string): string => {
     clip: getRandomValue([true, false], rng),
     randomizeIds: true,
     base: [getRandomValue(["standard"], rng)],
-    baseColor: [getRandomValue(["77311d", "ac6651", "fad3c3", "c5c7f0", "b2fcae"], rng)],
+    baseColor: [getRandomValue(["77311d", "cf8974", "fad3c3", "edd8da", "f9c9b6"], rng)],
     earringColor: [getRandomValue(["000000", "6bd9e9", "9287ff"], rng)],
     earrings: [getRandomValue(["hoop", "stud"] as EarringType[], rng)],
     earringsProbability: getRandomValue([0, 100], rng),
