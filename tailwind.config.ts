@@ -73,6 +73,11 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       width: {
+        '48': '12rem',
+        '50': '12.5rem',
+        '52': '13rem',
+        '54': '13.75rem',
+        '56': '14.5rem',
         '64': '16rem',
       },
       height: {

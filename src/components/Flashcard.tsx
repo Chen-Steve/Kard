@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash, FaQuestionCircle } from 'react-icons/fa';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
@@ -8,6 +8,7 @@ import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
 import { MdSettings } from "react-icons/md";
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
+import Papa from 'papaparse';
 
 interface FlashcardProps {
   userId: string;
@@ -37,6 +38,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
   const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isImportVisible, setIsImportVisible] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredDecks = decks.filter(deck =>
     deck.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -218,6 +223,61 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   };
 
+  const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setCsvFile(event.target.files[0]);
+    }
+  };
+
+  const importFlashcardsFromCsv = () => {
+    if (!csvFile) return;
+
+    Papa.parse(csvFile, {
+      header: true,
+      complete: async (results) => {
+        const importedFlashcards: Flashcard[] = results.data.map((row: any, index: number) => ({
+          id: `imported-${index}`,
+          question: row.question || '',
+          answer: row.answer || '',
+          order: flashcards.length + index + 1,
+        }));
+
+        // Save each flashcard to the database
+        for (const flashcard of importedFlashcards) {
+          try {
+            const response = await fetch('/api/flashcard', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                question: flashcard.question,
+                answer: flashcard.answer,
+                userId: userId,
+                deckId: selectedDeckId,
+                order: flashcard.order,
+              }),
+            });
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
+            }
+            const savedCard = await response.json();
+            setFlashcards((prevFlashcards) => [...prevFlashcards, savedCard]);
+          } catch (error) {
+            console.error('Error adding flashcard:', error);
+            toast.error('Failed to add flashcard. Please try again.');
+          }
+        }
+
+        setCsvFile(null);
+        setIsImportVisible(false);
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+        toast.error('Failed to import flashcards. Please check the CSV format.');
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-3xl">
       <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlip} />
@@ -276,7 +336,40 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               </>
             )}
           </div>
-          <MdSettings className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer" />
+          <div className="relative">
+            <MdSettings
+              className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
+              onClick={() => setIsImportVisible(!isImportVisible)}
+            />
+            {isImportVisible && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleCsvUpload}
+                  ref={fileInputRef}
+                  className="hidden"
+                  title="input file"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
+                  style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
+                >
+                  Choose File
+                </button>
+                <button
+                  onClick={importFlashcardsFromCsv}
+                  className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
+                >
+                  Import Flashcards
+                </button>
+                <div className="flex items-center mt-2">
+                  <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center mt-0">
           <button

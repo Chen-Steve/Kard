@@ -94,7 +94,7 @@ const SignUp = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                             focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                             focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="you@example.com"
                   required
                 />
@@ -109,7 +109,7 @@ const SignUp = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                             focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                             focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="Your username"
                   required
                 />
@@ -139,7 +139,7 @@ const SignUp = () => {
               </div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black-500"
                 disabled={loading}
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
