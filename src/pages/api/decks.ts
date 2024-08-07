@@ -13,11 +13,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const decks = await prisma.deck.findMany({
         where: { userId },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
+        include: {
+          deckTags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
       });
-      res.status(200).json(decks);
+
+      const decksWithTags = decks.map(deck => ({
+        ...deck,
+        tags: deck.deckTags.map(dt => dt.tag),
+      }));
+
+      res.status(200).json(decksWithTags);
     } catch (error) {
-      console.error('GET decks error:', error);
+      console.error('GET decks error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'POST') {
@@ -34,12 +47,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name,
           description,
           userId,
-          tags,
+          deckTags: {
+            create: tags.map((tag: { name: string; color: string }) => ({
+              tag: {
+                connectOrCreate: {
+                  where: { name: tag.name },
+                  create: { name: tag.name, color: tag.color },
+                },
+              },
+            })),
+          },
+        },
+        include: {
+          deckTags: {
+            include: {
+              tag: true,
+            },
+          },
         },
       });
-      res.status(201).json(newDeck);
+
+      const deckWithTags = {
+        ...newDeck,
+        tags: newDeck.deckTags.map(dt => dt.tag),
+      };
+
+      res.status(201).json(deckWithTags);
     } catch (error) {
-      console.error('POST deck error:', error);
+      console.error('POST deck error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else {

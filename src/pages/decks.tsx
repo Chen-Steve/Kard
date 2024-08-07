@@ -16,12 +16,19 @@ import {
   DialogTrigger
 } from '../components/ui/Dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import SketchPickerWrapper from '../components/SketchPickerWrapper';
+
+interface Tag {
+  id: number;
+  name: string;
+  color: string;
+}
 
 interface Deck {
   id: string;
   name: string;
   description: string;
-  tags: string[];
+  tags: Tag[];
 }
 
 const DecksPage = () => {
@@ -29,7 +36,9 @@ const DecksPage = () => {
   const [loading, setLoading] = useState(true);
   const [newDeckName, setNewDeckName] = useState('');
   const [newDeckDescription, setNewDeckDescription] = useState('');
-  const [newDeckTags, setNewDeckTags] = useState<string[]>([]);
+  const [newDeckTags, setNewDeckTags] = useState<Tag[]>([]);
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagColor, setNewTagColor] = useState('#000000');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all'); // State for selected tag
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -45,15 +54,18 @@ const DecksPage = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('decks')
-        .select('*')
-        .eq('userId', session.user.id);
+      const response = await fetch(`/api/decks?userId=${session.user.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to fetch decks');
+      }
 
-      const validDecks = Array.isArray(data) ? data.filter((deck): deck is Deck => deck && deck.id) : [];
-      setDecks(validDecks.map(deck => ({ ...deck, tags: deck.tags || [] }))); // Ensure tags is always an array
+      const data = await response.json();
+      setDecks(data);
     } catch (error) {
       console.error('Error fetching decks:', error);
     } finally {
@@ -80,15 +92,25 @@ const DecksPage = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('decks')
-        .insert([{ name: newDeckName, description: newDeckDescription, userId: session.user.id, tags: newDeckTags }])
-        .select()
-        .single();
+      const response = await fetch('/api/decks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newDeckName,
+          description: newDeckDescription,
+          userId: session.user.id,
+          tags: newDeckTags,
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to create deck');
+      }
 
-      setDecks((prevDecks) => [...prevDecks, { ...data, tags: data.tags || [] }]); // Ensure tags is always an array
+      const newDeck = await response.json();
+      setDecks((prevDecks) => [...prevDecks, newDeck]);
       setNewDeckName('');
       setNewDeckDescription('');
       setNewDeckTags([]);
@@ -96,6 +118,12 @@ const DecksPage = () => {
     } catch (error) {
       console.error('Error creating deck:', error);
     }
+  };
+
+  const handleAddTag = () => {
+    setNewDeckTags([...newDeckTags, { id: 0, name: newTagName, color: newTagColor }]);
+    setNewTagName('');
+    setNewTagColor('#000000');
   };
 
   const handleDeleteDeck = async (deckId: string) => {
@@ -108,13 +136,17 @@ const DecksPage = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('decks')
-        .delete()
-        .eq('id', deckId)
-        .eq('userId', session.user.id);
+      const response = await fetch(`/api/decks`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ deckId, userId: session.user.id }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to delete deck');
+      }
 
       setDecks((prevDecks) => prevDecks.filter((deck) => deck.id !== deckId));
     } catch (error) {
@@ -123,13 +155,13 @@ const DecksPage = () => {
   };
 
   const filteredDecks = decks.filter(
-    (deck) => 
-      deck && 
+    (deck) =>
+      deck &&
       deck.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedTag === 'all' || deck.tags.includes(selectedTag)) // Filter by selected tag
+      (selectedTag === 'all' || deck.tags.some(tag => tag.name === selectedTag))
   );
 
-  const uniqueTags = Array.from(new Set(decks.flatMap(deck => deck.tags))); // Get unique tags
+  const uniqueTags = Array.from(new Set(decks.flatMap(deck => deck.tags.map(tag => tag.name))));
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
@@ -162,11 +194,35 @@ const DecksPage = () => {
                     value={newDeckDescription}
                     onChange={(e) => setNewDeckDescription(e.target.value)}
                   />
-                  <Input
-                    placeholder="Tags (comma separated)"
-                    value={newDeckTags.join(',')}
-                    onChange={(e) => setNewDeckTags(e.target.value.split(',').map(tag => tag.trim()))}
-                  />
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="flex flex-col space-y-2">
+                        <label htmlFor="tag-name" className="sr-only">Tag Name</label>
+                        <input
+                          type="text"
+                          id="tag-name"
+                          placeholder="Tag Name"
+                          value={newTagName}
+                          onChange={(e) => setNewTagName(e.target.value)}
+                          className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                        />
+                        <Button onClick={handleAddTag}>Add Tag</Button>
+                      </div>
+                      <SketchPickerWrapper
+                        color={newTagColor}
+                        onChangeComplete={(color) => setNewTagColor(color.hex)}
+                        className="ml-4"
+                      />
+                    </div>
+
+                  </div>
+                  <div>
+                    {newDeckTags.map((tag, index) => (
+                      <span key={index} style={{ backgroundColor: tag.color }} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2">
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <DialogFooter>
                   <Button onClick={handleCreateDeck}>Create Deck</Button>
@@ -197,7 +253,7 @@ const DecksPage = () => {
                 <SelectValue placeholder="Filter by Tag" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Tags</SelectItem> {/* Use "all" instead of empty string */}
+                <SelectItem value="all">All Tags</SelectItem>
                 {uniqueTags.map(tag => (
                   <SelectItem key={tag} value={tag}>{tag}</SelectItem>
                 ))}
@@ -219,8 +275,8 @@ const DecksPage = () => {
                     </CardDescription>
                     <div className="mt-2">
                       {deck.tags.map((tag) => (
-                        <span key={tag} className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs px-2 py-1 rounded mr-2">
-                          {tag}
+                        <span key={tag.id} style={{ backgroundColor: tag.color }} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2">
+                          {tag.name}
                         </span>
                       ))}
                     </div>

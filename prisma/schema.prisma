@@ -8,11 +8,11 @@ generator client {
 }
 
 model User {
-  id        String     @id
-  email     String     @unique @db.Text
-  name      String?    @unique @db.Text 
-  password  String?    @db.Text
-  avatarUrl String?    @db.Text @map("avatar_url")
+  id         String      @id
+  email      String      @unique @db.Text
+  name       String?     @unique @db.Text 
+  password   String?     @db.Text
+  avatarUrl  String?     @db.Text @map("avatar_url")
   flashcards Flashcard[]
   decks      Deck[]
 
@@ -33,14 +33,34 @@ model Flashcard {
 }
 
 model Deck {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tags        String[] @default([])
-
-  user        User     @relation(fields: [userId], references: [id])
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id])
   flashcards  Flashcard[]
+  deckTags    DeckTag[]
+  
+  @@map("decks")
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  color    String    @default("#000000")
+  deckTags DeckTag[]
+
+  @@map("tags")
+}
+
+model DeckTag {
+  deckId String @map("deck_id")
+  tagId  Int    @map("tag_id")
+  deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  @@id([deckId, tagId])
+
+  @@map("deck_tags")
 }
