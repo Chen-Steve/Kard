@@ -77,8 +77,86 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('POST deck error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
+  } else if (req.method === 'PUT') {
+    const { deckId, name, description, userId, tags } = req.body;
+
+    if (!deckId || !name || !description || !userId) {
+      res.status(400).json({ error: 'Bad Request', details: 'deckId, name, description, and userId are required' });
+      return;
+    }
+
+    try {
+      const updatedDeck = await prisma.deck.update({
+        where: { id: deckId },
+        data: {
+          name,
+          description,
+          deckTags: {
+            deleteMany: {},
+            create: tags.map((tag: { name: string; color: string }) => ({
+              tag: {
+                connectOrCreate: {
+                  where: { name: tag.name },
+                  create: { name: tag.name, color: tag.color },
+                },
+              },
+            })),
+          },
+        },
+        include: {
+          deckTags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+      });
+
+      const deckWithTags = {
+        ...updatedDeck,
+        tags: updatedDeck.deckTags.map(dt => dt.tag),
+      };
+
+      res.status(200).json(deckWithTags);
+    } catch (error) {
+      console.error('PUT deck error:', error as Error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
+  } else if (req.method === 'DELETE') {
+    const { deckId, tagId, userId } = req.body;
+
+    if (!deckId || !tagId || !userId) {
+      res.status(400).json({ error: 'Bad Request', details: 'deckId, tagId, and userId are required' });
+      return;
+    }
+
+    try {
+      const deck = await prisma.deck.findUnique({
+        where: { id: deckId },
+        include: {
+          deckTags: true,
+        },
+      });
+
+      if (!deck || deck.userId !== userId) {
+        res.status(404).json({ error: 'Not Found', details: 'Deck not found or unauthorized' });
+        return;
+      }
+
+      await prisma.deckTag.deleteMany({
+        where: {
+          deckId,
+          tagId,
+        },
+      });
+
+      res.status(204).end();
+    } catch (error) {
+      console.error('DELETE tag error:', error as Error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

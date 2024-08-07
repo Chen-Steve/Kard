@@ -42,6 +42,8 @@ const DecksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all'); // State for selected tag
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   const router = useRouter();
 
   const fetchDecks = useCallback(async () => {
@@ -121,9 +123,35 @@ const DecksPage = () => {
   };
 
   const handleAddTag = () => {
-    setNewDeckTags([...newDeckTags, { id: 0, name: newTagName, color: newTagColor }]);
+    if (!newTagName.trim()) return;
+    if (isEditDialogOpen && editingDeck) {
+      setEditingDeck((prevDeck) => {
+        if (!prevDeck) return prevDeck;
+        return {
+          ...prevDeck,
+          tags: [...prevDeck.tags, { id: 0, name: newTagName, color: newTagColor }],
+        };
+      });
+    } else {
+      setNewDeckTags([...newDeckTags, { id: 0, name: newTagName, color: newTagColor }]);
+    }
     setNewTagName('');
     setNewTagColor('#000000');
+  };
+
+  const handleDeleteTag = (tagIndex: number) => {
+    setNewDeckTags((prevTags) => prevTags.filter((_, index) => index !== tagIndex));
+  };
+
+  const handleDeleteEditingTag = (tagIndex: number) => {
+    if (!editingDeck) return;
+    setEditingDeck((prevDeck) => {
+      if (!prevDeck) return prevDeck;
+      return {
+        ...prevDeck,
+        tags: prevDeck.tags.filter((_, index) => index !== tagIndex),
+      };
+    });
   };
 
   const handleDeleteDeck = async (deckId: string) => {
@@ -151,6 +179,53 @@ const DecksPage = () => {
       setDecks((prevDecks) => prevDecks.filter((deck) => deck.id !== deckId));
     } catch (error) {
       console.error('Error deleting deck:', error);
+    }
+  };
+
+  const handleEditDeck = (deck: Deck) => {
+    setEditingDeck(deck);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateDeck = async () => {
+    if (!editingDeck) {
+      console.error('No deck to update');
+      return;
+    }
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
+      router.push('/signin');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/decks`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          deckId: editingDeck.id,
+          name: editingDeck.name,
+          description: editingDeck.description,
+          userId: session.user.id,
+          tags: editingDeck.tags,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update deck');
+      }
+
+      const updatedDeck = await response.json();
+      setDecks((prevDecks) => prevDecks.map((deck) => (deck.id === updatedDeck.id ? updatedDeck : deck)));
+      setEditingDeck(null);
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating deck:', error);
     }
   };
 
@@ -214,12 +289,14 @@ const DecksPage = () => {
                         className="ml-4"
                       />
                     </div>
-
                   </div>
                   <div>
                     {newDeckTags.map((tag, index) => (
-                      <span key={index} style={{ backgroundColor: tag.color }} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2">
+                      <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
                         {tag.name}
+                        <button onClick={() => handleDeleteTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
+                          x
+                        </button>
                       </span>
                     ))}
                   </div>
@@ -275,7 +352,7 @@ const DecksPage = () => {
                     </CardDescription>
                     <div className="mt-2">
                       {deck.tags.map((tag) => (
-                        <span key={tag.id} style={{ backgroundColor: tag.color }} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2">
+                        <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
                           {tag.name}
                         </span>
                       ))}
@@ -285,13 +362,22 @@ const DecksPage = () => {
                     <Link href={`/decks/${deck.id}`}>
                       <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
                     </Link>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDeleteDeck(deck.id)}
-                      className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditDeck(deck)}
+                        className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDeleteDeck(deck.id)}
+                        className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ) : null
@@ -299,6 +385,60 @@ const DecksPage = () => {
           </div>
         )}
       </main>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Deck</DialogTitle>
+            <DialogDescription>Edit the details of your deck.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Input
+              placeholder="Deck Name"
+              value={editingDeck?.name || ''}
+              onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, name: e.target.value } : prevDeck)}
+            />
+            <Input
+              placeholder="Deck Description"
+              value={editingDeck?.description || ''}
+              onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, description: e.target.value } : prevDeck)}
+            />
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-start space-x-4">
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="tag-name" className="sr-only">Tag Name</label>
+                  <input
+                    type="text"
+                    id="tag-name"
+                    placeholder="Tag Name"
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                  />
+                  <Button onClick={handleAddTag}>Add Tag</Button>
+                </div>
+                <SketchPickerWrapper
+                  color={newTagColor}
+                  onChangeComplete={(color) => setNewTagColor(color.hex)}
+                  className="ml-4"
+                />
+              </div>
+            </div>
+            <div>
+              {editingDeck?.tags.map((tag, index) => (
+                <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                  {tag.name}
+                  <button onClick={() => handleDeleteEditingTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
+                    x
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleUpdateDeck}>Update Deck</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
