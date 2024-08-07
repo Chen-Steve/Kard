@@ -186,7 +186,7 @@ const Profile = () => {
             <Button variant="outline" onClick={() => setIsEditing(false)} className="mr-2 text-black dark:text-white">
               Cancel
             </Button>
-            <Button onClick={handleSave} className="text-black dark:text-white">Save</Button>
+            <Button onClick={handleSave} className="text-black bg-gray-400 hover:bg-gray-500 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">Save</Button>
           </CardFooter>
         )}
         <CardFooter className="flex justify-end">
