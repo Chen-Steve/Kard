@@ -15,11 +15,13 @@ import {
   DialogTitle,
   DialogTrigger
 } from '../components/ui/Dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 
 interface Deck {
   id: string;
   name: string;
   description: string;
+  tags: string[];
 }
 
 const DecksPage = () => {
@@ -27,7 +29,9 @@ const DecksPage = () => {
   const [loading, setLoading] = useState(true);
   const [newDeckName, setNewDeckName] = useState('');
   const [newDeckDescription, setNewDeckDescription] = useState('');
+  const [newDeckTags, setNewDeckTags] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string>('all'); // State for selected tag
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const router = useRouter();
 
@@ -48,8 +52,8 @@ const DecksPage = () => {
 
       if (error) throw error;
 
-      const validDecks = Array.isArray(data) ? data.filter((deck) => deck && deck.id) : [];
-      setDecks(validDecks);
+      const validDecks = Array.isArray(data) ? data.filter((deck): deck is Deck => deck && deck.id) : [];
+      setDecks(validDecks.map(deck => ({ ...deck, tags: deck.tags || [] }))); // Ensure tags is always an array
     } catch (error) {
       console.error('Error fetching decks:', error);
     } finally {
@@ -78,14 +82,16 @@ const DecksPage = () => {
     try {
       const { data, error } = await supabase
         .from('decks')
-        .insert([{ name: newDeckName, description: newDeckDescription, userId: session.user.id }])
+        .insert([{ name: newDeckName, description: newDeckDescription, userId: session.user.id, tags: newDeckTags }])
+        .select()
         .single();
 
       if (error) throw error;
 
-      setDecks((prevDecks) => [...prevDecks, data]);
+      setDecks((prevDecks) => [...prevDecks, { ...data, tags: data.tags || [] }]); // Ensure tags is always an array
       setNewDeckName('');
       setNewDeckDescription('');
+      setNewDeckTags([]);
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error('Error creating deck:', error);
@@ -117,8 +123,13 @@ const DecksPage = () => {
   };
 
   const filteredDecks = decks.filter(
-    (deck) => deck && deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (deck) => 
+      deck && 
+      deck.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedTag === 'all' || deck.tags.includes(selectedTag)) // Filter by selected tag
   );
+
+  const uniqueTags = Array.from(new Set(decks.flatMap(deck => deck.tags))); // Get unique tags
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
@@ -151,6 +162,11 @@ const DecksPage = () => {
                     value={newDeckDescription}
                     onChange={(e) => setNewDeckDescription(e.target.value)}
                   />
+                  <Input
+                    placeholder="Tags (comma separated)"
+                    value={newDeckTags.join(',')}
+                    onChange={(e) => setNewDeckTags(e.target.value.split(',').map(tag => tag.trim()))}
+                  />
                 </div>
                 <DialogFooter>
                   <Button onClick={handleCreateDeck}>Create Deck</Button>
@@ -175,6 +191,19 @@ const DecksPage = () => {
               className="pl-10"
             />
           </div>
+          <div className="mt-4">
+            <Select onValueChange={setSelectedTag}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter by Tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tags</SelectItem> {/* Use "all" instead of empty string */}
+                {uniqueTags.map(tag => (
+                  <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {filteredDecks.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400">No decks found. Create a new deck to get started.</p>
@@ -185,7 +214,16 @@ const DecksPage = () => {
                 <Card key={deck.id} className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
                   <CardHeader>
                     <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
-                    <CardDescription className="text-gray-600 dark:text-gray-400">{deck.description}</CardDescription>
+                    <CardDescription className="text-gray-600 dark:text-gray-400">
+                      {deck.description}
+                    </CardDescription>
+                    <div className="mt-2">
+                      {deck.tags.map((tag) => (
+                        <span key={tag} className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs px-2 py-1 rounded mr-2">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </CardHeader>
                   <CardContent className="flex justify-between items-center">
                     <Link href={`/decks/${deck.id}`}>
