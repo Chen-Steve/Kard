@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { FaArrowLeft } from 'react-icons/fa'; // Import the back arrow icon
 import { toast, useToast } from '../components/ui/use-toast'; // Import toast components
 import { Toaster } from '../components/ui/toaster'; // Import Toaster component
+import { getMicahAvatarSvg } from '../utils/avatar';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -39,6 +40,7 @@ const Profile = () => {
       if (userError) {
         console.error('Error fetching user data:', userError);
       } else {
+        userData.avatar_url = getMicahAvatarSvg(userData.email);
         setUser(userData);
         setName(userData.name);
         setEmail(userData.email);

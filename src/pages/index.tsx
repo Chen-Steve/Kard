@@ -39,11 +39,11 @@ const HomePage: FC = () => {
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-5xl font-bold text-black mb-4">
             {text}
             <Cursor />
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-gray-800 max-w-2xl mx-auto">
             Elevate your learning experience with custom flashcards. Create, manage, and master your knowledge.
           </p>
         </div>
@@ -51,7 +51,7 @@ const HomePage: FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
             <div
-              className="bg-foreground text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleButtonClick}
             >
               Get Started
@@ -60,7 +60,7 @@ const HomePage: FC = () => {
         </div>
       </main>
 
-      <footer className="w-full text-foreground p-6 text-center">
+      <footer className="w-full text-black p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
 
