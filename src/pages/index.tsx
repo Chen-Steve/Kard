@@ -7,6 +7,8 @@ import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
 import { RiFeedbackFill } from "react-icons/ri";
 import CookieConsent from '../components/CookieConsent';
+import { Button } from '../components/ui/Button';
+
 
 const HomePage: FC = () => {
   const handleButtonClick = () => {
@@ -24,8 +26,7 @@ const HomePage: FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-white flex flex-col relative">
-      <div className="hidden md:block absolute top-0 left-20 h-full border-l-2 border-black"></div>
+    <div className="min-h-screen flex flex-col relative cell">
       <header className="w-full text-foreground p-6 flex justify-center items-center">
         <nav className="flex space-x-20">
           <Link href="/" className="kard wiggle-effect">Kard</Link>
@@ -34,8 +35,6 @@ const HomePage: FC = () => {
           </div>
         </nav>
       </header>
-
-      <hr className="hidden md:block border-t-2 border-black w-full" />
 
       <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center mb-12">
@@ -50,19 +49,19 @@ const HomePage: FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
-            <div
-              className="text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+            <Button
+              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleButtonClick}
             >
               Get Started
-            </div>
+            </Button>
           </Link>
           <Link href="/signin">
-            <div
-              className="text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+            <Button
+              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
             >
               Login
-            </div>
+            </Button>
           </Link>
         </div>
       </main>

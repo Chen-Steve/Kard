@@ -36,14 +36,14 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-white flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
       {loading ? (
         <Spinner /> // Display spinner when loading
       ) : (
         <>
-          <div className="absolute top-4 left-4 sm:top-20 sm:left-20">
+          <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
             <Link href="/">
-              <FaArrowLeft className="text-white text-2xl" />
+              <FaArrowLeft className="text-black text-2xl" />
             </Link>
           </div>
           <div className="p-8 rounded-lg w-full max-w-sm">
