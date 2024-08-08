@@ -241,7 +241,7 @@ const DecksPage = () => {
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
+    <div className="min-h-screen bg-blue-100 dark:bg-gray-800">
       <header className="bg-gray dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
@@ -321,12 +321,12 @@ const DecksPage = () => {
               placeholder="Search Decks"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
             />
           </div>
           <div className="mt-4">
             <Select onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
                 <SelectValue placeholder="Filter by Tag" />
               </SelectTrigger>
               <SelectContent>

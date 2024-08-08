@@ -72,16 +72,6 @@
   z-index: -1;
 }
 
-.dot-pattern {
-  background: #fff;
-  background-image:
-    radial-gradient(#aaa 1px, transparent 1px),
-    radial-gradient(#aaa 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
-}
-
-
 @layer base {
   * {
     @apply border-border;
@@ -236,3 +226,21 @@ nav {
   transition: height 2s ease-out;
   height: 0;
 }
+
+.mesh {
+  background-image: url('mesh3.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+.dot-pattern {
+  background: #fff;
+  background-image:
+    radial-gradient(#aaa 1px, transparent 1px),
+    radial-gradient(#aaa 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}
+

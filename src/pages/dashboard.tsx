@@ -198,7 +198,7 @@ const Dashboard = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col">
+    <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
         <NavMenu />
         <div className="absolute top-4 right-8 flex items-center">
@@ -210,7 +210,7 @@ const Dashboard = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               />
               {dropdownOpen && (
-                <div className="absolute right-2 mt-6 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
+                <div className="absolute right-2 mt-6 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
                   <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="block font-medium">{user.name}</span>
                     <span className="block">{user.email}</span>

@@ -42,7 +42,7 @@ const HomePage: FC = () => {
             {text}
             <Cursor />
           </h1>
-          <p className="text-xl text-gray-800 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-900 max-w-2xl mx-auto">
             Elevate your learning experience with custom flashcards. Create, manage, and master your knowledge.
           </p>
         </div>
@@ -50,7 +50,7 @@ const HomePage: FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-12">
           <Link href="/signup">
             <Button
-              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1 w-full sm:w-auto"
               onClick={handleButtonClick}
             >
               Get Started
@@ -58,7 +58,7 @@ const HomePage: FC = () => {
           </Link>
           <Link href="/signin">
             <Button
-              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="text-background px-6 py-3 rounded-md font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1 w-full sm:w-auto"
             >
               Login
             </Button>

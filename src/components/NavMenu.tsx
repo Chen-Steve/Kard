@@ -20,7 +20,7 @@ const NavMenu = () => {
         <RiMenu4Fill className="text-4xl text-black dark:text-white" />
       </button>
       <div
-        className={`fixed top-0 left-0 bg-gray-200 dark:bg-gray-800 rounded-sm transition-width duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 bg-blue-100 dark:bg-gray-800 rounded-sm transition-width duration-300 ease-in-out ${
           isOpen ? "w-50 h-64" : "w-0 h-64"
         } overflow-hidden h-full`}
       >
