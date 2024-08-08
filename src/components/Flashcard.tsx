@@ -225,7 +225,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setCsvFile(event.target.files[0]);
+      const file = event.target.files[0];
+      if (file.type !== 'text/csv') {
+        toast.error('File not supported. Please upload a .csv file.');
+        return;
+      }
+      setCsvFile(file);
     }
   };
 
@@ -353,10 +358,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
+                  className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
                   style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
                 >
-                  Choose File
+                  Choose csv file
                 </button>
                 <button
                   onClick={importFlashcardsFromCsv}
