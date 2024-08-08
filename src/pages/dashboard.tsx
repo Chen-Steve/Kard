@@ -13,6 +13,7 @@ import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
+import Cookies from 'js-cookie';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -26,42 +27,77 @@ const Dashboard = () => {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const sessionData = Cookies.get('session');
+      if (sessionData) {
+        const session = JSON.parse(sessionData);
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-      if (error || !session) {
-        console.error('No active session found.');
-        router.push('/signin');
-        return;
-      }
-
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (userError) {
-        if (userError.code === 'PGRST116') {
-          console.error('No user data found for this ID');
+        if (userError) {
+          if (userError.code === 'PGRST116') {
+            console.error('No user data found for this ID');
+          } else {
+            console.error('Error fetching user data:', userError);
+          }
         } else {
-          console.error('Error fetching user data:', userError);
+          userData.avatarUrl = getMicahAvatarSvg(userData.email);
+          setUser(userData);
+        }
+
+        const { data: decksData, error: decksError } = await supabase
+          .from('decks')
+          .select('*')
+          .eq('userId', session.user.id);
+
+        if (decksError) {
+          console.error('Error fetching decks:', decksError);
+        } else {
+          setDecks(decksData);
+          if (decksData.length > 0) {
+            setSelectedDeckId(decksData[0].id);
+          }
         }
       } else {
-        userData.avatarUrl = getMicahAvatarSvg(userData.email);
-        setUser(userData);
-      }
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-      const { data: decksData, error: decksError } = await supabase
-        .from('decks')
-        .select('*')
-        .eq('userId', session.user.id);
+        if (error || !session) {
+          console.error('No active session found.');
+          router.push('/signin');
+          return;
+        }
 
-      if (decksError) {
-        console.error('Error fetching decks:', decksError);
-      } else {
-        setDecks(decksData);
-        if (decksData.length > 0) {
-          setSelectedDeckId(decksData[0].id);
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userError) {
+          if (userError.code === 'PGRST116') {
+            console.error('No user data found for this ID');
+          } else {
+            console.error('Error fetching user data:', userError);
+          }
+        } else {
+          userData.avatarUrl = getMicahAvatarSvg(userData.email);
+          setUser(userData);
+        }
+
+        const { data: decksData, error: decksError } = await supabase
+          .from('decks')
+          .select('*')
+          .eq('userId', session.user.id);
+
+        if (decksError) {
+          console.error('Error fetching decks:', decksError);
+        } else {
+          setDecks(decksData);
+          if (decksData.length > 0) {
+            setSelectedDeckId(decksData[0].id);
+          }
         }
       }
     };
@@ -70,6 +106,7 @@ const Dashboard = () => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
+        Cookies.remove('session'); // Remove session from cookies on sign out
         router.push('/signin');
       } else {
         const fetchUserData = async () => {

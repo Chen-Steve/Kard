@@ -5,6 +5,7 @@ import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Spinner from '../components/Spinner'; // Assuming you have a Spinner component
+import Cookies from 'js-cookie';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -29,6 +30,7 @@ const SignIn = () => {
       setLoading(false); // Reset loading state
     } else {
       console.log('Signed in successfully:', data);
+      Cookies.set('session', JSON.stringify(data.session), { expires: 7 });
       router.push('/dashboard');
     }
   };

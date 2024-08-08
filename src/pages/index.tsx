@@ -57,6 +57,13 @@ const HomePage: FC = () => {
               Get Started
             </div>
           </Link>
+          <Link href="/signin">
+            <div
+              className="text-background px-6 py-3 rounded-full font-semibold shadow-lg shine-effect text-white bg-gray-800 hover:bg-gray-800 transition duration-300 ease-in-out transform hover:-translate-y-1"
+            >
+              Login
+            </div>
+          </Link>
         </div>
       </main>
 
