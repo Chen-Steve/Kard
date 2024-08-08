@@ -7,7 +7,8 @@ import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
 import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
-import { MdDarkMode } from "react-icons/md"; // Import the dark mode icon
+import { MdDarkMode } from "react-icons/md"; 
+import { FaSun } from "react-icons/fa";
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
@@ -198,7 +199,7 @@ const Dashboard = () => {
                       onClick={toggleDarkMode}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
                     >
-                      <MdDarkMode className="mr-2" />
+                      {isDarkMode ? <FaSun className="mr-2" /> : <MdDarkMode className="mr-2" />}
                       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                     </button>
                   </div>

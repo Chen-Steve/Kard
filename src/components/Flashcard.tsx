@@ -415,7 +415,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           {showList ? 'Hide List' : 'Show List'}
         </button>
       </div>
-      <hr className="border-t-2 border-border dark:border-gray-600 w-full mx-auto mt-2" />
+      <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-2" />
 
       {showList && (
         <div className="mt-2">
