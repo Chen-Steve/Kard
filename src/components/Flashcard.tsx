@@ -293,9 +293,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           onClick={handleFlip}
         >
           {getCurrentCard() ? (
-            <p className="text-2xl font-semibold text-card-foreground dark:text-gray-200">
-              {isFlipped ? getCurrentCard()?.answer : getCurrentCard()?.question}
-            </p>
+            <div dangerouslySetInnerHTML={{ __html: isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? '' }} />
           ) : (
             <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
           )}

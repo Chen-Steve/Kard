@@ -130,7 +130,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
 
-    console.log('DELETE request body:', req.body); // Add this line to log the request body
+    console.log('DELETE request body:', req.body);
 
     try {
       const deck = await prisma.deck.findUnique({
