@@ -227,14 +227,6 @@ nav {
   height: 0;
 }
 
-.mesh {
-  background-image: url('mesh3.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: -1;
-}
-
 .dot-pattern {
   background: #fff;
   background-image:

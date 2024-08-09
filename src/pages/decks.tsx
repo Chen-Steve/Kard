@@ -164,12 +164,15 @@ const DecksPage = () => {
     }
 
     try {
-      const response = await fetch(`/api/decks`, {
+      const response = await fetch('/api/decks', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ deckId, userId: session.user.id }),
+        body: JSON.stringify({
+          deckId,
+          userId: session.user.id,
+        }),
       });
 
       if (!response.ok) {

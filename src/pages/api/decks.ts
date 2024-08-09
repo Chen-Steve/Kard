@@ -123,12 +123,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {
-    const { deckId, tagId, userId } = req.body;
+    const { deckId, userId } = req.body;
 
-    if (!deckId || !tagId || !userId) {
-      res.status(400).json({ error: 'Bad Request', details: 'deckId, tagId, and userId are required' });
+    if (!deckId || !userId) {
+      res.status(400).json({ error: 'Bad Request', details: 'deckId and userId are required' });
       return;
     }
+
+    console.log('DELETE request body:', req.body); // Add this line to log the request body
 
     try {
       const deck = await prisma.deck.findUnique({
@@ -143,16 +145,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
+      // Delete all related tags
       await prisma.deckTag.deleteMany({
         where: {
           deckId,
-          tagId,
         },
+      });
+
+      // Delete the deck
+      await prisma.deck.delete({
+        where: { id: deckId },
       });
 
       res.status(204).end();
     } catch (error) {
-      console.error('DELETE tag error:', error as Error);
+      console.error('DELETE deck error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else {
