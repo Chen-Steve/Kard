@@ -27,12 +27,18 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
     setAnswerContent(answer);
   }, [question, answer]);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === ' ') {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <div className="mb-4 p-4 bg-white dark:bg-gray-600 rounded shadow flex justify-between items-center">
       {isEditing ? (
         <>
           <div className="flex w-full space-x-4">
-            <div className="w-1/2">
+            <div className="w-1/2" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
               <ReactQuill
                 value={questionContent}
                 onChange={setQuestionContent}
@@ -46,7 +52,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
                 ]}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-1/2" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
               <ReactQuill
                 value={answerContent}
                 onChange={setAnswerContent}
@@ -69,10 +75,10 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onS
         <>
           <div className="flex w-full space-x-4">
             <div className="w-1/2 p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white">
-              <p className="font-bold" dangerouslySetInnerHTML={{ __html: question ?? '' }} />
+              <p className="font-bold" style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: question ?? '' }} />
             </div>
             <div className="w-1/2 p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white">
-              <p className="font-bold" dangerouslySetInnerHTML={{ __html: answer ?? '' }} />
+              <p className="font-bold" style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: answer ?? '' }} />
             </div>
           </div>
           <button onClick={() => setIsEditing(true)} className="ml-4 px-3 py-2 bg-gray-300 dark:bg-gray-600 rounded">

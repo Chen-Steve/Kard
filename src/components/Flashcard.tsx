@@ -42,6 +42,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [csvFile, setCsvFile] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const flashcardRef = useRef<HTMLDivElement>(null);
 
   const filteredDecks = decks.filter(deck =>
     deck.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,6 +77,24 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     fetchFlashcards();
   }, [fetchFlashcards]);
 
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          console.log('A child node has been added or removed.');
+        }
+      });
+    });
+
+    if (flashcardRef.current) {
+      observer.observe(flashcardRef.current, { childList: true, subtree: true });
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const handlePrevious = () => {
     if (flashcards.length === 0) return;
     setCurrentCardIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
@@ -90,8 +109,37 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     setIsFlipped(false);
   };
 
-  const handleFlip = () => {
+  const handleFlip = (event: React.KeyboardEvent) => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+      return; // Do not flip if the target is an input or textarea
+    }
     setIsFlipped((prev) => !prev);
+  };
+
+  const handleFlipClick = () => {
+    const customEvent = { target: { tagName: '' } } as unknown as React.KeyboardEvent;
+    handleFlip(customEvent);
+  };
+
+  const handleFlipWrapper = () => {
+    const customEvent = {
+      altKey: false,
+      charCode: 0,
+      ctrlKey: false,
+      code: '',
+      key: '',
+      keyCode: 0,
+      metaKey: false,
+      repeat: false,
+      shiftKey: false,
+      getModifierState: () => false,
+      preventDefault: () => {},
+      isTrusted: true,
+      target: null,
+      // Add other necessary properties if needed
+    } as unknown as React.KeyboardEvent<Element>;
+  
+    handleFlip(customEvent);
   };
 
   const handleAddCard = async () => {
@@ -285,12 +333,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   return (
     <div className="container mx-auto p-4 max-w-3xl">
-      <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlip} />
+      <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlipWrapper} />
       {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
       <div className="flex flex-col items-center mb-8">
         <div
           className="w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
-          onClick={handleFlip}
+          onClick={handleFlipClick}
         >
           {getCurrentCard() ? (
             <div dangerouslySetInnerHTML={{ __html: isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? '' }} />
