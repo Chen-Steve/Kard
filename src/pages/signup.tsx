@@ -91,7 +91,7 @@ const SignUp = () => {
                 <span className="block sm:inline">{errorMessage}</span>
               </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-black">
                   Email
