@@ -4,7 +4,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
-import Spinner from '../components/Spinner'; 
+import Spinner from '../components/Spinner';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -12,12 +13,19 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+
+    if (!hcaptchaToken) {
+      setErrorMessage('Please complete the hCaptcha.');
+      setLoading(false);
+      return;
+    }
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -39,7 +47,7 @@ const SignUp = () => {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: data.user.id, email, password, name }),
+          body: JSON.stringify({ id: data.user.id, email, password, name, hcaptchaToken }),
         });
 
         if (!response.ok) {
@@ -137,6 +145,10 @@ const SignUp = () => {
                   </div>
                 </div>
               </div>
+              <HCaptcha
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                onVerify={(token) => setHcaptchaToken(token)}
+              />
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black-500"

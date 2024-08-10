@@ -3,20 +3,44 @@ import bcrypt from 'bcrypt';
 import prisma from '../../../lib/prisma';
 import { getMicahAvatarSvg } from '../../../utils/avatar';
 import rateLimit from '../../../middleware/rateLimit';
+import axios from 'axios';
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`Received ${req.method} request at /api/auth/signup`);
   if (req.method === 'POST') {
     await rateLimit(req, res, () => {}); // Apply rate limiting
-    const { id, email, password, name } = req.body;
+    const { id, email, password, name, hcaptchaToken } = req.body;
 
-    if (!id || !email || !name) {
-      res.status(400).json({ error: 'ID, email, and name are required' });
+    if (!id || !email || !name || !hcaptchaToken) {
+      res.status(400).json({ error: 'ID, email, name, and hCaptcha token are required' });
       return;
     }
 
     if (email.length > 255 || (password && password.length > 255) || id.length > 255 || name.length > 255) {
       res.status(400).json({ error: 'ID, email, password, and name must be 255 characters or less' });
+      return;
+    }
+
+    // Verify hCaptcha token
+    try {
+      const hcaptchaResponse = await axios.post<{ success: boolean }>(
+        `https://hcaptcha.com/siteverify`,
+        {},
+        {
+          params: {
+            secret: process.env.HCAPTCHA_SECRET_KEY,
+            response: hcaptchaToken,
+          },
+        }
+      );
+
+      if (!hcaptchaResponse.data.success) {
+        res.status(400).json({ error: 'Invalid hCaptcha token' });
+        return;
+      }
+    } catch (error) {
+      console.error('hCaptcha verification error:', error);
+      res.status(500).json({ error: 'hCaptcha verification failed' });
       return;
     }
 
