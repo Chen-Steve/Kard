@@ -17,6 +17,8 @@ import {
 } from '../components/ui/Dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import SketchPickerWrapper from '../components/SketchPickerWrapper';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import useDOMNodeInserted from '../hooks/useDOMNodeInserted';
 
 interface Tag {
   id: number;
@@ -164,15 +166,12 @@ const DecksPage = () => {
     }
 
     try {
-      const response = await fetch('/api/decks', {
+      const response = await fetch(`/api/decks`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          deckId,
-          userId: session.user.id,
-        }),
+        body: JSON.stringify({ deckId, userId: session.user.id }),
       });
 
       if (!response.ok) {
@@ -240,6 +239,38 @@ const DecksPage = () => {
   );
 
   const uniqueTags = Array.from(new Set(decks.flatMap(deck => deck.tags.map(tag => tag.name))));
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+
+    const reorderedDecks = Array.from(decks);
+    const [movedDeck] = reorderedDecks.splice(result.source.index, 1);
+    reorderedDecks.splice(result.destination.index, 0, movedDeck);
+
+    setDecks(reorderedDecks);
+
+    try {
+      const response = await fetch('/api/decks', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decks: reorderedDecks }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update deck order');
+      }
+    } catch (error) {
+      console.error('Error updating deck order:', error);
+    }
+  };
+
+  useDOMNodeInserted((mutationsList) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        console.log('A child node has been added or removed.');
+      }
+    }
+  });
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
@@ -344,48 +375,66 @@ const DecksPage = () => {
         {filteredDecks.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400">No decks found. Create a new deck to get started.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDecks.map((deck) => (
-              deck && deck.id ? (
-                <Card key={deck.id} className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
-                    <CardDescription className="text-gray-600 dark:text-gray-400">
-                      {deck.description}
-                    </CardDescription>
-                    <div className="mt-2">
-                      {deck.tags.map((tag) => (
-                        <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
-                          {tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex justify-between items-center">
-                    <Link href={`/decks/${deck.id}`}>
-                      <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
-                    </Link>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleEditDeck(deck)}
-                        className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleDeleteDeck(deck.id)}
-                        className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : null
-            ))}
-          </div>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="decks">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredDecks.map((deck, index) => (
+                    deck && deck.id ? (
+                      <Draggable key={deck.id} draggableId={deck.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="transition-shadow duration-300"
+                          >
+                            <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
+                              <CardHeader>
+                                <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
+                                <CardDescription className="text-gray-600 dark:text-gray-400">
+                                  {deck.description}
+                                </CardDescription>
+                                <div className="mt-2">
+                                  {deck.tags.map((tag) => (
+                                    <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                                      {tag.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </CardHeader>
+                              <CardContent className="flex justify-between items-center">
+                                <Link href={`/decks/${deck.id}`}>
+                                  <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
+                                </Link>
+                                <div className="flex space-x-2">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleEditDeck(deck)}
+                                    className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    onClick={() => handleDeleteDeck(deck.id)}
+                                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        )}
+                      </Draggable>
+                    ) : null
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </main>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
