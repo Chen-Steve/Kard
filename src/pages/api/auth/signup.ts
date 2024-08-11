@@ -2,8 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import prisma from '../../../lib/prisma';
 import { getMicahAvatarSvg } from '../../../utils/avatar';
-import rateLimit from '../../../middleware/rateLimit';
 import axios from 'axios';
+
+const rateLimit = (req: NextApiRequest, res: NextApiResponse, next: () => void) => {
+  // Implement rate limiting logic here
+  next();
+};
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`Received ${req.method} request at /api/auth/signup`);
