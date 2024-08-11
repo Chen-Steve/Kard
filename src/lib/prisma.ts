@@ -5,8 +5,14 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
+const isPgBouncer = process.env.PGBOUNCER === 'true';
 const prisma = global.prisma || new PrismaClient({
   log: ['query', 'info', 'warn', 'error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL + (isPgBouncer ? '?pgbouncer=true' : ''),
+    },
+  },
 });
 
 if (process.env.NODE_ENV !== 'production') {
