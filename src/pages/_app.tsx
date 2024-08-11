@@ -9,6 +9,7 @@ import '../app/globals.css';
 import '../lib/fontAwesome';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
+import { Toaster } from '../components/ui/toaster';
 
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,13 +39,14 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
   return (
     <>
       <Head>
-        <link rel="icon" href="/app/kard.ico" />
+        <link rel="icon" href="/logo.ico" />
       </Head>
       <SessionProvider session={initialSession}>
         <AuthWrapper>
           <DragDropContext onDragEnd={handleDragEnd}>
             <Component {...pageProps} />
             <Analytics />
+            <Toaster />
             <ToastContainer />
           </DragDropContext>
         </AuthWrapper>

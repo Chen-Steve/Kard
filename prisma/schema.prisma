@@ -15,6 +15,7 @@ model User {
   avatarUrl  String?     @db.Text @map("avatar_url")
   flashcards Flashcard[]
   decks      Deck[]
+  generations Generation[]
 
   @@map("users")
 }
@@ -63,4 +64,14 @@ model DeckTag {
   @@id([deckId, tagId])
 
   @@map("deck_tags")
+}
+
+model Generation {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  count     Int      @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("generations")
 }

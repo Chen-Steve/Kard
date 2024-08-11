@@ -4,7 +4,7 @@ interface OpenAIResponse {
   text: string;
 }
 
-export const generateFlashcards = async (description: string): Promise<{ question: string, answer: string }[]> => {
+export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
     const response = await axios.post<OpenAIResponse>('/api/generate', {
       prompt: `Generate flashcards based on the following description: "${description}". 
@@ -17,11 +17,11 @@ export const generateFlashcards = async (description: string): Promise<{ questio
       ---
       Continue this format for the entire description provided.`,
       max_tokens: 500,
+      userId,
     }, { timeout: 30000 });
 
     console.log('OpenAI API response:', response.data.text);
 
-    // Parse the AI's response into flashcards
     const flashcardsText = response.data.text.trim();
     const flashcards = flashcardsText.split('---').map(block => {
       const [questionPart, answerPart] = block.split('Answer:');
@@ -30,10 +30,9 @@ export const generateFlashcards = async (description: string): Promise<{ questio
       return { question, answer };
     });
 
-    // Filter out invalid flashcards
     const validFlashcards = flashcards.filter(flashcard => flashcard.question && flashcard.answer);
 
-    console.log('Valid flashcards:', validFlashcards); // Log the valid flashcards
+    console.log('Valid flashcards:', validFlashcards);
 
     return validFlashcards;
   } catch (error) {

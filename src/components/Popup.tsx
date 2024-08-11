@@ -4,28 +4,58 @@ import { Textarea } from '../components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { generateFlashcards } from '../lib/openai';
 import { AiOutlineExperiment } from 'react-icons/ai';
+import { toast } from '../components/ui/use-toast';
+import { isAxiosError } from '../lib/axiosErrorGuard';
 
 interface PopupProps {
   onClose: () => void;
   onFlashcardsGenerated: (flashcards: { question: string, answer: string }[]) => void;
+  userId: string; 
 }
 
-const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated }) => {
+const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId }) => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const flashcards = await generateFlashcards(description);
+      const flashcards = await generateFlashcards(description, userId);
       console.log('Generated Flashcards:', flashcards);
 
-      // Filter out invalid flashcards
       const validFlashcards = flashcards.filter(flashcard => flashcard.question && flashcard.answer);
-      console.log('Valid Flashcards:', validFlashcards); // Log valid flashcards
+      console.log('Valid Flashcards:', validFlashcards);
       onFlashcardsGenerated(validFlashcards);
     } catch (error) {
       console.error('Error generating flashcards:', error);
+
+      if (isAxiosError(error)) {
+        if (error.response && error.response.status === 429) {
+          toast({
+            title: 'Limit Reached',
+            description: 'Daily generation limit reached. Please try again tomorrow.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Failed to generate flashcards. Please try again.',
+            variant: 'destructive',
+          });
+        }
+      } else if (error instanceof Error) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Unknown Error',
+          description: 'An unknown error occurred. Please try again.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setLoading(false);
       onClose();
