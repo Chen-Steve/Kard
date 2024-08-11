@@ -7,8 +7,10 @@ import EditFlashcard from './EditFlashcard';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
 import { MdSettings } from "react-icons/md";
+import { PiSparkleBold } from "react-icons/pi";
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 import Papa from 'papaparse';
+import Popup from './Popup'; // Import the Popup component
 
 interface FlashcardProps {
   userId: string;
@@ -40,6 +42,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [searchTerm, setSearchTerm] = useState('');
   const [isImportVisible, setIsImportVisible] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [isPopupVisible, setIsPopupVisible] = useState(false); 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const flashcardRef = useRef<HTMLDivElement>(null);
@@ -331,182 +334,221 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     });
   };
 
+  const handleFlashcardsGenerated = async (generatedFlashcards: { question: string, answer: string }[]) => {
+    const validFlashcards = generatedFlashcards.filter(flashcard => flashcard.question && flashcard.answer);
+
+    for (const flashcard of validFlashcards) {
+      try {
+        const response = await fetch('/api/flashcard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: flashcard.question,
+            answer: flashcard.answer,
+            userId: userId,
+            deckId: selectedDeckId,
+            order: flashcards.length + 1, // Adjust this if you want a different order
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
+        }
+
+        const savedCard = await response.json();
+        setFlashcards(prevFlashcards => [...prevFlashcards, savedCard]);
+      } catch (error) {
+        console.error('Error adding flashcard:', error);
+        toast.error('Failed to add flashcard. Please try again.');
+      }
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4 max-w-3xl">
-      <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlipWrapper} />
-      {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
-      <div className="flex flex-col items-center mb-8">
-        <div
-          className="w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
-          onClick={handleFlipClick}
-        >
-          {getCurrentCard() ? (
-            <div dangerouslySetInnerHTML={{ __html: isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? '' }} />
-          ) : (
-            <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
-          )}
-        </div>
-        <div className="flex justify-between w-full mt-0">
-          <div className="flex items-center">
-            <button
-              onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
-              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-2 rounded"
-            >
-              Select Deck
-            </button>
-            {isDeckSelectVisible && (
-              <>
-                <label htmlFor="deck-select" className="sr-only">Select Deck</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Search decks..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-1 ml-2 border-2 border-black dark:border-gray-600 rounded"
-                  />
-                  <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
-                    <SelectTrigger className="p-2 border-1 border-black dark:border-gray-600" />
-                    {(searchTerm || filteredDecks.length > 0) && (
-                      <SelectContent>
-                        {filteredDecks.length > 0 ? (
-                          filteredDecks.map((deck) => (
-                            <SelectItem key={deck.id} value={deck.id}>
-                              {deck.name}
+    <div className="relative">
+      <div className="container mx-auto p-4 max-w-3xl">
+        <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlipWrapper} />
+        {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
+        <div className="flex flex-col items-center mb-8">
+          <div
+            className="w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+            onClick={handleFlipClick}
+          >
+            {getCurrentCard() ? (
+              <div dangerouslySetInnerHTML={{ __html: isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? '' }} />
+            ) : (
+              <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
+            )}
+          </div>
+          <div className="flex justify-between w-full mt-0">
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
+                className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-2 rounded"
+              >
+                Select Deck
+              </button>
+              {isDeckSelectVisible && (
+                <>
+                  <label htmlFor="deck-select" className="sr-only">Select Deck</label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Search decks..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="p-1 ml-2 border-2 border-black dark:border-gray-600 rounded"
+                    />
+                    <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
+                      <SelectTrigger className="p-2 border-1 border-black dark:border-gray-600" />
+                      {(searchTerm || filteredDecks.length > 0) && (
+                        <SelectContent>
+                          {filteredDecks.length > 0 ? (
+                            filteredDecks.map((deck) => (
+                              <SelectItem key={deck.id} value={deck.id}>
+                                {deck.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-decks" disabled>
+                              No decks available
                             </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-decks" disabled>
-                            No decks available
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    )}
-                  </Select>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="relative">
-            <MdSettings
-              className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
-              onClick={() => setIsImportVisible(!isImportVisible)}
-            />
-            {isImportVisible && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleCsvUpload}
-                  ref={fileInputRef}
-                  className="hidden"
-                  title="input file"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
-                  style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
-                >
-                  Choose csv file
-                </button>
-                <button
-                  onClick={importFlashcardsFromCsv}
-                  className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
-                >
-                  Import Flashcards
-                </button>
-                <div className="flex items-center mt-2">
-                  <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center mt-0">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className="mr-4 text-2xl text-black dark:text-white"
-            aria-label="Previous"
-            disabled={currentCardIndex === 0}
-          >
-            <FaChevronLeft />
-          </button>
-          <span className="text-lg text-foreground dark:text-gray-200">
-            {getCurrentCard() ? `${currentCardIndex + 1} / ${flashcards.length}` : '0 / 0'}
-          </span>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="ml-4 text-2xl text-black dark:text-white"
-            aria-label="Next"
-            disabled={currentCardIndex === flashcards.length - 1}
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-      </div>
-
-      <div className="flex justify-between space-x-4">
-        <button
-          onClick={handleAddCard}
-          className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
-        >
-          <FaPlus className="mr-2" /> Add Flashcard
-        </button>
-        <button
-          onClick={() => setShowList(!showList)}
-          className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
-        >
-          {showList ? 'Hide List' : 'Show List'}
-        </button>
-      </div>
-      <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-2" />
-
-      {showList && (
-        <div className="mt-2">
-          <DragDropContext onDragEnd={handleDrop}>
-            <Droppable droppableId="flashcards">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {flashcards.map((card, index) => (
-                    <Draggable key={card.id} draggableId={card.id} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="bg-white dark:bg-gray-800 rounded mb-2"
-                        >
-                          <EditFlashcard
-                            id={card.id}
-                            question={card.question}
-                            answer={showDefinitions ? card.answer : ''}
-                            onSave={debouncedSaveCard}
-                            onDelete={handleDeleteCard}
-                          />
-                        </div>
+                          )}
+                        </SelectContent>
                       )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+                    </Select>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="relative flex items-center">
+              <PiSparkleBold
+                className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer mr-2"
+                onClick={() => setIsPopupVisible(true)}
+              />
+              <MdSettings
+                className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
+                onClick={() => setIsImportVisible(!isImportVisible)}
+              />
+              {isImportVisible && (
+                <div className="absolute right-0 mt-8 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCsvUpload}
+                    ref={fileInputRef}
+                    className="hidden"
+                    title="input file"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
+                    style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
+                  >
+                    Choose csv file
+                  </button>
+                  <button
+                    onClick={importFlashcardsFromCsv}
+                    className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
+                  >
+                    Import Flashcards
+                  </button>
+                  <div className="flex items-center mt-2">
+                    <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
+                  </div>
                 </div>
               )}
-            </Droppable>
-          </DragDropContext>
+            </div>
+          </div>
+          <div className="flex items-center mt-0">
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="mr-4 text-2xl text-black dark:text-white"
+              aria-label="Previous"
+              disabled={currentCardIndex === 0}
+            >
+              <FaChevronLeft />
+            </button>
+            <span className="text-lg text-foreground dark:text-gray-200">
+              {getCurrentCard() ? `${currentCardIndex + 1} / ${flashcards.length}` : '0 / 0'}
+            </span>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="ml-4 text-2xl text-black dark:text-white"
+              aria-label="Next"
+              disabled={currentCardIndex === flashcards.length - 1}
+            >
+              <FaChevronRight />
+            </button>
+          </div>
         </div>
-      )}
 
-      {flashcards.length > 0 && (
-        <button
-          onClick={() => setShowDefinitions(!showDefinitions)}
-          className="fixed bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
-        >
-          {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
-          {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
-        </button>
-      )}
+        <div className="flex justify-between space-x-4">
+          <button
+            onClick={handleAddCard}
+            className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+          >
+            <FaPlus className="mr-2" /> Add Flashcard
+          </button>
+          <button
+            onClick={() => setShowList(!showList)}
+            className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+          >
+            {showList ? 'Hide List' : 'Show List'}
+          </button>
+        </div>
+        <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-2" />
 
+        {showList && (
+          <div className="mt-2">
+            <DragDropContext onDragEnd={handleDrop}>
+              <Droppable droppableId="flashcards">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {flashcards.map((card, index) => (
+                      <Draggable key={card.id} draggableId={card.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="bg-white dark:bg-gray-800 rounded mb-2"
+                          >
+                            <EditFlashcard
+                              id={card.id}
+                              question={card.question}
+                              answer={showDefinitions ? card.answer : ''}
+                              onSave={debouncedSaveCard}
+                              onDelete={handleDeleteCard}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </div>
+        )}
+
+        {flashcards.length > 0 && (
+          <button
+            onClick={() => setShowDefinitions(!showDefinitions)}
+            className="fixed bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
+          >
+            {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
+            {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
+          </button>
+        )}
+
+        {isPopupVisible && <Popup onClose={() => setIsPopupVisible(false)} onFlashcardsGenerated={handleFlashcardsGenerated} />}
+
+      </div>
     </div>
   );
 };

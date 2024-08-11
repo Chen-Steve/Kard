@@ -30,6 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+      console.log('Creating flashcard with data:', { question, answer, userId, deckId }); // Log incoming data
+
       const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) {
         res.status(404).json({ error: 'User not found' });
@@ -43,10 +45,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           question,
           answer,
           order: flashcardCount + 1,
-          userId,
-          deckId,
+          user: { connect: { id: userId } }, // Connect the user
+          deck: { connect: { id: deckId } }, // Connect the deck
         },
       }));
+      console.log('New flashcard created:', newFlashcard); // Log created flashcard
       res.status(201).json(newFlashcard);
     } catch (error) {
       console.error('POST flashcard error:', error);
@@ -73,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'PUT') {
-    console.log('PUT request body:', req.body); // Add this line to log the request body
+    console.log('PUT request body:', req.body);
     const { id, question, answer, order } = req.body;
 
     if (!id || !question || !answer || order === undefined) {
