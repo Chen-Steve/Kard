@@ -3,6 +3,7 @@ import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
+import Head from 'next/head';
 import 'react-toastify/dist/ReactToastify.css';
 import '../app/globals.css';
 import '../lib/fontAwesome';
@@ -35,15 +36,20 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
   }, []);
 
   return (
-    <SessionProvider session={initialSession}>
-      <AuthWrapper>
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Component {...pageProps} />
-          <Analytics />
-          <ToastContainer />
-        </DragDropContext>
-      </AuthWrapper>
-    </SessionProvider>
+    <>
+      <Head>
+        <link rel="icon" href="/app/kard.ico" />
+      </Head>
+      <SessionProvider session={initialSession}>
+        <AuthWrapper>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Component {...pageProps} />
+            <Analytics />
+            <ToastContainer />
+          </DragDropContext>
+        </AuthWrapper>
+      </SessionProvider>
+    </>
   );
 }
 
