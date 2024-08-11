@@ -1,11 +1,24 @@
 {
     "version": 2,
     "builds": [
-      { "src": "python-api/**/*.py", "use": "@vercel/python" }
+      {
+        "src": "python-api/**/*.py", 
+        "use": "@vercel/python"
+      },
+      {
+        "src": "src/pages/**/*.tsx",
+        "use": "@vercel/next"
+      }
     ],
     "routes": [
-      { "src": "/api/(.*)", "dest": "python-api/$1" },
-      { "src": "/", "dest": "src/pages/index.tsx" }
+      {
+        "src": "/api/(.*)",
+        "dest": "python-api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "src/pages/$1"
+      }
     ]
   }
   
