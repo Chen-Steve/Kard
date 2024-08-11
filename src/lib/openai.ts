@@ -6,7 +6,7 @@ interface OpenAIResponse {
 
 export const generateFlashcards = async (description: string): Promise<{ question: string, answer: string }[]> => {
   try {
-    const response = await axios.post<OpenAIResponse>('http://kard-sandy.vercel.app/generate', {
+    const response = await axios.post<OpenAIResponse>('/api/generate', {
       prompt: `Generate flashcards based on the following description: "${description}". 
       Each flashcard should be formatted as follows:
       Question: What is the capital of France?
