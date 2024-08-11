@@ -546,7 +546,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           </button>
         )}
 
-        {isPopupVisible && <Popup onClose={() => setIsPopupVisible(false)} onFlashcardsGenerated={handleFlashcardsGenerated} />}
+        {isPopupVisible && (
+          <Popup 
+            onClose={() => setIsPopupVisible(false)} 
+            onFlashcardsGenerated={handleFlashcardsGenerated} 
+            userId={userId}
+          />
+        )}
 
       </div>
     </div>
