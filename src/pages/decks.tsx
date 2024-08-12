@@ -31,6 +31,7 @@ interface Deck {
   name: string;
   description: string;
   tags: Tag[];
+  order: number; // Added order property
 }
 
 const DecksPage = () => {
@@ -247,20 +248,29 @@ const DecksPage = () => {
     const [movedDeck] = reorderedDecks.splice(result.source.index, 1);
     reorderedDecks.splice(result.destination.index, 0, movedDeck);
 
-    setDecks(reorderedDecks);
+    // Update the order of the decks
+    const updatedDecks = reorderedDecks.map((deck, index) => ({
+      ...deck,
+      order: index + 1,
+    }));
 
     try {
       const response = await fetch('/api/decks', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decks: reorderedDecks }),
+        body: JSON.stringify({ decks: updatedDecks }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to update deck order');
       }
+
+      // Update the local state with the new order
+      setDecks(updatedDecks);
     } catch (error) {
       console.error('Error updating deck order:', error);
+      // Optionally, revert the local state if the API call fails
+      setDecks(decks);
     }
   };
 

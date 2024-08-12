@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const decks = await prisma.deck.findMany({
         where: { userId },
-        orderBy: { created_at: 'desc' },
+        orderBy: { order: 'asc' },
         include: {
           deckTags: {
             include: {
@@ -162,8 +162,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('DELETE deck error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
+  } else if (req.method === 'PATCH') {
+    const { decks } = req.body;
+
+    if (!Array.isArray(decks) || decks.length === 0) {
+      res.status(400).json({ error: 'Invalid decks data' });
+      return;
+    }
+
+    try {
+      const updatePromises = decks.map((deck, index) =>
+        prisma.deck.update({
+          where: { id: deck.id },
+          data: { order: index + 1 },
+        })
+      );
+      await Promise.all(updatePromises);
+      res.status(200).json({ message: 'Decks updated successfully' });
+    } catch (error) {
+      console.error('PATCH decks error:', error as Error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
   } else {
-    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
+    res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
