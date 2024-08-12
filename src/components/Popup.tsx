@@ -36,6 +36,13 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
             description: 'Daily generation limit reached. Please try again tomorrow.',
             variant: 'destructive',
           });
+        } else if (error.response && error.response.status === 400) {
+          const errorMessage = (error.response.data as { error: string }).error;
+          toast({
+            title: 'Invalid Input',
+            description: errorMessage,
+            variant: 'destructive',
+          });
         } else {
           toast({
             title: 'Error',

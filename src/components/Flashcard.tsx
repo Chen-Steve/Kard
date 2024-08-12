@@ -432,7 +432,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                 onClick={() => setIsImportVisible(!isImportVisible)}
               />
               {isImportVisible && (
-                <div className="absolute right-0 mt-8 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
+                <div className="absolute right-0 mt-48 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
                   <input
                     type="file"
                     accept=".csv"

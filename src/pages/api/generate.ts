@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -17,6 +18,11 @@ interface OpenAIRequest {
   prompt: string;
   max_tokens: number;
 }
+
+const matcher = new RegExpMatcher({
+  ...englishDataset.build(),
+  ...englishRecommendedTransformers,
+});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -36,6 +42,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!userIp) {
     res.status(500).json({ error: 'Unable to determine user identity' });
+    return;
+  }
+
+  // Check for profanity
+  if (matcher.hasMatch(prompt)) {
+    res.status(400).json({ error: 'Your input contains inappropriate content. Please revise and try again.' });
     return;
   }
 
