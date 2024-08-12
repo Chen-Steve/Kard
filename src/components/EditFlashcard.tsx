@@ -1,94 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import React, { useState, useEffect, useRef } from 'react';
+import { FaTrashAlt, FaSave } from 'react-icons/fa';
 
 interface EditFlashcardProps {
   id: string;
   question: string;
   answer: string;
-  onSave: (id: string, updatedQuestion: string, updatedAnswer: string) => void;
+  onSave: (id: string, question: string, answer: string) => void;
   onDelete: (id: string) => void;
 }
 
-const EditFlashcard: React.FC<EditFlashcardProps> = ({ id, question, answer, onSave, onDelete }) => {
+const EditFlashcard: React.FC<EditFlashcardProps> = ({
+  id,
+  question,
+  answer,
+  onSave,
+  onDelete,
+}) => {
+  const [editedQuestion, setEditedQuestion] = useState(question);
+  const [editedAnswer, setEditedAnswer] = useState(answer);
   const [isEditing, setIsEditing] = useState(false);
-  const [questionContent, setQuestionContent] = useState(question);
-  const [answerContent, setAnswerContent] = useState(answer);
+  const questionRef = useRef<HTMLTextAreaElement>(null);
+  const answerRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      questionRef.current?.focus();
+    }
+  }, [isEditing]);
 
   const handleSave = () => {
-    onSave(id, questionContent, answerContent);
+    onSave(id, editedQuestion, editedAnswer);
     setIsEditing(false);
   };
 
-  useEffect(() => {
-    setQuestionContent(question);
-    setAnswerContent(answer);
-  }, [question, answer]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === ' ') {
-      e.stopPropagation();
-    }
+  const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
   return (
-    <div className="mb-4 p-4 bg-white dark:bg-gray-600 rounded shadow flex justify-between items-center">
-      {isEditing ? (
-        <>
-          <div className="flex w-full space-x-4">
-            <div className="w-1/2" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
-              <ReactQuill
-                value={questionContent}
-                onChange={setQuestionContent}
-                modules={{
-                  toolbar: [
-                    ['bold', 'italic', 'underline'],
-                  ],
-                }}
-                formats={[
-                  'bold', 'italic', 'underline',
-                ]}
-              />
-            </div>
-            <div className="w-1/2" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
-              <ReactQuill
-                value={answerContent}
-                onChange={setAnswerContent}
-                modules={{
-                  toolbar: [
-                    ['bold', 'italic', 'underline'],
-                  ],
-                }}
-                formats={[
-                  'bold', 'italic', 'underline',
-                ]}
-              />
-            </div>
-          </div>
-          <button onClick={handleSave} className="ml-4 px-3 py-2 bg-green-700 text-white rounded">
-            Save
-          </button>
-        </>
-      ) : (
-        <>
-          <div className="flex w-full space-x-4">
-            <div className="w-1/2 p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white">
-              <p className="font-bold" style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: question ?? '' }} />
-            </div>
-            <div className="w-1/2 p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white">
-              <p className="font-bold" style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: answer ?? '' }} />
-            </div>
-          </div>
-          <button onClick={() => setIsEditing(true)} className="ml-4 px-3 py-2 bg-gray-300 dark:bg-gray-600 rounded">
-            Edit
-          </button>
-          <button onClick={() => onDelete(id)} className="ml-4 px-1 py-2 bg-red-500 text-white rounded">
-            Delete
-          </button>
-        </>
-      )}
+    <div className="border-2 border-black dark:border-gray-600 rounded-sm p-4 mb-4 relative">
+      <div className="flex flex-col space-y-2">
+        <div className="flex-grow">
+          <textarea
+            ref={questionRef}
+            value={editedQuestion}
+            onChange={(e) => {
+              setEditedQuestion(e.target.value);
+              adjustTextareaHeight(e.target);
+            }}
+            onFocus={() => setIsEditing(true)}
+            className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
+            rows={1}
+            title="Question"
+          />
+        </div>
+        <div className="flex-grow">
+          <textarea
+            ref={answerRef}
+            value={editedAnswer}
+            onChange={(e) => {
+              setEditedAnswer(e.target.value);
+              adjustTextareaHeight(e.target);
+            }}
+            onFocus={() => setIsEditing(true)}
+            className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
+            rows={1}
+            title="Answer"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end mt-2 space-x-2">
+        <button
+          onClick={() => onDelete(id)}
+          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
+          title="Delete"
+        >
+          <FaTrashAlt />
+        </button>
+        <button
+          onClick={handleSave}
+          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
+          title="Save"
+        >
+          <FaSave size={16} />
+        </button>
+      </div>
     </div>
   );
 };

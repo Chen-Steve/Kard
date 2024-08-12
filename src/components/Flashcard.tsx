@@ -30,6 +30,8 @@ interface Deck {
   name: string;
 }
 
+const MAX_CHAR_LIMIT = 930;
+
 const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [] }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -157,6 +159,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       deckId: selectedDeckId, // Include deckId
     };
 
+    // Check character limit before adding
+    if (newCard.question.length > MAX_CHAR_LIMIT || newCard.answer.length > MAX_CHAR_LIMIT) {
+      setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
+      return;
+    }
+
     setFlashcards((prevFlashcards) => [...prevFlashcards, newCard]);
     setCurrentCardIndex(flashcards.length);
     setError(null);
@@ -195,6 +203,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       setError('Flashcard not found');
       return;
     }
+
+    // Check character limit
+    if (updatedQuestion.length > MAX_CHAR_LIMIT || updatedAnswer.length > MAX_CHAR_LIMIT) {
+      setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
+      return;
+    }
+
     try {
       const response = await fetch('/api/flashcard', {
         method: 'PUT',
@@ -291,12 +306,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     Papa.parse(csvFile, {
       header: true,
       complete: async (results) => {
-        const importedFlashcards: Flashcard[] = results.data.map((row: any, index: number) => ({
-          id: `imported-${index}`,
-          question: row.question || '',
-          answer: row.answer || '',
-          order: flashcards.length + index + 1,
-        }));
+        const importedFlashcards: Flashcard[] = results.data
+          .map((row: any, index: number) => ({
+            id: `imported-${index}`,
+            question: row.question || '',
+            answer: row.answer || '',
+            order: flashcards.length + index + 1,
+          }))
+          .filter(card => card.question.length <= MAX_CHAR_LIMIT && card.answer.length <= MAX_CHAR_LIMIT);
 
         // Save each flashcard to the database
         for (const flashcard of importedFlashcards) {
@@ -335,7 +352,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   };
 
   const handleFlashcardsGenerated = async (generatedFlashcards: { question: string, answer: string }[]) => {
-    const validFlashcards = generatedFlashcards.filter(flashcard => flashcard.question && flashcard.answer);
+    const validFlashcards = generatedFlashcards.filter(flashcard => 
+      flashcard.question && 
+      flashcard.answer && 
+      flashcard.question.length <= MAX_CHAR_LIMIT && 
+      flashcard.answer.length <= MAX_CHAR_LIMIT
+    );
 
     for (const flashcard of validFlashcards) {
       try {
@@ -372,7 +394,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
         <div className="flex flex-col items-center mb-8">
           <div
-            className="w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
             onClick={handleFlipClick}
           >
             {getCurrentCard() ? (
