@@ -39,7 +39,7 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
   return (
     <>
       <Head>
-        <link rel="icon" href="/logo.ico" />
+        <link rel="icon" href="/blob.ico" />
       </Head>
       <SessionProvider session={initialSession}>
         <AuthWrapper>
