@@ -92,12 +92,12 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-3xl bg-gray-100 dark:bg-black text-black dark:text-gray-200">
+    <div className="container mx-auto p-8 max-w-3xl bg-white dark:bg-black text-black dark:text-gray-200">
       {!gameStarted && !gameEnded && (
         <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-700 z-50 flex flex-col items-center justify-center">
           <div className="absolute top-40 left-100 bg-gray-100 dark:bg-gray-700">
             <Link href="/dashboard" passHref>
-              <span className="text-black dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer flex items-center">
+              <span className="text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer flex items-center">
                 <FaArrowLeft className="mr-2" /> Back to Dashboard
               </span>
             </Link>
@@ -118,7 +118,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
         <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-700 z-50 flex flex-col items-center justify-center">
           <div className="absolute top-40 left-100 bg-gray-100 dark:bg-gray-700">
             <Link href="/dashboard" passHref>
-              <span className="text-black dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer flex items-center">
+              <span className="text-black dark:text-black hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer flex items-center">
                 <FaArrowLeft className="mr-2" /> Back to Dashboard
               </span>
             </Link>
@@ -144,9 +144,9 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
         </div>
       )}
       <div className={`game-content ${gameStarted && !gameEnded ? 'transition-curtain' : ''}`}>
-        <div className="mb-4 dark:bg-gray-700">
+        <div className="mb-4 bg-white dark:bg-gray-700">
           <Link href="/dashboard" passHref>
-            <span className="text-black dark:text-gray-200 dark:bg-black hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
+            <span className="text-black bg-white dark:text-gray-200 dark:bg-black hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
               <FaArrowLeft className="mr-2" /> Back to Dashboard
             </span>
           </Link>
@@ -155,7 +155,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           <h1 className="text-2xl font-bold">{deckTitle}</h1>
           <p className="text-lg">Time: {formatTime(time)}</p>
         </div>
-        <div className="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {shuffledCards.map((card, index) => {
             const isSelected = selectedCards.includes(card);
             const isMatched = matchedCards.has(card.id);
@@ -163,15 +163,14 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
               <div key={index} className="aspect-w-1 aspect-h-1">
                 <Card
                   onClick={() => handleCardClick(card)}
-                  className={`cursor-pointer transition-colors flex items-center justify-center text-center 
+                  className={`cursor-pointer transition-colors flex items-center justify-center text-center h-full
                     ${isMatched ? 'bg-green-300 dark:bg-green-500' : 
                     isSelected ? 'bg-blue-100 dark:bg-blue-300' : 
                     'hover:bg-gray-200 dark:hover:bg-gray-400'}
                     ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-100 dark:bg-orange-300' : ''}`}
-                  style={{ height: '150px', width: '150px' }}
                 >
-                  <CardContent>
-                    {card.content}
+                  <CardContent className="p-2 overflow-auto h-full w-full flex items-center justify-center">
+                    <div className="text-sm">{card.content}</div>
                   </CardContent>
                 </Card>
               </div>

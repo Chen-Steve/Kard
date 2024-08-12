@@ -59,7 +59,7 @@ const MatchingGamePage: React.FC = () => {
   }));
 
   return (
-    <div className="container mx-auto p-4 max-w-3xl">
+    <div className="container mx-auto p-4 max-w-6xl">
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <MatchingGame cards={cards} deckTitle="" />    
     </div>
