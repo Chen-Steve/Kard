@@ -178,7 +178,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
             title="Question"
           />
-          {isEditMode && (
+          {/* {isEditMode && (
             <button
               onClick={() => handleHighlight(questionRef)}
               className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
@@ -186,7 +186,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             >
               <PiHighlighterBold className="text-lg" />
             </button>
-          )}
+          )} */}
         </div>
         <div className="flex-grow">
           <div
@@ -199,7 +199,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
             title="Answer"
           />
-          {isEditMode && (
+          {/*isEditMode && (
             <button
               onClick={() => handleHighlight(answerRef)}
               className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
@@ -207,7 +207,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             >
               <PiHighlighterBold className="text-lg" />
             </button>
-          )}
+          ) */}
         </div>
       </div>
       <div className="flex justify-end mt-2 space-x-2">

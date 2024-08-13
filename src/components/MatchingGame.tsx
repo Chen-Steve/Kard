@@ -170,7 +170,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                     ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-100 dark:bg-orange-300' : ''}`}
                 >
                   <CardContent className="p-2 overflow-auto h-full w-full flex items-center justify-center">
-                    <div className="text-sm">{card.content}</div>
+                      <div className="text-sm" dangerouslySetInnerHTML={{ __html: card.content }}></div>
                   </CardContent>
                 </Card>
               </div>
