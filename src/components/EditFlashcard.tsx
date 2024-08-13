@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaTrashAlt, FaSave, FaHighlighter } from 'react-icons/fa';
+import { FaTrashAlt, FaSave, FaHighlighter, FaEdit } from 'react-icons/fa';
 import { PiHighlighterBold } from "react-icons/pi";
 
 interface EditFlashcardProps {
@@ -20,6 +20,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   const [editedQuestion, setEditedQuestion] = useState(question);
   const [editedAnswer, setEditedAnswer] = useState(answer);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const questionRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +33,11 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   const handleSave = () => {
     onSave(id, editedQuestion, editedAnswer);
     setIsEditing(false);
+    setIsEditMode(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditMode(true);
   };
 
   const saveSelection = () => {
@@ -164,7 +170,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
         <div className="flex-grow">
           <div
             ref={questionRef}
-            contentEditable
+            contentEditable={isEditMode}
             dangerouslySetInnerHTML={{ __html: editedQuestion }}
             onInput={() => handleInput(questionRef, setEditedQuestion)}
             onFocus={() => setIsEditing(true)}
@@ -172,18 +178,20 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
             title="Question"
           />
-          <button
-            onClick={() => handleHighlight(questionRef)}
-            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
-            title="Highlight"
-          >
-            <PiHighlighterBold className="text-lg" />
-          </button>
+          {isEditMode && (
+            <button
+              onClick={() => handleHighlight(questionRef)}
+              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
+              title="Highlight"
+            >
+              <PiHighlighterBold className="text-lg" />
+            </button>
+          )}
         </div>
         <div className="flex-grow">
           <div
             ref={answerRef}
-            contentEditable
+            contentEditable={isEditMode}
             dangerouslySetInnerHTML={{ __html: editedAnswer }}
             onInput={() => handleInput(answerRef, setEditedAnswer)}
             onFocus={() => setIsEditing(true)}
@@ -191,30 +199,44 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
             title="Answer"
           />
-          <button
-            onClick={() => handleHighlight(answerRef)}
-            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
-            title="Highlight"
-          >
-            <PiHighlighterBold className="text-lg" />
-          </button>
+          {isEditMode && (
+            <button
+              onClick={() => handleHighlight(answerRef)}
+              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
+              title="Highlight"
+            >
+              <PiHighlighterBold className="text-lg" />
+            </button>
+          )}
         </div>
       </div>
       <div className="flex justify-end mt-2 space-x-2">
-        <button
-          onClick={() => onDelete(id)}
-          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
-          title="Delete"
-        >
-          <FaTrashAlt />
-        </button>
-        <button
-          onClick={handleSave}
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
-          title="Save"
-        >
-          <FaSave size={16} />
-        </button>
+        {isEditMode ? (
+          <>
+            <button
+              onClick={() => onDelete(id)}
+              className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
+              title="Delete"
+            >
+              <FaTrashAlt />
+            </button>
+            <button
+              onClick={handleSave}
+              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
+              title="Save"
+            >
+              <FaSave size={16} />
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleEdit}
+            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
+            title="Edit"
+          >
+            <FaEdit size={16} />
+          </button>
+        )}
       </div>
     </div>
   );
