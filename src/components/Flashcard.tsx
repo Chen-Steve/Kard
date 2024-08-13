@@ -116,7 +116,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleFlip = (event: React.KeyboardEvent) => {
     const target = event.target as HTMLElement;
-    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable) {
+    if (target && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable)) {
       return; // Do not flip if the target is an input, textarea, or contenteditable
     }
     setIsFlipped((prev) => !prev);
@@ -395,7 +395,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
         <div className="flex flex-col items-center mb-8">
           <div
-            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer"
+            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4"
             onClick={handleFlipClick}
           >
             {getCurrentCard() ? (
