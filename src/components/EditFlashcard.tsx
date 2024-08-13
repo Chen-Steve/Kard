@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaTrashAlt, FaSave, FaHighlighter } from 'react-icons/fa';
+import { PiHighlighterBold } from "react-icons/pi";
 
 interface EditFlashcardProps {
   id: string;
@@ -173,10 +174,10 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
           />
           <button
             onClick={() => handleHighlight(questionRef)}
-            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors"
+            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
             title="Highlight"
           >
-            <FaHighlighter />
+            <PiHighlighterBold className="text-lg" />
           </button>
         </div>
         <div className="flex-grow">
@@ -192,10 +193,10 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
           />
           <button
             onClick={() => handleHighlight(answerRef)}
-            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors"
+            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
             title="Highlight"
           >
-            <FaHighlighter />
+            <PiHighlighterBold className="text-lg" />
           </button>
         </div>
       </div>
