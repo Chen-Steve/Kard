@@ -10,13 +10,43 @@ interface Flashcard {
   answer: string;
 }
 
+interface Deck {
+  id: string;
+  name: string;
+  description: string;
+}
+
 const AIChatPage: React.FC = () => {
   const router = useRouter();
   const { userId, deckId } = router.query;
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFlashcards = useCallback(async () => {
+  const fetchDecks = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      const response = await fetch(`/api/decks?userId=${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch decks');
+      }
+
+      const data: Deck[] = await response.json();
+      setDecks(data);
+    } catch (error) {
+      console.error('Error fetching decks:', error);
+      setError('Failed to fetch decks. Please try again.');
+    }
+  }, [userId]);
+
+  const fetchFlashcards = useCallback(async (deckId: string) => {
     if (!userId || !deckId) {
       setError('Invalid user ID or deck ID.');
       return;
@@ -34,11 +64,24 @@ const AIChatPage: React.FC = () => {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
     }
-  }, [userId, deckId]);
+  }, [userId]);
 
   useEffect(() => {
-    fetchFlashcards();
-  }, [fetchFlashcards]);
+    fetchDecks();
+  }, [fetchDecks]);
+
+  useEffect(() => {
+    if (deckId && typeof deckId === 'string') {
+      setSelectedDeckId(deckId);
+      fetchFlashcards(deckId);
+    }
+  }, [deckId, fetchFlashcards]);
+
+  const handleDeckChange = (newDeckId: string) => {
+    setSelectedDeckId(newDeckId);
+    fetchFlashcards(newDeckId);
+    router.push(`/ai-chat/${userId}/${newDeckId}`, undefined, { shallow: true });
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
@@ -50,7 +93,12 @@ const AIChatPage: React.FC = () => {
         </Link>
       </div>
       {error && <div className="text-red-500 mb-4">{error}</div>}
-      <AIChatComponent flashcards={flashcards} />
+      <AIChatComponent 
+        flashcards={flashcards} 
+        decks={decks} 
+        selectedDeckId={selectedDeckId} 
+        onDeckChange={handleDeckChange} 
+      />
     </div>
   );
 };

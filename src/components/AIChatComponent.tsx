@@ -8,8 +8,16 @@ interface Flashcard {
   answer: string;
 }
 
+interface Deck {
+  id: string;
+  name: string;
+}
+
 interface AIChatComponentProps {
   flashcards: Flashcard[];
+  decks: Deck[];
+  selectedDeckId: string | null;
+  onDeckChange: (deckId: string) => void;
 }
 
 interface Message {
@@ -17,7 +25,7 @@ interface Message {
   content: string;
 }
 
-const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards }) => {
+const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, selectedDeckId, onDeckChange }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +60,21 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards }) => {
 
   return (
     <div className="flex flex-col h-[80vh]">
+      <div className="mb-4">
+        <select
+          title="Select a deck"
+          value={selectedDeckId || ''}
+          onChange={(e) => onDeckChange(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        >
+          <option value="">Select a deck</option>
+          {decks.map((deck) => (
+            <option key={deck.id} value={deck.id}>
+              {deck.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="flex-grow overflow-auto mb-4 p-4 border border-gray-300 rounded">
         {messages.map((message, index) => (
           <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
@@ -72,7 +95,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards }) => {
         />
         <Button 
           type="submit" 
-          disabled={isLoading} 
+          disabled={isLoading || !selectedDeckId} 
           className="px-6 py-6 text-base font-medium"
         >
           {isLoading ? 'Thinking...' : 'Send'}
