@@ -40,3 +40,19 @@ export const generateFlashcards = async (description: string, userId: string): P
     throw error;
   }
 };
+
+export const generateAIResponse = async (message: string, flashcards: any[]): Promise<string> => {
+  try {
+    const response = await axios.post<OpenAIResponse>('/api/aichat', {
+      message,
+      flashcards,
+    }, { timeout: 30000 });
+
+    console.log('AI Chat API response:', response.data.text);
+
+    return response.data.text;
+  } catch (error) {
+    console.error('Error in AI chat:', error);
+    throw error;
+  }
+};
