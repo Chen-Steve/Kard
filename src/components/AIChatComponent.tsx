@@ -11,13 +11,14 @@ interface Flashcard {
 interface Deck {
   id: string;
   name: string;
+  uuid: string;
 }
 
 interface AIChatComponentProps {
   flashcards: Flashcard[];
   decks: Deck[];
-  selectedDeckId: string | null;
-  onDeckChange: (deckId: string) => void;
+  selectedDeckUUID: string | null;
+  onDeckChange: (deckUUID: string) => void;
 }
 
 interface Message {
@@ -25,7 +26,7 @@ interface Message {
   content: string;
 }
 
-const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, selectedDeckId, onDeckChange }) => {
+const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, selectedDeckUUID, onDeckChange }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,13 +64,13 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
       <div className="mb-4">
         <select
           title="Select a deck"
-          value={selectedDeckId || ''}
+          value={selectedDeckUUID || ''}
           onChange={(e) => onDeckChange(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Select a deck</option>
           {decks.map((deck) => (
-            <option key={deck.id} value={deck.id}>
+            <option key={deck.uuid} value={deck.uuid}>
               {deck.name}
             </option>
           ))}
@@ -95,7 +96,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
         />
         <Button 
           type="submit" 
-          disabled={isLoading || !selectedDeckId} 
+          disabled={isLoading || !selectedDeckUUID} 
           className="px-6 py-6 text-base font-medium"
         >
           {isLoading ? 'Thinking...' : 'Send'}

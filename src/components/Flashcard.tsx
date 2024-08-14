@@ -11,6 +11,7 @@ import { PiSparkleBold } from "react-icons/pi";
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 import Papa from 'papaparse';
 import Popup from './Popup';
+import supabase from '../lib/supabaseClient';
 
 interface FlashcardProps {
   userId: string;
@@ -53,34 +54,29 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     deck.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const fetchFlashcards = useCallback(async () => {
+  const fetchFlashcards = useCallback(async (deckId: string) => {
+    if (!userId || !deckId) {
+      setError('Invalid user ID or deck ID.');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${selectedDeckId}`);
+      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${deckId}`);
       if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Flashcards not found for this user');
-        }
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-          const errorData = await response.json();
-          throw new Error(`Failed to fetch flashcards: ${errorData.error}, ${errorData.details}`);
-        } else {
-          const text = await response.text();
-          throw new Error(`Failed to fetch flashcards: ${response.status} ${response.statusText}\n${text}`);
-        }
+        throw new Error(`Failed to fetch flashcards: ${response.status} ${response.statusText}`);
       }
-      const data = await response.json();
+      const data: Flashcard[] = await response.json();
       setFlashcards(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
     }
-  }, [userId, selectedDeckId]);
+  }, [userId]);
 
   useEffect(() => {
-    fetchFlashcards();
-  }, [fetchFlashcards]);
+    fetchFlashcards(selectedDeckId);
+  }, [fetchFlashcards, selectedDeckId]);
 
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {

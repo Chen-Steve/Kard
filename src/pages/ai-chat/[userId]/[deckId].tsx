@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 import AIChatComponent from '../../../components/AIChatComponent';
+import supabase from '../../../lib/supabaseClient';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Flashcard {
   id: string;
@@ -13,74 +15,99 @@ interface Flashcard {
 interface Deck {
   id: string;
   name: string;
-  description: string;
+  uuid: string;
 }
 
 const AIChatPage: React.FC = () => {
   const router = useRouter();
-  const { userId, deckId } = router.query;
+  const { funnelUUID, deckUUID } = router.query;
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
-  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
+  const [selectedDeckUUID, setSelectedDeckUUID] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDecks = useCallback(async () => {
-    if (!userId) return;
+    if (!funnelUUID) return;
 
     try {
-      const response = await fetch(`/api/decks?userId=${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('funnel_uuid', funnelUUID)
+        .single();
+
+      if (userError) throw userError;
+
+      const { data: decksData, error: decksError } = await supabase
+        .from('decks')
+        .select('*')
+        .eq('userId', userData.id);
+
+      if (decksError) throw decksError;
+
+      const decksWithUUID = decksData.map(deck => ({
+        ...deck,
+        uuid: uuidv4()
+      }));
+
+      setDecks(decksWithUUID);
+
+      // Store the mapping in the session
+      await supabase.auth.updateUser({
+        data: { deck_uuid_mapping: decksWithUUID.reduce((acc, deck) => ({ ...acc, [deck.uuid]: deck.id }), {}) }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch decks');
-      }
-
-      const data: Deck[] = await response.json();
-      setDecks(data);
     } catch (error) {
       console.error('Error fetching decks:', error);
       setError('Failed to fetch decks. Please try again.');
     }
-  }, [userId]);
+  }, [funnelUUID]);
 
-  const fetchFlashcards = useCallback(async (deckId: string) => {
-    if (!userId || !deckId) {
+  const fetchFlashcards = useCallback(async (deckUUID: string) => {
+    if (!funnelUUID || !deckUUID) {
       setError('Invalid user ID or deck ID.');
       return;
     }
 
     try {
-      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${deckId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch flashcards: ${response.status} ${response.statusText}`);
-      }
-      const data: Flashcard[] = await response.json();
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      const deckId = sessionData.session?.user.user_metadata.deck_uuid_mapping[deckUUID];
+      if (!deckId) throw new Error('Deck not found');
+
+      const { data, error } = await supabase
+        .from('flashcards')
+        .select('*')
+        .eq('deckId', deckId);
+
+      if (error) throw error;
       setFlashcards(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
     }
-  }, [userId]);
+  }, [funnelUUID]);
 
   useEffect(() => {
     fetchDecks();
   }, [fetchDecks]);
 
   useEffect(() => {
-    if (deckId && typeof deckId === 'string') {
-      setSelectedDeckId(deckId);
-      fetchFlashcards(deckId);
+    if (deckUUID && typeof deckUUID === 'string') {
+      setSelectedDeckUUID(deckUUID);
+      fetchFlashcards(deckUUID);
     }
-  }, [deckId, fetchFlashcards]);
+  }, [deckUUID, fetchFlashcards]);
 
-  const handleDeckChange = (newDeckId: string) => {
-    setSelectedDeckId(newDeckId);
-    fetchFlashcards(newDeckId);
-    router.push(`/ai-chat/${userId}/${newDeckId}`, undefined, { shallow: true });
+  const handleDeckChange = (newDeckUUID: string) => {
+    setSelectedDeckUUID(newDeckUUID);
+    fetchFlashcards(newDeckUUID);
+    router.push(`/ai-chat/${funnelUUID}/${newDeckUUID}`, undefined, { shallow: true });
   };
 
   return (
@@ -96,7 +123,7 @@ const AIChatPage: React.FC = () => {
       <AIChatComponent 
         flashcards={flashcards} 
         decks={decks} 
-        selectedDeckId={selectedDeckId} 
+        selectedDeckUUID={selectedDeckUUID} 
         onDeckChange={handleDeckChange} 
       />
     </div>
