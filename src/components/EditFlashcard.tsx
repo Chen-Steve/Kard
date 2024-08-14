@@ -6,6 +6,7 @@ interface EditFlashcardProps {
   id: string;
   question: string;
   answer: string;
+  showDefinitions: boolean;
   onSave: (id: string, question: string, answer: string) => void;
   onDelete: (id: string) => void;
 }
@@ -14,6 +15,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   id,
   question,
   answer,
+  showDefinitions,
   onSave,
   onDelete,
 }) => {
@@ -188,27 +190,29 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             </button>
           )} */}
         </div>
-        <div className="flex-grow">
-          <div
-            ref={answerRef}
-            contentEditable={isEditMode}
-            dangerouslySetInnerHTML={{ __html: editedAnswer }}
-            onInput={() => handleInput(answerRef, setEditedAnswer)}
-            onFocus={() => setIsEditing(true)}
-            onKeyDown={handleKeyDown}
-            className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
-            title="Answer"
-          />
-          {/*isEditMode && (
-            <button
-              onClick={() => handleHighlight(answerRef)}
-              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
-              title="Highlight"
-            >
-              <PiHighlighterBold className="text-lg" />
-            </button>
-          ) */}
-        </div>
+        {showDefinitions && (
+          <div className="flex-grow">
+            <div
+              ref={answerRef}
+              contentEditable={isEditMode}
+              dangerouslySetInnerHTML={{ __html: editedAnswer }}
+              onInput={() => handleInput(answerRef, setEditedAnswer)}
+              onFocus={() => setIsEditing(true)}
+              onKeyDown={handleKeyDown}
+              className="w-full p-2 border border-gray-300 dark:bg-gray-500 dark:border-gray-600 rounded resize-none overflow-hidden"
+              title="Answer"
+            />
+            {/*isEditMode && (
+              <button
+                onClick={() => handleHighlight(answerRef)}
+                className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors mt-2"
+                title="Highlight"
+              >
+                <PiHighlighterBold className="text-lg" />
+              </button>
+            ) */}
+          </div>
+        )}
       </div>
       <div className="flex justify-end mt-2 space-x-2">
         {isEditMode ? (

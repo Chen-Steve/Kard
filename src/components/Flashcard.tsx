@@ -37,7 +37,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDefinitions, setShowDefinitions] = useState(true); 
+  const [showDefinitions, setShowDefinitions] = useState(true);
   const [showList, setShowList] = useState(true);
   const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
   const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
@@ -542,7 +542,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                             <EditFlashcard
                               id={card.id}
                               question={card.question}
-                              answer={showDefinitions ? card.answer : ''}
+                              answer={card.answer}
+                              showDefinitions={showDefinitions}
                               onSave={debouncedSaveCard}
                               onDelete={handleDeleteCard}
                             />

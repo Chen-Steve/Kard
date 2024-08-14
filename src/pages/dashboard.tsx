@@ -7,9 +7,9 @@ import { getMicahAvatarSvg } from '../utils/avatar';
 import { SiStagetimer } from "react-icons/si";
 import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
+import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { MdDarkMode } from "react-icons/md"; 
 import { FaSun } from "react-icons/fa";
-import { TbMessageChatbotFilled } from "react-icons/tb";
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
@@ -279,7 +279,7 @@ const Dashboard = () => {
               className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={() => router.push(`/ai-chat/${user.id}/${selectedDeckId}`)}
             >
-              <TbMessageChatbotFilled className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
+              <BiSolidMessageSquareDots  className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
               <span className="text-xl font-semibold mb-1">K-Chat</span>
             </button>
           </div>
