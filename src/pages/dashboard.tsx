@@ -277,22 +277,21 @@ const Dashboard = () => {
               <span className="text-xl font-semibold mb-1">Match</span>
             </button>
             <button
-  className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
-  onClick={async () => {
-    const funnelUUID = uuidv4();
-    const deckUUID = uuidv4();
-    await supabase.auth.updateUser({
-      data: { 
-        funnel_uuid: funnelUUID,
-        deck_uuid_mapping: { [deckUUID]: selectedDeckId }
-      }
-    });
-    router.push(`/ai-chat/${funnelUUID}/${deckUUID}`);
-  }}
->
-  <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
-  <span className="text-xl font-semibold mb-1">K-Chat</span>
-</button>
+              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
+              onClick={async () => {
+                if (selectedDeckId) {
+                  router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                } else {
+                  toast({
+                    title: 'No Deck Selected',
+                    description: 'Please select a deck to start the AI chat.',
+                  });
+                }
+              }}
+            >
+              <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
+              <span className="text-xl font-semibold mb-1">K-Chat</span>
+            </button>
           </div>
         )}
         {decks.length === 0 ? (

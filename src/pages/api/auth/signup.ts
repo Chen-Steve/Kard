@@ -77,10 +77,10 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      console.log('User created in database:', user); // Add logging here
+      console.log('User created in database:', user);
       res.status(201).json(user);
     } catch (error) {
-      console.error('Signup error:', error as any); // Log the full error
+      console.error('Signup error:', error as any);
       if ((error as Error).message.includes('does not exist in the current database')) {
         res.status(500).json({ error: 'Table not found', details: (error as Error).message });
       } else {

@@ -48,13 +48,18 @@ const DecksPage = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
 
   const fetchDecks = useCallback(async () => {
-    if (!userId) return;
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
+      router.push('/signin');
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/decks?userId=${userId}`, {
+      const response = await fetch(`/api/decks?userId=${session.user.id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -64,25 +69,13 @@ const DecksPage = () => {
         throw new Error('Failed to fetch decks');
       }
 
-      const data: Deck[] = await response.json();
+      const data = await response.json();
       setDecks(data);
     } catch (error) {
       console.error('Error fetching decks:', error);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUserId(session.user.id);
-      } else {
-        router.push('/signin');
-      }
-    };
-    fetchUserId();
   }, [router]);
 
   useEffect(() => {
@@ -95,8 +88,10 @@ const DecksPage = () => {
       return;
     }
 
-    if (!userId) {
-      console.error('User ID is not available');
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
       router.push('/signin');
       return;
     }
@@ -110,7 +105,7 @@ const DecksPage = () => {
         body: JSON.stringify({
           name: newDeckName,
           description: newDeckDescription,
-          userId: userId,
+          userId: session.user.id,
           tags: newDeckTags,
         }),
       });
@@ -163,8 +158,10 @@ const DecksPage = () => {
   };
 
   const handleDeleteDeck = async (deckId: string) => {
-    if (!userId) {
-      console.error('User ID is not available');
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
       router.push('/signin');
       return;
     }
@@ -175,7 +172,7 @@ const DecksPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ deckId, userId }),
+        body: JSON.stringify({ deckId, userId: session.user.id }),
       });
 
       if (!response.ok) {
@@ -199,8 +196,10 @@ const DecksPage = () => {
       return;
     }
 
-    if (!userId) {
-      console.error('User ID is not available');
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
       router.push('/signin');
       return;
     }
@@ -215,7 +214,7 @@ const DecksPage = () => {
           deckId: editingDeck.id,
           name: editingDeck.name,
           description: editingDeck.description,
-          userId: userId,
+          userId: session.user.id,
           tags: editingDeck.tags,
         }),
       });
