@@ -9,7 +9,7 @@ import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import { MdDarkMode } from "react-icons/md"; 
 import { FaSun } from "react-icons/fa";
-import { AiOutlineRobot } from "react-icons/ai";
+import { TbMessageChatbotFilled } from "react-icons/tb";
 import NavMenu from '../components/NavMenu';
 import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
@@ -279,7 +279,7 @@ const Dashboard = () => {
               className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={() => router.push(`/ai-chat/${user.id}/${selectedDeckId}`)}
             >
-              <AiOutlineRobot className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
+              <TbMessageChatbotFilled className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
               <span className="text-xl font-semibold mb-1">K-Chat</span>
             </button>
           </div>
