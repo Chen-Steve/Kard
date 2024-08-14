@@ -10,7 +10,7 @@ import { MdSettings } from "react-icons/md";
 import { PiSparkleBold } from "react-icons/pi";
 import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 import Papa from 'papaparse';
-import Popup from './Popup'; // Import the Popup component
+import Popup from './Popup';
 
 interface FlashcardProps {
   userId: string;

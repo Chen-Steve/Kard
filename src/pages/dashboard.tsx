@@ -171,10 +171,14 @@ const Dashboard = () => {
   };
 
   const handleLearnClick = () => {
-    toast({
-      title: 'Coming Soon!',
-      description: 'The Learn feature is coming soon.',
-    });
+    if (selectedDeckId) {
+      router.push(`/learning-mode/${user.id}/${selectedDeckId}`);
+    } else {
+      toast({
+        title: 'No Deck Selected',
+        description: 'Please select a deck to start learning.',
+      });
+    }
   };
 
   const handleTestClick = () => {
