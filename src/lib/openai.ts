@@ -4,6 +4,28 @@ interface OpenAIResponse {
   text: string;
 }
 
+export interface Message {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export const generateAIResponse = async (message: string, flashcards: any[], history: Message[]): Promise<string> => {
+  try {
+    const response = await axios.post<OpenAIResponse>('/api/aichat', {
+      message,
+      flashcards,
+      history,
+    }, { timeout: 30000 });
+
+    console.log('AI Chat API response:', response.data.text);
+
+    return response.data.text;
+  } catch (error) {
+    console.error('Error in AI chat:', error);
+    throw error;
+  }
+};
+
 export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
     const response = await axios.post<OpenAIResponse>('/api/generate', {
@@ -37,22 +59,6 @@ export const generateFlashcards = async (description: string, userId: string): P
     return validFlashcards;
   } catch (error) {
     console.error('Error generating flashcards:', error);
-    throw error;
-  }
-};
-
-export const generateAIResponse = async (message: string, flashcards: any[]): Promise<string> => {
-  try {
-    const response = await axios.post<OpenAIResponse>('/api/aichat', {
-      message,
-      flashcards,
-    }, { timeout: 30000 });
-
-    console.log('AI Chat API response:', response.data.text);
-
-    return response.data.text;
-  } catch (error) {
-    console.error('Error in AI chat:', error);
     throw error;
   }
 };

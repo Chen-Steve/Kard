@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/Button';
-import { generateAIResponse } from '../lib/openai';
+import { generateAIResponse, Message } from '../lib/openai';
 
 interface Flashcard {
   id: string;
@@ -18,11 +18,6 @@ interface AIChatComponentProps {
   decks: Deck[];
   selectedDeckId: string | null;
   onDeckChange: (deckId: string) => void;
-}
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
 }
 
 const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, selectedDeckId, onDeckChange }) => {
@@ -47,7 +42,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
     setIsLoading(true);
 
     try {
-      const aiResponse = await generateAIResponse(input, flashcards);
+      const aiResponse = await generateAIResponse(input, flashcards, messages);
       const aiMessage: Message = { role: 'assistant', content: aiResponse };
       setMessages(prevMessages => [...prevMessages, aiMessage]);
     } catch (error) {
