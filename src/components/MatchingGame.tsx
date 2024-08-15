@@ -102,7 +102,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards }) => {
             </Link>
           </div>
           <h1 className="text-2xl font-bold mb-4">Ready to play?</h1>
-          <p className="text-lg mb-6">
+          <p className="text-lg mb-6 text-center px-4">
             Match all the terms with their definitions as fast as you can. Avoid wrong matches, they add extra time!
           </p>
           <button
