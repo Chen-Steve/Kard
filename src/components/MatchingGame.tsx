@@ -12,7 +12,6 @@ interface Flashcard {
 
 interface MatchingGameProps {
   cards: Flashcard[];
-  deckTitle: string;
 }
 
 interface CardItem {
@@ -21,7 +20,7 @@ interface CardItem {
   content: string;
 }
 
-const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
+const MatchingGame: React.FC<MatchingGameProps> = ({ cards }) => {
   const [shuffledCards, setShuffledCards] = useState<CardItem[]>([]);
   const [selectedCards, setSelectedCards] = useState<CardItem[]>([]);
   const [matchedCards, setMatchedCards] = useState<Set<string>>(new Set());
@@ -152,7 +151,6 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           </Link>
         </div>
         <div className="text-center mb-4">
-          <h1 className="text-2xl font-bold">{deckTitle}</h1>
           <p className="text-lg">Time: {formatTime(time)}</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

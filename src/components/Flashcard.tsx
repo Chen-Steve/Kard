@@ -16,6 +16,7 @@ interface FlashcardProps {
   userId: string;
   deckId: string;
   decks: Deck[];
+  onDeckChange?: (newDeckId: string) => void;
 }
 
 interface Flashcard {
@@ -32,7 +33,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [] }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -388,6 +389,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   };
 
+  const handleDeckChange = (newDeckId: string) => {
+    setSelectedDeckId(newDeckId);
+    if (onDeckChange) {
+      onDeckChange(newDeckId);
+    }
+  };
+
   return (
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
@@ -422,7 +430,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="p-1 ml-2 border-2 border-black dark:border-gray-600 rounded"
                     />
-                    <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
+                    <Select value={selectedDeckId} onValueChange={handleDeckChange}>
                       <SelectTrigger className="p-2 border-1 border-black dark:border-gray-600" />
                       {(searchTerm || filteredDecks.length > 0) && (
                         <SelectContent>

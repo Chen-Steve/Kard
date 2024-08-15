@@ -1,12 +1,25 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
+import supabase from '../../../lib/supabaseClient';
 
 const options: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -57,6 +70,26 @@ const options: NextAuthOptions = {
       else if (url.startsWith('/')) return new URL(url, baseUrl).toString();
       return baseUrl;
     },
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        const { data, error } = await supabase.auth.signUp({
+          email: user.email!,
+          password: '', // Generate a random password or handle this case
+        });
+
+        if (error) {
+          console.error('Error creating Supabase user:', error);
+          return false;
+        }
+
+        // Update the user in your database with Supabase ID
+        await prisma.user.update({
+          where: { email: user.email! },
+          data: { id: data.user!.id },
+        });
+      }
+      return true;
+    },
   },
   pages: {
     signIn: '/signin',
@@ -66,6 +99,17 @@ const options: NextAuthOptions = {
     newUser: undefined,
   },
   debug: true, // Enable debug mode
+  logger: {
+    error: (code, metadata) => {
+      console.error(code, metadata);
+    },
+    warn: (code) => {
+      console.warn(code);
+    },
+    debug: (code, metadata) => {
+      console.debug(code, metadata);
+    },
+  },
 };
 
 const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -58,7 +58,10 @@ const Dashboard = () => {
           console.error('Error fetching decks:', decksError);
         } else {
           setDecks(decksData);
-          if (decksData.length > 0) {
+          const savedDeckId = localStorage.getItem('selectedDeckId');
+          if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+            setSelectedDeckId(savedDeckId);
+          } else if (decksData.length > 0) {
             setSelectedDeckId(decksData[0].id);
           }
         }
@@ -97,7 +100,10 @@ const Dashboard = () => {
           console.error('Error fetching decks:', decksError);
         } else {
           setDecks(decksData);
-          if (decksData.length > 0) {
+          const savedDeckId = localStorage.getItem('selectedDeckId');
+          if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+            setSelectedDeckId(savedDeckId);
+          } else if (decksData.length > 0) {
             setSelectedDeckId(decksData[0].id);
           }
         }
@@ -155,6 +161,12 @@ const Dashboard = () => {
       document.documentElement.classList.add('dark');
     }
   }, []);
+
+  useEffect(() => {
+    if (selectedDeckId) {
+      localStorage.setItem('selectedDeckId', selectedDeckId);
+    }
+  }, [selectedDeckId]);
 
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
@@ -299,7 +311,7 @@ const Dashboard = () => {
             <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">Go to your library and create some decks!</p>
           </div>
         ) : (
-          selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} />
+          selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)} />
         )}
       </main>
       <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center">

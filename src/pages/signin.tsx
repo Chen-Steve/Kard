@@ -4,8 +4,9 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
-import Spinner from '../components/Spinner'; // Assuming you have a Spinner component
+import Spinner from '../components/Spinner';
 import Cookies from 'js-cookie';
+import { signIn } from 'next-auth/react';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -35,10 +36,15 @@ const SignIn = () => {
     }
   };
 
+  const handleGoogleSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    signIn('google', { callbackUrl: '/dashboard' });
+  };
+
   return (
     <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
       {loading ? (
-        <Spinner /> // Display spinner when loading
+        <Spinner />
       ) : (
         <>
           <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
@@ -98,6 +104,12 @@ const SignIn = () => {
                 disabled={loading}
               >
                 {loading ? 'Signing In...' : 'Sign In'}
+              </button>
+              <button
+                onClick={handleGoogleSignIn}
+                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Sign in with Google
               </button>
             </form>
           </div>
