@@ -12,6 +12,7 @@ interface Flashcard {
 
 interface MatchingGameProps {
   cards: Flashcard[];
+  deckTitle: string;
 }
 
 interface CardItem {
