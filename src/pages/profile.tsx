@@ -136,7 +136,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mb-4">
-        <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:text-white">
+        <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:bg-gray-700 dark:text-white">
           <FaArrowLeft className="mr-2" /> Back to Dashboard
         </Button>
       </div>
@@ -145,7 +145,7 @@ const Profile = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-black dark:text-white">Profile</CardTitle>
             {!isEditing && (
-              <Button variant="outline" onClick={handleEdit} className="text-black dark:text-white">
+              <Button variant="outline" onClick={handleEdit} className="text-black dark:bg-gray-800 dark:text-white">
                 Edit
               </Button>
             )}
@@ -191,7 +191,7 @@ const Profile = () => {
           </CardFooter>
         )}
         <CardFooter className="flex justify-end">
-          <Button variant="outline" onClick={handleDeleteAccount} className="mr-2 text-red-600 dark:text-red-400">
+          <Button variant="outline" onClick={handleDeleteAccount} className="mr-2 text-red-600 dark:bg-gray-800 dark:text-red-400">
             Delete Account
           </Button>
         </CardFooter>
