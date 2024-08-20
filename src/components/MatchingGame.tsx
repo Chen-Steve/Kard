@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Card, CardContent } from '../components/ui/Card';
+import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {
   id: string;
@@ -169,7 +170,19 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards }) => {
                     ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-100 dark:bg-orange-300' : ''}`}
                 >
                   <CardContent className="p-2 overflow-auto h-full w-full flex items-center justify-center">
-                      <div className="text-sm" dangerouslySetInnerHTML={{ __html: card.content }}></div>
+                    <div className="text-sm">
+                      <Markdown
+                        options={{
+                          overrides: {
+                            strong: { component: 'strong', props: { className: 'font-bold' } },
+                            em: { component: 'em', props: { className: 'italic' } },
+                            u: { component: 'u', props: { className: 'underline' } },
+                          },
+                        }}
+                      >
+                        {card.content}
+                      </Markdown>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
