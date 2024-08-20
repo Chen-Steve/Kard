@@ -206,7 +206,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       return;
     }
 
-    // Check character limit
+    // Check character limit (consider the HTML content)
     if (updatedQuestion.length > MAX_CHAR_LIMIT || updatedAnswer.length > MAX_CHAR_LIMIT) {
       setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
       return;
@@ -552,7 +552,9 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                               question={card.question}
                               answer={card.answer}
                               showDefinitions={showDefinitions}
-                              onSave={debouncedSaveCard}
+                              onSave={(id, updatedQuestion, updatedAnswer) => {
+                                debouncedSaveCard(id, updatedQuestion, updatedAnswer);
+                              }}
                               onDelete={handleDeleteCard}
                             />
                           </div>
