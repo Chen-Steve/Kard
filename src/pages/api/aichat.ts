@@ -2,6 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { Message } from '../../lib/openai';
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity';
 
 dotenv.config();
 
@@ -10,6 +11,12 @@ const openai = new OpenAI({
 });
 
 const MAX_HISTORY_LENGTH = 10;
+const MAX_MESSAGE_LENGTH = 500;
+
+const matcher = new RegExpMatcher({
+  ...englishDataset.build(),
+  ...englishRecommendedTransformers,
+});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -21,6 +28,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!message || !flashcards || !history) {
     res.status(400).json({ error: 'Missing required fields' });
+    return;
+  }
+
+  // Input validation
+  if (typeof message !== 'string' || message.length > MAX_MESSAGE_LENGTH) {
+    res.status(400).json({ error: 'Invalid message format or length' });
+    return;
+  }
+
+  // Content filtering
+  if (matcher.hasMatch(message)) {
+    res.status(422).json({ error: 'INAPPROPRIATE_CONTENT' });
     return;
   }
 

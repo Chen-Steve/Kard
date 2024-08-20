@@ -48,7 +48,13 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
       setMessages(prevMessages => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error('Error in AI chat:', error);
-      setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+      let errorMessage = 'Sorry, I encountered an error. Please try again.';
+      
+      if (error instanceof Error && error.message === 'INAPPROPRIATE_CONTENT') {
+        errorMessage = "I'm sorry, but I can't respond to that kind of language or content. Please try rephrasing your message in a more appropriate way.";
+      }
+      
+      setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
