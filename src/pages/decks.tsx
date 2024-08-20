@@ -288,10 +288,10 @@ const DecksPage = () => {
     <div className="min-h-screen bg-blue-100 dark:bg-gray-800">
       <header className="bg-gray dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-            <ArrowLeft className="h-6 w-6" />
+          <Link href="/dashboard" className="flex items-center text-black dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+            <ArrowLeft className="h-6 w-6 mr-2" />
+            <span>Back to Dashboard</span>
           </Link>
-          <h1 className="text-2xl font-light text-[#39594D] dark:text-[#F7F7F7]">My Decks</h1>
           <div className="flex space-x-2">
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
