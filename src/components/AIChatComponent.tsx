@@ -74,13 +74,13 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
   };
 
   return (
-    <div className="flex flex-col h-[80vh]">
+    <div className="flex flex-col max-w-full h-[85vh] bg-white dark:bg-gray-800 dark:text-white">
       <div className="mb-4">
         <select
           title="Select a deck"
           value={selectedDeckId || ''}
           onChange={(e) => onDeckChange(e.target.value)}
-          className="w-full p-2 border border-black rounded"
+          className="w-full max-w-xs p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:border-white dark:border dark:text-white"
         >
           <option value="">Select a deck</option>
           {decks.map((deck) => (
@@ -90,10 +90,10 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
           ))}
         </select>
       </div>
-      <div className="flex-grow overflow-auto mb-4 p-4 border border-black rounded">
+      <div className="flex-grow overflow-auto mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:border-white dark:border">
         {messages.map((message, index) => (
           <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
+            <span className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-black dark:text-white'}`}>
               {message.role === 'user' ? (
                 message.content
               ) : (
@@ -109,13 +109,13 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-grow p-3 border border-gray-300 rounded"
+          className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
           placeholder="Ask about your flashcards..."
         />
         <Button 
           type="submit" 
           disabled={isLoading || !selectedDeckId} 
-          className="px-6 py-6 text-base font-medium"
+          className="px-6 py-6 text-base font-medium dark:bg-gray-700 dark:text-white"
         >
           {isLoading ? 'Thinking...' : 'Send'}
         </Button>

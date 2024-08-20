@@ -84,7 +84,7 @@ const AIChatPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
+    <div className="container mx-auto p-4 max-w-full min-h-screen dark:bg-gray-800 dark:text-white">
       <div className="mb-4">
         <Link href="/dashboard" passHref>
           <span className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
@@ -92,7 +92,7 @@ const AIChatPage: React.FC = () => {
           </span>
         </Link>
       </div>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
       <AIChatComponent 
         flashcards={flashcards} 
         decks={decks} 
