@@ -33,6 +33,19 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
 
   useEffect(scrollToBottom, [messages]);
 
+  useEffect(() => {
+    if (selectedDeckId) {
+      const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
+      if (selectedDeck) {
+        const initialMessage: Message = {
+          role: 'assistant',
+          content: `How can I help you learn about ${selectedDeck.name}?`
+        };
+        setMessages([initialMessage]);
+      }
+    }
+  }, [selectedDeckId, decks]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -67,7 +80,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
           title="Select a deck"
           value={selectedDeckId || ''}
           onChange={(e) => onDeckChange(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2 border border-black rounded"
         >
           <option value="">Select a deck</option>
           {decks.map((deck) => (
@@ -77,7 +90,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
           ))}
         </select>
       </div>
-      <div className="flex-grow overflow-auto mb-4 p-4 border border-gray-300 rounded">
+      <div className="flex-grow overflow-auto mb-4 p-4 border border-black rounded">
         {messages.map((message, index) => (
           <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
             <span className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>

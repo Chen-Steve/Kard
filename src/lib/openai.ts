@@ -26,6 +26,21 @@ export const generateAIResponse = async (message: string, flashcards: any[], his
   }
 };
 
+export const generateQuiz = async (flashcards: any[]): Promise<string> => {
+  try {
+    const response = await axios.post<OpenAIResponse>('/api/aichat', {
+      message: "Generate a quiz based on these flashcards.",
+      flashcards,
+      history: [],
+    }, { timeout: 30000 });
+
+    return response.data.text;
+  } catch (error) {
+    console.error('Error generating quiz:', error);
+    throw error;
+  }
+};
+
 export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
     const response = await axios.post<OpenAIResponse>('/api/generate', {
@@ -59,6 +74,21 @@ export const generateFlashcards = async (description: string, userId: string): P
     return validFlashcards;
   } catch (error) {
     console.error('Error generating flashcards:', error);
+    throw error;
+  }
+};
+
+export const generateStudyPlan = async (userId: string, performanceData: any[]): Promise<string> => {
+  try {
+    const response = await axios.post<OpenAIResponse>('/api/aichat', {
+      message: "Generate a personalized study plan based on this performance data.",
+      flashcards: [],
+      history: performanceData,
+    }, { timeout: 30000 });
+
+    return response.data.text;
+  } catch (error) {
+    console.error('Error generating study plan:', error);
     throw error;
   }
 };

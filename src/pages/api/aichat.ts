@@ -18,6 +18,8 @@ const matcher = new RegExpMatcher({
   ...englishRecommendedTransformers,
 });
 
+const whitelist = ['deck', 'flashcard'];
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -38,7 +40,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Content filtering
-  if (matcher.hasMatch(message)) {
+  const isWhitelisted = whitelist.some(word => message.includes(word));
+  if (!isWhitelisted && matcher.hasMatch(message)) {
     res.status(422).json({ error: 'INAPPROPRIATE_CONTENT' });
     return;
   }
