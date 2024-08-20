@@ -358,28 +358,30 @@ const DecksPage = () => {
       </header>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white" />
-            <Input
-              type="text"
-              placeholder="Search Decks"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
-            />
-          </div>
-          <div className="mt-4">
-            <Select onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
-                <SelectValue placeholder="Filter by Tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Tags</SelectItem>
-                {uniqueTags.map(tag => (
-                  <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex space-x-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white" />
+              <Input
+                type="text"
+                placeholder="Search Decks"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
+              />
+            </div>
+            <div>
+              <Select onValueChange={setSelectedTag}>
+                <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
+                  <SelectValue placeholder="Filter by Tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Tags</SelectItem>
+                  {uniqueTags.map(tag => (
+                    <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         {filteredDecks.length === 0 ? (
