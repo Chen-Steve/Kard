@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const limitedHistory = history.slice(-MAX_HISTORY_LENGTH) as Message[];
     const messages: Message[] = [
-      { role: "system", content: "You are a helpful assistant that discusses flashcards. Here are the flashcards:" + JSON.stringify(flashcards) },
+      { role: "system", content: "You are a helpful assistant that discusses flashcards. Use markdown formatting for emphasis: **bold**, *italic*, and __underline__. Here are the flashcards:" + JSON.stringify(flashcards) },
       ...limitedHistory,
       { role: "user", content: message }
     ];

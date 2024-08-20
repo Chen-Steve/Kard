@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/Button';
 import { generateAIResponse, Message } from '../lib/openai';
+import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {
   id: string;
@@ -74,7 +75,11 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
         {messages.map((message, index) => (
           <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
             <span className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-              {message.content}
+              {message.role === 'user' ? (
+                message.content
+              ) : (
+                <Markdown>{message.content}</Markdown>
+              )}
             </span>
           </div>
         ))}
