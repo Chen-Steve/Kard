@@ -8,9 +8,9 @@ import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
 import { MdSettings } from "react-icons/md";
 import { PiSparkleBold } from "react-icons/pi";
-import { Select, SelectTrigger, SelectContent, SelectItem } from './ui/select';
 import Papa from 'papaparse';
 import Popup from './Popup';
+import Markdown from 'markdown-to-jsx';
 
 interface FlashcardProps {
   userId: string;
@@ -40,8 +40,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [error, setError] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true);
   const [showList, setShowList] = useState(true);
-  const [selectedDeckId, setSelectedDeckId] = useState<string>(deckId);
-  const [isDeckSelectVisible, setIsDeckSelectVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isImportVisible, setIsImportVisible] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -49,14 +47,11 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const flashcardRef = useRef<HTMLDivElement>(null);
-
-  const filteredDecks = decks.filter(deck =>
-    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   const fetchFlashcards = useCallback(async () => {
     try {
-      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${selectedDeckId}`);
+      const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${deckId}`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Flashcards not found for this user');
@@ -72,16 +67,19 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       }
       const data = await response.json();
       setFlashcards(data);
+      setCurrentCardIndex(0);
       setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
     }
-  }, [userId, selectedDeckId]);
+  }, [userId, deckId]);
 
   useEffect(() => {
-    fetchFlashcards();
-  }, [fetchFlashcards]);
+    if (deckId) {
+      fetchFlashcards();
+    }
+  }, [deckId, fetchFlashcards]);
 
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
@@ -158,7 +156,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       answer: 'Definition',
       order: newCardOrder,
       userId: userId,
-      deckId: selectedDeckId, // Include deckId
+      deckId: deckId, // Include deckId
     };
 
     // Check character limit before adding
@@ -327,7 +325,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                 question: flashcard.question,
                 answer: flashcard.answer,
                 userId: userId,
-                deckId: selectedDeckId,
+                deckId: deckId,
                 order: flashcard.order,
               }),
             });
@@ -370,7 +368,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             question: flashcard.question,
             answer: flashcard.answer,
             userId: userId,
-            deckId: selectedDeckId,
+            deckId: deckId,
             order: flashcards.length + 1, // Adjust this if you want a different order
           }),
         });
@@ -389,13 +387,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   };
 
-  const handleDeckChange = (newDeckId: string) => {
-    setSelectedDeckId(newDeckId);
-    if (onDeckChange) {
-      onDeckChange(newDeckId);
-    }
-  };
-
   return (
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
@@ -407,88 +398,53 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             onClick={handleFlipClick}
           >
             {getCurrentCard() ? (
-              <div dangerouslySetInnerHTML={{ __html: isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? '' }} />            ) : (
+              <div>
+                <Markdown>{isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? ''}</Markdown>
+              </div>
+            ) : (
               <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
             )}
           </div>
           <div className="flex justify-between w-full mt-0">
             <div className="flex items-center">
-              <button
-                onClick={() => setIsDeckSelectVisible(!isDeckSelectVisible)}
-                className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-2 rounded"
-              >
-                Select Deck
-              </button>
-              {isDeckSelectVisible && (
-                <>
-                  <label htmlFor="deck-select" className="sr-only">Select Deck</label>
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      placeholder="Search decks..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="p-1 ml-2 border-2 border-black dark:border-gray-600 rounded"
-                    />
-                    <Select value={selectedDeckId} onValueChange={handleDeckChange}>
-                      <SelectTrigger className="p-2 border-1 border-black dark:border-gray-600" />
-                      {(searchTerm || filteredDecks.length > 0) && (
-                        <SelectContent>
-                          {filteredDecks.length > 0 ? (
-                            filteredDecks.map((deck) => (
-                              <SelectItem key={deck.id} value={deck.id}>
-                                {deck.name}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="no-decks" disabled>
-                              No decks available
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      )}
-                    </Select>
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="relative flex items-center">
               <PiSparkleBold
                 className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer mr-2"
                 onClick={() => setIsPopupVisible(true)}
               />
-              <MdSettings
-                className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
-                onClick={() => setIsImportVisible(!isImportVisible)}
-              />
-              {isImportVisible && (
-                <div className="absolute right-0 mt-48 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleCsvUpload}
-                    ref={fileInputRef}
-                    className="hidden"
-                    title="input file"
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
-                    style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
-                  >
-                    Choose csv file
-                  </button>
-                  <button
-                    onClick={importFlashcardsFromCsv}
-                    className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
-                  >
-                    Import Flashcards
-                  </button>
-                  <div className="flex items-center mt-2">
-                    <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
+              <div className="relative" ref={settingsRef}>
+                <MdSettings
+                  className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
+                  onClick={() => setIsImportVisible(!isImportVisible)}
+                />
+                {isImportVisible && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvUpload}
+                      ref={fileInputRef}
+                      className="hidden"
+                      title="input file"
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
+                      style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
+                    >
+                      Choose csv file
+                    </button>
+                    <button
+                      onClick={importFlashcardsFromCsv}
+                      className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
+                    >
+                      Import Flashcards
+                    </button>
+                    <div className="flex items-center mt-2">
+                      <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center mt-0">

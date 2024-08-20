@@ -15,7 +15,6 @@ import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
-import { v4 as uuidv4 } from 'uuid';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -213,12 +212,16 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeckSelect = (deckId: string) => {
+    setSelectedDeckId(deckId);
+  };
+
   if (!user) return <p>Loading...</p>;
 
   return (
     <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
-        <NavMenu />
+        <NavMenu onDeckSelect={handleDeckSelect} />
         <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>

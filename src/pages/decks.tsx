@@ -31,7 +31,7 @@ interface Deck {
   name: string;
   description: string;
   tags: Tag[];
-  order: number; // Added order property
+  order: number;
 }
 
 const DecksPage = () => {
@@ -43,7 +43,7 @@ const DecksPage = () => {
   const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('#000000');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState<string>('all'); // State for selected tag
+  const [selectedTag, setSelectedTag] = useState<string>('all'); 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
