@@ -5,9 +5,9 @@ import UserAvatar from '../components/UserAvatar';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { FaArrowLeft } from 'react-icons/fa'; // Import the back arrow icon
-import { toast, useToast } from '../components/ui/use-toast'; // Import toast components
-import { Toaster } from '../components/ui/toaster'; // Import Toaster component
+import { FaArrowLeft } from 'react-icons/fa'; 
+import { toast, useToast } from '../components/ui/use-toast'; 
+import { Toaster } from '../components/ui/toaster'; 
 import { getMicahAvatarSvg } from '../utils/avatar';
 
 const Profile = () => {
@@ -17,7 +17,6 @@ const Profile = () => {
   const [email, setEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [uploading, setUploading] = useState(false); // Commented out
   const router = useRouter();
   const { dismiss } = useToast();
 
@@ -45,7 +44,7 @@ const Profile = () => {
         setName(userData.name);
         setEmail(userData.email);
         setSelectedAvatar(userData.avatar_url);
-        console.log('Fetched user data:', userData); // Debugging fetched user data
+        console.log('Fetched user data:', userData);
       }
     };
 
