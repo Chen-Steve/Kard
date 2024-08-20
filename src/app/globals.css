@@ -235,3 +235,20 @@ nav {
   background-size: 40px 40px;
   background-position: 0 0, 20px 20px;
 }
+
+.comic-button {
+  background-color: #ffcc00;
+  color: #000;
+  padding: 10px 20px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.comic-button:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0 #000;
+}

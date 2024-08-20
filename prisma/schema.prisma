@@ -11,6 +11,7 @@ model User {
   id         String      @id
   email      String      @unique @db.Text
   name       String?     @unique @db.Text 
+  membership String      @default("free")
   password   String?     @db.Text
   avatarUrl  String?     @db.Text @map("avatar_url")
   flashcards Flashcard[]

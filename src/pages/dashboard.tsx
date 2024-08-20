@@ -15,6 +15,8 @@ import FlashcardComponent from '../components/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
+import { HiLightningBolt } from "react-icons/hi";
+
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -25,6 +27,7 @@ const Dashboard = () => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { dismiss } = useToast();
+  const [userMembership, setUserMembership] = useState('free');
 
   useEffect(() => {
     const getSession = async () => {
@@ -46,6 +49,7 @@ const Dashboard = () => {
         } else {
           userData.avatarUrl = getMicahAvatarSvg(userData.email);
           setUser(userData);
+          setUserMembership(userData.membership || 'free');
         }
 
         const { data: decksData, error: decksError } = await supabase
@@ -88,6 +92,7 @@ const Dashboard = () => {
         } else {
           userData.avatarUrl = getMicahAvatarSvg(userData.email);
           setUser(userData);
+          setUserMembership(userData.membership || 'free');
         }
 
         const { data: decksData, error: decksError } = await supabase
@@ -128,6 +133,7 @@ const Dashboard = () => {
           } else {
             userData.avatarUrl = getMicahAvatarSvg(userData.email);
             setUser(userData);
+            setUserMembership(userData.membership || 'free');
           }
         };
 
@@ -261,6 +267,15 @@ const Dashboard = () => {
                       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                     </button>
                   </div>
+                  <div className="border-t border-gray-200 dark:border-gray-600">
+                    <button
+                      onClick={() => router.push('/pricing')}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                    >
+                      <HiLightningBolt className="mr-2" />
+                      Upgrade
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -292,20 +307,46 @@ const Dashboard = () => {
               <span className="text-xl font-semibold mb-1">Match</span>
             </button>
             <button
-              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
+              title="K-Chat"
+              className={`
+                relative flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12
+                hover:bg-gray-100 dark:hover:bg-gray-600 
+                focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
+              `}
               onClick={async () => {
-                if (selectedDeckId) {
-                  router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                if (userMembership === 'pro') {
+                  if (selectedDeckId) {
+                    router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                  } else {
+                    toast({
+                      title: 'No Deck Selected',
+                      description: 'Please select a deck to start the AI chat.',
+                    });
+                  }
                 } else {
                   toast({
-                    title: 'No Deck Selected',
-                    description: 'Please select a deck to start the AI chat.',
+                    title: 'Upgrade to Pro',
+                    description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
+                    action: (
+                      <button
+                        onClick={() => router.push('/pricing')}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      >
+                        Upgrade
+                      </button>
+                    ),
                   });
                 }
               }}
             >
               <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
               <span className="text-xl font-semibold mb-1">K-Chat</span>
+              {userMembership !== 'pro' && (
+                <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
+                  <HiLightningBolt className="inline-block mr-1" />
+                  PRO
+                </div>
+              )}
             </button>
           </div>
         )}
