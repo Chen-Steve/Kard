@@ -306,48 +306,63 @@ const Dashboard = () => {
               <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
               <span className="text-xl font-semibold mb-1">Match</span>
             </button>
-            <button
-              title="K-Chat"
-              className={`
-                relative flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12
-                hover:bg-gray-100 dark:hover:bg-gray-600 
-                focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
-              `}
-              onClick={async () => {
-                if (userMembership === 'pro') {
-                  if (selectedDeckId) {
-                    router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+            <div className="relative">
+              <button
+                title="K-Chat"
+                className={`
+                  flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 w-full
+                  hover:bg-gray-100 dark:hover:bg-gray-600 
+                  focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
+                `}
+                onClick={async () => {
+                  if (userMembership === 'pro') {
+                    if (selectedDeckId) {
+                      router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                    } else {
+                      toast({
+                        title: 'No Deck Selected',
+                        description: 'Please select a deck to start the AI chat.',
+                      });
+                    }
                   } else {
                     toast({
-                      title: 'No Deck Selected',
-                      description: 'Please select a deck to start the AI chat.',
+                      title: 'Upgrade to Pro',
+                      description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
+                      action: (
+                        <button
+                          onClick={() => router.push('/pricing')}
+                          className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
+                        >
+                          Upgrade
+                        </button>
+                      ),
                     });
                   }
-                } else {
-                  toast({
-                    title: 'Upgrade to Pro',
-                    description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-                    action: (
-                      <button
-                        onClick={() => router.push('/pricing')}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                      >
-                        Upgrade
-                      </button>
-                    ),
-                  });
-                }
-              }}
-            >
-              <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
-              <span className="text-xl font-semibold mb-1">K-Chat</span>
+                }}
+              >
+                <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
+                <span className="text-xl font-semibold mb-1">K-Chat</span>
+              </button>
+              {userMembership !== 'pro' && (
+                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none" 
+                     style={{
+                       backgroundImage: `repeating-linear-gradient(
+                         45deg,
+                         transparent,
+                         transparent 10px,
+                         rgba(0,0,0,0.1) 10px,
+                         rgba(0,0,0,0.1) 20px
+                       )`
+                     }}
+                />
+              )}
               {userMembership !== 'pro' && (
                 <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
                   <HiLightningBolt className="inline-block mr-1" />
                   PRO
                 </div>
               )}
-            </button>
+            </div>
           </div>
         )}
         {decks.length === 0 ? (
