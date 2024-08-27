@@ -227,7 +227,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
-        <NavMenu onDeckSelect={handleDeckSelect} />
+          <NavMenu onDeckSelect={handleDeckSelect} />
         <div className="absolute top-4 right-8 flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
@@ -282,7 +282,7 @@ const Dashboard = () => {
           )}
         </div>
       </header>
-      <main className="flex-grow p-4 mt-12">
+      <main className="flex-grow p-4 mt-16">
         {decks.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2 mb-2">
             <button

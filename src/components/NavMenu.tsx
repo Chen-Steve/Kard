@@ -56,45 +56,39 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
 
   return (
     <div className="relative">
-      <button
-        className="absolute top-2 left-2 z-50"
-        aria-label="Menu"
-        onClick={toggleSidebar}
-      >
-        <RiMenu4Fill className="text-4xl text-black dark:text-white" />
-      </button>
+      <div className="fixed top-6 left-6 z-50">
+        <button
+          aria-label={isOpen ? "Close Menu" : "Open Menu"}
+          onClick={toggleSidebar}
+        >
+          <RiMenu4Fill className="text-6xl text-black dark:text-white" />
+        </button>
+        {isOpen && (
+          <button
+            className="absolute left-40 top-1/2 -translate-y-1/2 p-2"
+            aria-label={isPinned ? "Unpin Menu" : "Pin Menu"}
+            onClick={togglePin}
+          >
+            {isPinned ? (
+              <BsPinAngleFill className="text-4xl text-black dark:text-white" />
+            ) : (
+              <BsPinAngle className="text-4xl text-black dark:text-white" />
+            )}
+          </button>
+        )}
+      </div>
       <div
-        className={`fixed top-0 left-0 bg-blue-100 dark:bg-gray-800 rounded-sm transition-all duration-300 ease-in-out ${
-          isOpen ? "w-50 h-full" : "w-0 h-full"
+        className={`fixed top-0 left-0 bg-blue-100 dark:bg-gray-800 h-full transition-all duration-300 ease-in-out ${
+          isOpen ? "w-56" : "w-0"
         } overflow-hidden z-40`}
       >
-        <div className="p-4">
+        <div className="p-4 pt-20"> {/* Added top padding to accommodate the menu icon */}
           {isOpen && (
             <>
-              <div className="flex justify-between items-center">
-                <button
-                  className="p-2"
-                  aria-label="Close Menu"
-                  onClick={toggleSidebar}
-                >
-                  <RiMenu4Fill className="text-4xl text-black dark:text-white" />
-                </button>
-                <button
-                  className="p-2"
-                  aria-label={isPinned ? "Unpin Menu" : "Pin Menu"}
-                  onClick={togglePin}
-                >
-                  {isPinned ? (
-                    <BsPinAngleFill className="text-2xl text-black dark:text-white" />
-                  ) : (
-                    <BsPinAngle className="text-2xl text-black dark:text-white" />
-                  )}
-                </button>
-              </div>
               <hr className="my-4 border-gray-600 dark:border-gray-400" />
               <div className="flex items-center text-black dark:text-white">
-                <FaFolderOpen className="text-2xl" />
-                <Link href="/decks" className="ml-2 text-xl">
+                <FaFolderOpen className="text-xl" />
+                <Link href="/decks" className="ml-2 text-lg">
                   Your Library
                 </Link>
               </div>
@@ -103,7 +97,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
                   <button
                     key={deck.id}
                     onClick={() => handleDeckClick(deck.id)}
-                    className="block w-full text-left px-2 py-1 mt-2 text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded"
+                    className="block w-full text-left px-2 py-1 mt-2 text-sm text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded"
                   >
                     {deck.name}
                   </button>
