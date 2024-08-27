@@ -4,15 +4,9 @@ import prisma from '../../../lib/prisma';
 import { getMicahAvatarSvg } from '../../../utils/avatar';
 import axios from 'axios';
 
-const rateLimit = (req: NextApiRequest, res: NextApiResponse, next: () => void) => {
-  // Implement rate limiting logic here
-  next();
-};
-
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`Received ${req.method} request at /api/auth/signup`);
   if (req.method === 'POST') {
-    await rateLimit(req, res, () => {}); // Apply rate limiting
     const { id, email, password, name, hcaptchaToken } = req.body;
 
     if (!id || !email || !name || !hcaptchaToken) {
