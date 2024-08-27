@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiMenu4Fill } from "react-icons/ri";
 import { FaFolderOpen } from "react-icons/fa";
-import { BsPinAngle, BsPinAngleFill } from "react-icons/bs";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 
@@ -17,18 +16,10 @@ interface NavMenuProps {
 
 const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
   const [decks, setDecks] = useState<Deck[]>([]);
 
   const toggleSidebar = () => {
-    if (!isPinned) {
-      setIsOpen(!isOpen);
-    }
-  };
-
-  const togglePin = () => {
-    setIsPinned(!isPinned);
-    setIsOpen(true);
+    setIsOpen(!isOpen);
   };
 
   useEffect(() => {
@@ -49,9 +40,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
 
   const handleDeckClick = (deckId: string) => {
     onDeckSelect(deckId);
-    if (!isPinned) {
-      toggleSidebar();
-    }
+    toggleSidebar();
   };
 
   return (
@@ -63,45 +52,34 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         >
           <RiMenu4Fill className="text-6xl text-black dark:text-white" />
         </button>
-        {isOpen && (
-          <button
-            className="absolute left-40 top-1/2 -translate-y-1/2 p-2"
-            aria-label={isPinned ? "Unpin Menu" : "Pin Menu"}
-            onClick={togglePin}
-          >
-            {isPinned ? (
-              <BsPinAngleFill className="text-4xl text-black dark:text-white" />
-            ) : (
-              <BsPinAngle className="text-4xl text-black dark:text-white" />
-            )}
-          </button>
-        )}
       </div>
       <div
         className={`fixed top-0 left-0 bg-blue-100 dark:bg-gray-800 h-full transition-all duration-300 ease-in-out ${
-          isOpen ? "w-56" : "w-0"
+          isOpen ? "w-64" : "w-0"
         } overflow-hidden z-40`}
       >
-        <div className="p-4 pt-20"> {/* Added top padding to accommodate the menu icon */}
+        <div className="p-4 pt-20">
           {isOpen && (
             <>
               <hr className="my-4 border-gray-600 dark:border-gray-400" />
-              <div className="flex items-center text-black dark:text-white">
-                <FaFolderOpen className="text-xl" />
-                <Link href="/decks" className="ml-2 text-lg">
-                  Your Library
-                </Link>
-              </div>
-              <div className="mt-4">
-                {decks.map((deck) => (
-                  <button
-                    key={deck.id}
-                    onClick={() => handleDeckClick(deck.id)}
-                    className="block w-full text-left px-2 py-1 mt-2 text-sm text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded"
-                  >
-                    {deck.name}
-                  </button>
-                ))}
+              <div className="px-2">
+                <div className="flex items-center text-black dark:text-white mb-4">
+                  <FaFolderOpen className="text-2xl mr-2" />
+                  <Link href="/decks" className="text-xl font-semibold">
+                    Your Library
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  {decks.map((deck) => (
+                    <button
+                      key={deck.id}
+                      onClick={() => handleDeckClick(deck.id)}
+                      className="block w-full text-left py-2 text-base text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded"
+                    >
+                      {deck.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             </>
           )}
