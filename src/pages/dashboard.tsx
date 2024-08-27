@@ -268,13 +268,20 @@ const Dashboard = () => {
                     </button>
                   </div>
                   <div className="border-t border-gray-200 dark:border-gray-600">
-                    <button
-                      onClick={() => router.push('/pricing')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-                    >
-                      <HiLightningBolt className="mr-2" />
-                      Upgrade
-                    </button>
+                    {userMembership === 'pro' ? (
+                      <div className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 flex items-center">
+                        <HiLightningBolt className="mr-2" />
+                        Pro
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => router.push('/pricing')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                      >
+                        <HiLightningBolt className="mr-2" />
+                        Upgrade
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
