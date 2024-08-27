@@ -284,34 +284,34 @@ const Dashboard = () => {
       </header>
       <main className="flex-grow p-4 mt-12">
         {decks.length > 0 && (
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
+          <div className="flex flex-wrap justify-center gap-2 mb-2">
             <button
-              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
               onClick={handleLearnClick}
             >
-              <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-              <span className="text-xl font-semibold mb-1">Learn</span>
+              <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
+              <span className="font-semibold">Learn</span>
             </button>
             <button
-              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
               onClick={handleTestClick}
             >
-              <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-              <span className="text-xl font-semibold mb-1">Test</span>
+              <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+              <span className="font-semibold">Test</span>
             </button>
             <button
-              className="flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
               onClick={handleMatchClick}
             >
-              <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.5rem' }} />
-              <span className="text-xl font-semibold mb-1">Match</span>
+              <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+              <span className="font-semibold">Match</span>
             </button>
             <div className="relative">
               <button
                 title="K-Chat"
                 className={`
-                  flex items-center space-x-4 bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 h-12 w-full
-                  hover:bg-gray-100 dark:hover:bg-gray-600 
+                  flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                  hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
                   focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
                 `}
                 onClick={async () => {
@@ -340,8 +340,8 @@ const Dashboard = () => {
                   }
                 }}
               >
-                <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.5rem' }} />
-                <span className="text-xl font-semibold mb-1">K-Chat</span>
+                <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
+                <span className="font-semibold">K-Chat</span>
               </button>
               {userMembership !== 'pro' && (
                 <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none" 
