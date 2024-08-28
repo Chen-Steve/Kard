@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import SketchPickerWrapper from '../components/SketchPickerWrapper';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import useDOMNodeInserted from '../hooks/useDOMNodeInserted';
+import NavMenu from '../components/NavMenu';
 
 interface Tag {
   id: number;
@@ -48,6 +49,7 @@ const DecksPage = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   const [isPublic, setIsPublic] = useState(false);
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchDecks = useCallback(async () => {
@@ -285,251 +287,253 @@ const DecksPage = () => {
     }
   });
 
+  const handleDeckSelect = (deckId: string) => {
+    setSelectedDeckId(deckId);
+  };
+
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-blue-100 dark:bg-gray-800">
-      <header className="bg-gray dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <Link href="/dashboard" className="flex items-center text-black dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-            <ArrowLeft className="h-6 w-6 mr-2" />
-            <span>Back to Dashboard</span>
-          </Link>
-          <div className="flex space-x-2">
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline"><Plus className="h-4 w-4 mr-2" /> Create Deck</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Deck</DialogTitle>
-                  <DialogDescription>Add a new deck to your collection.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <Input
-                    placeholder="Deck Name"
-                    value={newDeckName}
-                    onChange={(e) => setNewDeckName(e.target.value)}
-                  />
-                  <Input
-                    placeholder="Deck Description"
-                    value={newDeckDescription}
-                    onChange={(e) => setNewDeckDescription(e.target.value)}
-                  />
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="flex flex-col space-y-2">
-                        <label htmlFor="tag-name" className="sr-only">Tag Name</label>
-                        <input
-                          type="text"
-                          id="tag-name"
-                          placeholder="Tag Name"
-                          value={newTagName}
-                          onChange={(e) => setNewTagName(e.target.value)}
-                          className="p-2 border-2 border-black dark:border-gray-600 rounded"
-                        />
-                        <Button onClick={handleAddTag}>Add Tag</Button>
-                      </div>
-                      <SketchPickerWrapper
-                        color={newTagColor}
-                        onChangeComplete={(color) => setNewTagColor(color.hex)}
-                        className="ml-4"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    {newDeckTags.map((tag, index) => (
-                      <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
-                        {tag.name}
-                        <button onClick={() => handleDeleteTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
-                          x
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center mt-4">
-                    <input
-                      type="checkbox"
-                      id="isPublic"
-                      checked={isPublic}
-                      onChange={(e) => setIsPublic(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
-                      Make this deck public
-                    </label>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button onClick={handleCreateDeck}>Create Deck</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <Button variant="outline" onClick={fetchDecks}>
-              <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-            </Button>
-          </div>
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <div className="flex space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white" />
-              <Input
-                type="text"
-                placeholder="Search Decks"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
-              />
-            </div>
-            <div>
-              <Select onValueChange={setSelectedTag}>
-                <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
-                  <SelectValue placeholder="Filter by Tag" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Tags</SelectItem>
-                  {uniqueTags.map(tag => (
-                    <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-        {filteredDecks.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400">No decks found. Create a new deck to get started.</p>
-        ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="decks">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredDecks.map((deck, index) => (
-                    deck && deck.id ? (
-                      <Draggable key={deck.id} draggableId={deck.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="transition-shadow duration-300"
-                          >
-                            <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
-                              <CardHeader>
-                                <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
-                                <CardDescription className="text-gray-600 dark:text-gray-400">
-                                  {deck.description}
-                                </CardDescription>
-                                <div className="mt-2">
-                                  {deck.tags.map((tag) => (
-                                    <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
-                                      {tag.name}
-                                    </span>
-                                  ))}
-                                </div>
-                              </CardHeader>
-                              <CardContent className="flex justify-between items-center">
-                                <Link href={`/decks/${deck.id}`}>
-                                  <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
-                                </Link>
-                                <div className="flex space-x-2">
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => handleEditDeck(deck)}
-                                    className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
-                                  >
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    onClick={() => handleDeleteDeck(deck.id)}
-                                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        )}
-                      </Draggable>
-                    ) : null
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </main>
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Deck</DialogTitle>
-            <DialogDescription>Edit the details of your deck.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <Input
-              placeholder="Deck Name"
-              value={editingDeck?.name || ''}
-              onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, name: e.target.value } : prevDeck)}
-            />
-            <Input
-              placeholder="Deck Description"
-              value={editingDeck?.description || ''}
-              onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, description: e.target.value } : prevDeck)}
-            />
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-start space-x-4">
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="tag-name" className="sr-only">Tag Name</label>
-                  <input
-                    type="text"
-                    id="tag-name"
-                    placeholder="Tag Name"
-                    value={newTagName}
-                    onChange={(e) => setNewTagName(e.target.value)}
-                    className="p-2 border-2 border-black dark:border-gray-600 rounded"
-                  />
-                  <Button onClick={handleAddTag}>Add Tag</Button>
-                </div>
-                <SketchPickerWrapper
-                  color={newTagColor}
-                  onChangeComplete={(color) => setNewTagColor(color.hex)}
-                  className="ml-4"
+    <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex">
+      <NavMenu onDeckSelect={handleDeckSelect} />
+      <div className="flex-1 pl-64">
+        <header className="bg-gray dark:bg-gray-800">
+          {/* Remove the existing header content */}
+        </header>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
+          <div className="mb-6">
+            <div className="flex space-x-4 items-center">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white" />
+                <Input
+                  type="text"
+                  placeholder="Search Decks"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
                 />
               </div>
-            </div>
-            <div>
-              {editingDeck?.tags.map((tag, index) => (
-                <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
-                  {tag.name}
-                  <button onClick={() => handleDeleteEditingTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
-                    x
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex items-center mt-4">
-              <input
-                type="checkbox"
-                id="isPublic"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
-                Make this deck public
-              </label>
+              <div className="w-48">
+                <Select onValueChange={setSelectedTag}>
+                  <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
+                    <SelectValue placeholder="Filter by Tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {uniqueTags.map(tag => (
+                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline"><Plus className="h-4 w-4 mr-2" /> Create Deck</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Deck</DialogTitle>
+                    <DialogDescription>Add a new deck to your collection.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <Input
+                      placeholder="Deck Name"
+                      value={newDeckName}
+                      onChange={(e) => setNewDeckName(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Deck Description"
+                      value={newDeckDescription}
+                      onChange={(e) => setNewDeckDescription(e.target.value)}
+                    />
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex flex-col space-y-2">
+                          <label htmlFor="tag-name" className="sr-only">Tag Name</label>
+                          <input
+                            type="text"
+                            id="tag-name"
+                            placeholder="Tag Name"
+                            value={newTagName}
+                            onChange={(e) => setNewTagName(e.target.value)}
+                            className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                          />
+                          <Button onClick={handleAddTag}>Add Tag</Button>
+                        </div>
+                        <SketchPickerWrapper
+                          color={newTagColor}
+                          onChangeComplete={(color) => setNewTagColor(color.hex)}
+                          className="ml-4"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      {newDeckTags.map((tag, index) => (
+                        <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                          {tag.name}
+                          <button onClick={() => handleDeleteTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
+                            x
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center mt-4">
+                      <input
+                        type="checkbox"
+                        id="isPublic"
+                        checked={isPublic}
+                        onChange={(e) => setIsPublic(e.target.checked)}
+                        className="mr-2"
+                      />
+                      <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                        Make this deck public
+                      </label>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleCreateDeck}>Create Deck</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Button variant="outline" onClick={fetchDecks}>
+                <RefreshCw className="h-4 w-4 mr-2" /> Refresh
+              </Button>
             </div>
           </div>
-          <DialogFooter>
-            <Button onClick={handleUpdateDeck}>Update Deck</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {filteredDecks.length === 0 ? (
+            <p className="text-center text-gray-500 dark:text-gray-400">No decks found. Create a new deck to get started.</p>
+          ) : (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="decks">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredDecks.map((deck, index) => (
+                      deck && deck.id ? (
+                        <Draggable key={deck.id} draggableId={deck.id} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`transition-shadow duration-300 ${
+                                deck.id === selectedDeckId ? 'border-2 border-blue-500' : ''
+                              }`}
+                            >
+                              <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
+                                <CardHeader>
+                                  <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
+                                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                                    {deck.description}
+                                  </CardDescription>
+                                  <div className="mt-2">
+                                    {deck.tags.map((tag) => (
+                                      <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                                        {tag.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </CardHeader>
+                                <CardContent className="flex justify-between items-center">
+                                  <Link href={`/decks/${deck.id}`}>
+                                    <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
+                                  </Link>
+                                  <div className="flex space-x-2">
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => handleEditDeck(deck)}
+                                      className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      onClick={() => handleDeleteDeck(deck.id)}
+                                      className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </div>
+                          )}
+                        </Draggable>
+                      ) : null
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </main>
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Deck</DialogTitle>
+              <DialogDescription>Edit the details of your deck.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Input
+                placeholder="Deck Name"
+                value={editingDeck?.name || ''}
+                onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, name: e.target.value } : prevDeck)}
+              />
+              <Input
+                placeholder="Deck Description"
+                value={editingDeck?.description || ''}
+                onChange={(e) => setEditingDeck((prevDeck) => prevDeck ? { ...prevDeck, description: e.target.value } : prevDeck)}
+              />
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="flex flex-col space-y-2">
+                    <label htmlFor="tag-name" className="sr-only">Tag Name</label>
+                    <input
+                      type="text"
+                      id="tag-name"
+                      placeholder="Tag Name"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                    />
+                    <Button onClick={handleAddTag}>Add Tag</Button>
+                  </div>
+                  <SketchPickerWrapper
+                    color={newTagColor}
+                    onChangeComplete={(color) => setNewTagColor(color.hex)}
+                    className="ml-4"
+                  />
+                </div>
+              </div>
+              <div>
+                {editingDeck?.tags.map((tag, index) => (
+                  <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                    {tag.name}
+                    <button onClick={() => handleDeleteEditingTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
+                      x
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center mt-4">
+                <input
+                  type="checkbox"
+                  id="isPublic"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className="mr-2"
+                />
+                <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                  Make this deck public
+                </label>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleUpdateDeck}>Update Deck</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };

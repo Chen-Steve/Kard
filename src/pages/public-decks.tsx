@@ -16,6 +16,11 @@ interface PublicDeck {
 
 const PublicDecksPage: React.FC = () => {
   const [publicDecks, setPublicDecks] = useState<PublicDeck[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredDecks = publicDecks.filter(deck =>
+    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     const fetchPublicDecks = async () => {
@@ -39,8 +44,17 @@ const PublicDecksPage: React.FC = () => {
       <div className="flex-1 pl-64 pt-20">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-black dark:text-white mb-8">Public Decks</h1>
+          <div className="mb-6 flex justify-left">
+            <input
+              type="text"
+              placeholder="Search decks..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full max-w-md p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-black dark:text-white"
+            />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {publicDecks.map((deck) => (
+            {filteredDecks.map((deck) => (
               <Card key={deck.id} className="bg-white dark:bg-gray-700">
                 <CardHeader>
                   <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
