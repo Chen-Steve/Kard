@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Markdown from 'markdown-to-jsx';
 
 interface EditFlashcardProps {
@@ -22,8 +22,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
 }) => {
   const [editedQuestion, setEditedQuestion] = useState(question);
   const [editedAnswer, setEditedAnswer] = useState(answer);
-  const questionRef = useRef<HTMLTextAreaElement>(null);
-  const answerRef = useRef<HTMLTextAreaElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     setEditedQuestion(question);
@@ -33,6 +32,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   const handleSave = () => {
     if (!readOnly) {
       onSave(id, editedQuestion, editedAnswer);
+      setIsEditing(false);
     }
   };
 
@@ -42,58 +42,42 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
     }
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-    setter: React.Dispatch<React.SetStateAction<string>>,
-    ref: React.RefObject<HTMLTextAreaElement>
-  ) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const start = ref.current!.selectionStart;
-      const end = ref.current!.selectionEnd;
-      setter((prev) => prev.substring(0, start) + '  ' + prev.substring(end));
-      setTimeout(() => {
-        ref.current!.selectionStart = ref.current!.selectionEnd = start + 2;
-      }, 0);
-    }
+  const handleEdit = () => {
+    setIsEditing(true);
   };
 
   return (
     <div className="border-2 border-black dark:border-gray-600 rounded-sm p-4 mb-4 relative">
       <div className="flex flex-col space-y-4">
         <div className="border border-gray-300 dark:border-gray-500 rounded p-2">
-          {readOnly ? (
-            <div className="p-2">
-              <Markdown>{editedQuestion}</Markdown>
-            </div>
-          ) : (
+          {isEditing ? (
             <textarea
-              ref={questionRef}
               value={editedQuestion}
               onChange={(e) => setEditedQuestion(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, setEditedQuestion, questionRef)}
               className="w-full p-2 border-none focus:outline-none bg-transparent"
               placeholder="Enter question here..."
               disabled={readOnly}
             />
+          ) : (
+            <div className="p-2">
+              <Markdown>{editedQuestion}</Markdown>
+            </div>
           )}
         </div>
         {showDefinitions && (
           <div className="border border-gray-300 dark:border-gray-500 rounded p-2">
-            {readOnly ? (
-              <div className="p-2">
-                <Markdown>{editedAnswer}</Markdown>
-              </div>
-            ) : (
+            {isEditing ? (
               <textarea
-                ref={answerRef}
                 value={editedAnswer}
                 onChange={(e) => setEditedAnswer(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, setEditedAnswer, answerRef)}
                 className="w-full p-2 border-none focus:outline-none bg-transparent"
                 placeholder="Enter answer here..."
                 disabled={readOnly}
               />
+            ) : (
+              <div className="p-2">
+                <Markdown>{editedAnswer}</Markdown>
+              </div>
             )}
           </div>
         )}
@@ -101,19 +85,29 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
       <div className="flex justify-end mt-2 space-x-2">
         {!readOnly && (
           <>
+            {isEditing ? (
+              <button
+                onClick={handleSave}
+                className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
+                title="Save"
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={handleEdit}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
+                title="Edit"
+              >
+                Edit
+              </button>
+            )}
             <button
               onClick={handleDelete}
               className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
               title="Delete"
             >
               Delete
-            </button>
-            <button
-              onClick={handleSave}
-              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
-              title="Save"
-            >
-              Save
             </button>
           </>
         )}
