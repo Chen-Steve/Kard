@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'POST') {
-    const { name, description, userId, tags } = req.body;
+    const { name, description, userId, tags, isPublic } = req.body;
 
     if (!name || !description || !userId) {
       res.status(400).json({ error: 'Bad Request', details: 'name, description, and userId are required' });
@@ -47,6 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name,
           description,
           userId,
+          isPublic: isPublic || false,
           deckTags: {
             create: tags.map((tag: { name: string; color: string }) => ({
               tag: {
@@ -78,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'PUT') {
-    const { deckId, name, description, userId, tags } = req.body;
+    const { deckId, name, description, userId, tags, isPublic } = req.body;
 
     if (!deckId || !name || !description || !userId) {
       res.status(400).json({ error: 'Bad Request', details: 'deckId, name, description, and userId are required' });
@@ -91,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: {
           name,
           description,
+          isPublic: isPublic || false,
           deckTags: {
             deleteMany: {},
             create: tags.map((tag: { name: string; color: string }) => ({

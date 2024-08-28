@@ -39,6 +39,7 @@ model Deck {
   name        String
   description String?
   userId      String
+  isPublic    Boolean      @default(false)
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
   order       Int      @default(0)

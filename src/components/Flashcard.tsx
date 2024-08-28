@@ -17,6 +17,7 @@ interface FlashcardProps {
   deckId: string;
   decks: Deck[];
   onDeckChange?: (newDeckId: string) => void;
+  readOnly?: boolean;
 }
 
 interface Flashcard {
@@ -33,7 +34,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -473,12 +474,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         </div>
 
         <div className="flex justify-between space-x-4">
-          <button
-            onClick={handleAddCard}
-            className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
-          >
-            <FaPlus className="mr-2" /> Add Flashcard
-          </button>
+          {!readOnly && (
+            <button
+              onClick={handleAddCard}
+              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+            >
+              <FaPlus className="mr-2" /> Add Flashcard
+            </button>
+          )}
           <button
             onClick={() => setShowList(!showList)}
             className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
@@ -512,6 +515,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                                 debouncedSaveCard(id, updatedQuestion, updatedAnswer);
                               }}
                               onDelete={handleDeleteCard}
+                              readOnly={readOnly}
                             />
                           </div>
                         )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiMenu4Fill } from "react-icons/ri";
-import { FaFolderOpen } from "react-icons/fa";
+import { FaFolderOpen, FaRegFolderOpen, FaHome } from "react-icons/fa";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 
@@ -61,20 +61,32 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         <div className="p-4 pt-20">
           {isOpen && (
             <>
-              <hr className="my-4 border-gray-600 dark:border-gray-400" />
-              <div className="px-2">
-                <div className="flex items-center text-black dark:text-white mb-4">
-                  <FaFolderOpen className="text-2xl mr-2" />
-                  <Link href="/decks" className="text-xl font-semibold">
-                    Your Library
-                  </Link>
-                </div>
-                <div className="space-y-2">
+              <hr className="my-2 border-gray-600 dark:border-gray-400" />
+              <div className="px-2 space-y-2">
+                <Link href="/dashboard" className="block hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors">
+                  <div className="flex items-center text-black dark:text-white py-2 px-2">
+                    <FaHome className="text-2xl mr-2" />
+                    <span className="text-xl font-semibold">Home</span>
+                  </div>
+                </Link>
+                <Link href="/decks" className="block hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors">
+                  <div className="flex items-center text-black dark:text-white py-2 px-2">
+                    <FaFolderOpen className="text-2xl mr-2" />
+                    <span className="text-xl font-semibold">Your Library</span>
+                  </div>
+                </Link>
+                <Link href="/public-decks" className="block hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors">
+                  <div className="flex items-center text-black dark:text-white py-2 px-2">
+                    <FaRegFolderOpen className="text-2xl mr-2" />
+                    <span className="text-xl font-semibold">Public Decks</span>
+                  </div>
+                </Link>
+                <div className="space-y-1 mt-2">
                   {decks.map((deck) => (
                     <button
                       key={deck.id}
                       onClick={() => handleDeckClick(deck.id)}
-                      className="block w-full text-left py-2 text-base text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded"
+                      className="block w-full text-left py-1 px-2 text-base text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors"
                     >
                       {deck.name}
                     </button>

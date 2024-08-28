@@ -1,5 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { FaTrashAlt, FaSave, FaEdit } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
 import Markdown from 'markdown-to-jsx';
 
 interface EditFlashcardProps {
@@ -7,8 +6,9 @@ interface EditFlashcardProps {
   question: string;
   answer: string;
   showDefinitions: boolean;
-  onSave: (id: string, question: string, answer: string) => void;
-  onDelete: (id: string) => void;
+  onSave: (id: string, updatedQuestion: string, updatedAnswer: string) => void;
+  onDelete: (id: string) => Promise<void>;
+  readOnly?: boolean;
 }
 
 const EditFlashcard: React.FC<EditFlashcardProps> = ({
@@ -18,65 +18,55 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   showDefinitions,
   onSave,
   onDelete,
+  readOnly = false
 }) => {
   const [editedQuestion, setEditedQuestion] = useState(question);
   const [editedAnswer, setEditedAnswer] = useState(answer);
-  const [isEditMode, setIsEditMode] = useState(false);
   const questionRef = useRef<HTMLTextAreaElement>(null);
   const answerRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    setEditedQuestion(question);
+    setEditedAnswer(answer);
+  }, [question, answer]);
+
   const handleSave = () => {
-    onSave(id, editedQuestion, editedAnswer);
-    setIsEditMode(false);
+    if (!readOnly) {
+      onSave(id, editedQuestion, editedAnswer);
+    }
   };
 
-  const handleEdit = () => {
-    setIsEditMode(true);
+  const handleDelete = () => {
+    if (!readOnly) {
+      onDelete(id);
+    }
   };
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>, setText: React.Dispatch<React.SetStateAction<string>>, ref: React.RefObject<HTMLTextAreaElement>) => {
-    if (e.ctrlKey) {
-      let start = e.currentTarget.selectionStart;
-      let end = e.currentTarget.selectionEnd;
-      let value = e.currentTarget.value;
-      let newValue = '';
-      let newCursorPos = start;
-
-      switch (e.key.toLowerCase()) {
-        case 'b':
-          e.preventDefault();
-          newValue = value.slice(0, start) + '**' + value.slice(start, end) + '**' + value.slice(end);
-          newCursorPos = end + 4;
-          break;
-        case 'i':
-          e.preventDefault();
-          newValue = value.slice(0, start) + '*' + value.slice(start, end) + '*' + value.slice(end);
-          newCursorPos = end + 2;
-          break;
-        case 'u':
-          e.preventDefault();
-          newValue = value.slice(0, start) + '__' + value.slice(start, end) + '__' + value.slice(end);
-          newCursorPos = end + 4;
-          break;
-        default:
-          return;
-      }
-
-      setText(newValue);
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    ref: React.RefObject<HTMLTextAreaElement>
+  ) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = ref.current!.selectionStart;
+      const end = ref.current!.selectionEnd;
+      setter((prev) => prev.substring(0, start) + '  ' + prev.substring(end));
       setTimeout(() => {
-        if (ref.current) {
-          ref.current.setSelectionRange(newCursorPos, newCursorPos);
-          ref.current.focus();
-        }
+        ref.current!.selectionStart = ref.current!.selectionEnd = start + 2;
       }, 0);
     }
-  }, []);
+  };
 
   return (
     <div className="border-2 border-black dark:border-gray-600 rounded-sm p-4 mb-4 relative">
       <div className="flex flex-col space-y-4">
         <div className="border border-gray-300 dark:border-gray-500 rounded p-2">
-          {isEditMode ? (
+          {readOnly ? (
+            <div className="p-2">
+              <Markdown>{editedQuestion}</Markdown>
+            </div>
+          ) : (
             <textarea
               ref={questionRef}
               value={editedQuestion}
@@ -84,16 +74,17 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               onKeyDown={(e) => handleKeyDown(e, setEditedQuestion, questionRef)}
               className="w-full p-2 border-none focus:outline-none bg-transparent"
               placeholder="Enter question here..."
+              disabled={readOnly}
             />
-          ) : (
-            <div className="p-2">
-              <Markdown>{editedQuestion}</Markdown>
-            </div>
           )}
         </div>
         {showDefinitions && (
           <div className="border border-gray-300 dark:border-gray-500 rounded p-2">
-            {isEditMode ? (
+            {readOnly ? (
+              <div className="p-2">
+                <Markdown>{editedAnswer}</Markdown>
+              </div>
+            ) : (
               <textarea
                 ref={answerRef}
                 value={editedAnswer}
@@ -101,41 +92,30 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                 onKeyDown={(e) => handleKeyDown(e, setEditedAnswer, answerRef)}
                 className="w-full p-2 border-none focus:outline-none bg-transparent"
                 placeholder="Enter answer here..."
+                disabled={readOnly}
               />
-            ) : (
-              <div className="p-2">
-                <Markdown>{editedAnswer}</Markdown>
-              </div>
             )}
           </div>
         )}
       </div>
       <div className="flex justify-end mt-2 space-x-2">
-        {isEditMode ? (
+        {!readOnly && (
           <>
             <button
-              onClick={() => onDelete(id)}
+              onClick={handleDelete}
               className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
               title="Delete"
             >
-              <FaTrashAlt />
+              Delete
             </button>
             <button
               onClick={handleSave}
               className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
               title="Save"
             >
-              <FaSave size={16} />
+              Save
             </button>
           </>
-        ) : (
-          <button
-            onClick={handleEdit}
-            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
-            title="Edit"
-          >
-            <FaEdit size={16} />
-          </button>
         )}
       </div>
     </div>

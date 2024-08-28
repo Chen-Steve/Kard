@@ -47,6 +47,7 @@ const DecksPage = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
+  const [isPublic, setIsPublic] = useState(false);
   const router = useRouter();
 
   const fetchDecks = useCallback(async () => {
@@ -107,6 +108,7 @@ const DecksPage = () => {
           description: newDeckDescription,
           userId: session.user.id,
           tags: newDeckTags,
+          isPublic: isPublic,
         }),
       });
 
@@ -216,6 +218,7 @@ const DecksPage = () => {
           description: editingDeck.description,
           userId: session.user.id,
           tags: editingDeck.tags,
+          isPublic: isPublic,
         }),
       });
 
@@ -343,6 +346,18 @@ const DecksPage = () => {
                         </button>
                       </span>
                     ))}
+                  </div>
+                  <div className="flex items-center mt-4">
+                    <input
+                      type="checkbox"
+                      id="isPublic"
+                      checked={isPublic}
+                      onChange={(e) => setIsPublic(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                      Make this deck public
+                    </label>
                   </div>
                 </div>
                 <DialogFooter>
@@ -496,6 +511,18 @@ const DecksPage = () => {
                   </button>
                 </span>
               ))}
+            </div>
+            <div className="flex items-center mt-4">
+              <input
+                type="checkbox"
+                id="isPublic"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                Make this deck public
+              </label>
             </div>
           </div>
           <DialogFooter>
