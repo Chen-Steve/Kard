@@ -43,7 +43,7 @@ const HomePage: FC = () => {
             <Cursor />
           </h1>
           <p className="text-xl text-gray-900 max-w-2xl mx-auto">
-            Elevate your learning experience with custom flashcards. Create, manage, and master your knowledge.
+            A Flashcard App that scales with you.
           </p>
         </div>
 

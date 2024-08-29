@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
+  const [selectedDeckName, setSelectedDeckName] = useState<string | null>(null);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { dismiss } = useToast();
@@ -64,8 +65,11 @@ const Dashboard = () => {
           const savedDeckId = localStorage.getItem('selectedDeckId');
           if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
             setSelectedDeckId(savedDeckId);
+            const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+            setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
           } else if (decksData.length > 0) {
             setSelectedDeckId(decksData[0].id);
+            setSelectedDeckName(decksData[0].name);
           }
         }
       } else {
@@ -107,8 +111,11 @@ const Dashboard = () => {
           const savedDeckId = localStorage.getItem('selectedDeckId');
           if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
             setSelectedDeckId(savedDeckId);
+            const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+            setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
           } else if (decksData.length > 0) {
             setSelectedDeckId(decksData[0].id);
+            setSelectedDeckName(decksData[0].name);
           }
         }
       }
@@ -220,6 +227,8 @@ const Dashboard = () => {
 
   const handleDeckSelect = (deckId: string) => {
     setSelectedDeckId(deckId);
+    const selectedDeck = decks.find(deck => deck.id === deckId);
+    setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
   };
 
   if (!user) return <p>Loading...</p>;
@@ -291,84 +300,91 @@ const Dashboard = () => {
       </header>
       <main className="flex-grow p-4 mt-16">
         {decks.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-2">
-            <button
-              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-              onClick={handleLearnClick}
-            >
-              <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-              <span className="font-semibold">Learn</span>
-            </button>
-            <button
-              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-              onClick={handleTestClick}
-            >
-              <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-              <span className="font-semibold">Test</span>
-            </button>
-            <button
-              className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-              onClick={handleMatchClick}
-            >
-              <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-              <span className="font-semibold">Match</span>
-            </button>
-            <div className="relative">
+          <div className="flex flex-wrap items-center justify-center">
+            {selectedDeckName && (
+              <h2 className="text-2xl font-bold text-black dark:text-white mr-16">
+                {selectedDeckName}
+              </h2>
+            )}
+            <div className="flex flex-wrap justify-center gap-2">
               <button
-                title="K-Chat"
-                className={`
-                  flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
-                  hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
-                  focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
-                `}
-                onClick={async () => {
-                  if (userMembership === 'pro') {
-                    if (selectedDeckId) {
-                      router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                onClick={handleLearnClick}
+              >
+                <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
+                <span className="font-semibold">Learn</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                onClick={handleTestClick}
+              >
+                <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                <span className="font-semibold">Test</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                onClick={handleMatchClick}
+              >
+                <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                <span className="font-semibold">Match</span>
+              </button>
+              <div className="relative">
+                <button
+                  title="K-Chat"
+                  className={`
+                    flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                    hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
+                    focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
+                  `}
+                  onClick={async () => {
+                    if (userMembership === 'pro') {
+                      if (selectedDeckId) {
+                        router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                      } else {
+                        toast({
+                          title: 'No Deck Selected',
+                          description: 'Please select a deck to start the AI chat.',
+                        });
+                      }
                     } else {
                       toast({
-                        title: 'No Deck Selected',
-                        description: 'Please select a deck to start the AI chat.',
+                        title: 'Upgrade to Pro',
+                        description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
+                        action: (
+                          <button
+                            onClick={() => router.push('/pricing')}
+                            className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
+                          >
+                            Upgrade
+                          </button>
+                        ),
                       });
                     }
-                  } else {
-                    toast({
-                      title: 'Upgrade to Pro',
-                      description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-                      action: (
-                        <button
-                          onClick={() => router.push('/pricing')}
-                          className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
-                        >
-                          Upgrade
-                        </button>
-                      ),
-                    });
-                  }
-                }}
-              >
-                <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
-                <span className="font-semibold">K-Chat</span>
-              </button>
-              {userMembership !== 'pro' && (
-                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none" 
-                     style={{
-                       backgroundImage: `repeating-linear-gradient(
-                         45deg,
-                         transparent,
-                         transparent 10px,
-                         rgba(0,0,0,0.1) 10px,
-                         rgba(0,0,0,0.1) 20px
-                       )`
-                     }}
-                />
-              )}
-              {userMembership !== 'pro' && (
-                <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
-                  <HiLightningBolt className="inline-block mr-1" />
-                  PRO
-                </div>
-              )}
+                  }}
+                >
+                  <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
+                  <span className="font-semibold">K-Chat</span>
+                </button>
+                {userMembership !== 'pro' && (
+                  <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none" 
+                       style={{
+                         backgroundImage: `repeating-linear-gradient(
+                           45deg,
+                           transparent,
+                           transparent 10px,
+                           rgba(0,0,0,0.1) 10px,
+                           rgba(0,0,0,0.1) 20px
+                         )`
+                       }}
+                  />
+                )}
+                {userMembership !== 'pro' && (
+                  <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
+                    <HiLightningBolt className="inline-block mr-1" />
+                    PRO
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

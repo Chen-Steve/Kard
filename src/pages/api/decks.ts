@@ -33,11 +33,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('GET decks error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
-  } else if (req.method === 'POST') {
+  } else if (req.method === 'POST' || req.method === 'PUT') {
     const { name, description, userId, tags, isPublic } = req.body;
 
     if (!name || !description || !userId) {
       res.status(400).json({ error: 'Bad Request', details: 'name, description, and userId are required' });
+      return;
+    }
+
+    // Add this check for the character limit
+    if (name.length > 20) {
+      res.status(400).json({ error: 'Bad Request', details: 'Deck name must be 20 characters or less' });
       return;
     }
 
@@ -75,53 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(201).json(deckWithTags);
     } catch (error) {
-      console.error('POST deck error:', error as Error);
-      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
-    }
-  } else if (req.method === 'PUT') {
-    const { deckId, name, description, userId, tags, isPublic } = req.body;
-
-    if (!deckId || !name || !description || !userId) {
-      res.status(400).json({ error: 'Bad Request', details: 'deckId, name, description, and userId are required' });
-      return;
-    }
-
-    try {
-      const updatedDeck = await prisma.deck.update({
-        where: { id: deckId },
-        data: {
-          name,
-          description,
-          isPublic: isPublic || false,
-          deckTags: {
-            deleteMany: {},
-            create: tags.map((tag: { name: string; color: string }) => ({
-              tag: {
-                connectOrCreate: {
-                  where: { name: tag.name },
-                  create: { name: tag.name, color: tag.color },
-                },
-              },
-            })),
-          },
-        },
-        include: {
-          deckTags: {
-            include: {
-              tag: true,
-            },
-          },
-        },
-      });
-
-      const deckWithTags = {
-        ...updatedDeck,
-        tags: updatedDeck.deckTags.map(dt => dt.tag),
-      };
-
-      res.status(200).json(deckWithTags);
-    } catch (error) {
-      console.error('PUT deck error:', error as Error);
+      console.error(`${req.method} deck error:`, error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {

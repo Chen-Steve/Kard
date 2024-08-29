@@ -407,11 +407,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             )}
           </div>
           <div className="flex justify-between w-full mt-0">
-            <div className="flex items-center">
+            {!readOnly && (
               <PiSparkleBold
                 className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer mr-2"
                 onClick={() => setIsPopupVisible(true)}
               />
+            )}
+            {!readOnly && (
               <div className="relative" ref={settingsRef}>
                 <MdSettings
                   className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
@@ -446,7 +448,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                   </div>
                 )}
               </div>
-            </div>
+            )}
           </div>
           <div className="flex items-center mt-0">
             <button

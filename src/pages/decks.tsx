@@ -20,6 +20,7 @@ import SketchPickerWrapper from '../components/SketchPickerWrapper';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import useDOMNodeInserted from '../hooks/useDOMNodeInserted';
 import NavMenu from '../components/NavMenu';
+import { useToast } from "@/components/ui/use-toast";
 
 interface Tag {
   id: number;
@@ -51,7 +52,8 @@ const DecksPage = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
-
+  const { toast } = useToast();
+  
   const fetchDecks = useCallback(async () => {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -88,6 +90,15 @@ const DecksPage = () => {
   const handleCreateDeck = async () => {
     if (!newDeckName || !newDeckDescription) {
       console.error('Deck name and description are required');
+      return;
+    }
+
+    if (newDeckName.length > 20) {
+      toast({
+        title: "Error",
+        description: "Deck name must be 20 characters or less",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -200,6 +211,15 @@ const DecksPage = () => {
       return;
     }
 
+    if (editingDeck.name.length > 20) {
+      toast({
+        title: "Error",
+        description: "Deck name must be 20 characters or less",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !session) {
@@ -300,20 +320,20 @@ const DecksPage = () => {
         <header className="bg-gray dark:bg-gray-800">
           {/* Remove the existing header content */}
         </header>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 mt-16">
           <div className="mb-6">
-            <div className="flex space-x-4 items-center">
-              <div className="relative flex-grow">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-start sm:items-center">
+              <div className="relative w-full sm:w-auto flex-grow">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-white" />
                 <Input
                   type="text"
                   placeholder="Search Decks"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
+                  className="pl-10 w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600"
                 />
               </div>
-              <div className="w-48">
+              <div className="w-full sm:w-48">
                 <Select onValueChange={setSelectedTag}>
                   <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-1 border-black dark:border-gray-600">
                     <SelectValue placeholder="Filter by Tag" />
@@ -326,78 +346,80 @@ const DecksPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline"><Plus className="h-4 w-4 mr-2" /> Create Deck</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Deck</DialogTitle>
-                    <DialogDescription>Add a new deck to your collection.</DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <Input
-                      placeholder="Deck Name"
-                      value={newDeckName}
-                      onChange={(e) => setNewDeckName(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Deck Description"
-                      value={newDeckDescription}
-                      onChange={(e) => setNewDeckDescription(e.target.value)}
-                    />
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-start space-x-4">
-                        <div className="flex flex-col space-y-2">
-                          <label htmlFor="tag-name" className="sr-only">Tag Name</label>
-                          <input
-                            type="text"
-                            id="tag-name"
-                            placeholder="Tag Name"
-                            value={newTagName}
-                            onChange={(e) => setNewTagName(e.target.value)}
-                            className="p-2 border-2 border-black dark:border-gray-600 rounded"
+              <div className="flex space-x-2">
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="whitespace-nowrap"><Plus className="h-4 w-4 mr-2" /> Create Deck</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Deck</DialogTitle>
+                      <DialogDescription>Add a new deck to your collection.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <Input
+                        placeholder="Deck Name"
+                        value={newDeckName}
+                        onChange={(e) => setNewDeckName(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Deck Description"
+                        value={newDeckDescription}
+                        onChange={(e) => setNewDeckDescription(e.target.value)}
+                      />
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex flex-col space-y-2">
+                            <label htmlFor="tag-name" className="sr-only">Tag Name</label>
+                            <input
+                              type="text"
+                              id="tag-name"
+                              placeholder="Tag Name"
+                              value={newTagName}
+                              onChange={(e) => setNewTagName(e.target.value)}
+                              className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                            />
+                            <Button onClick={handleAddTag}>Add Tag</Button>
+                          </div>
+                          <SketchPickerWrapper
+                            color={newTagColor}
+                            onChangeComplete={(color) => setNewTagColor(color.hex)}
+                            className="ml-4"
                           />
-                          <Button onClick={handleAddTag}>Add Tag</Button>
                         </div>
-                        <SketchPickerWrapper
-                          color={newTagColor}
-                          onChangeComplete={(color) => setNewTagColor(color.hex)}
-                          className="ml-4"
+                      </div>
+                      <div>
+                        {newDeckTags.map((tag, index) => (
+                          <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                            {tag.name}
+                            <button onClick={() => handleDeleteTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
+                              x
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center mt-4">
+                        <input
+                          type="checkbox"
+                          id="isPublic"
+                          checked={isPublic}
+                          onChange={(e) => setIsPublic(e.target.checked)}
+                          className="mr-2"
                         />
+                        <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                          Make this deck public
+                        </label>
                       </div>
                     </div>
-                    <div>
-                      {newDeckTags.map((tag, index) => (
-                        <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
-                          {tag.name}
-                          <button onClick={() => handleDeleteTag(index)} className="ml-2 text-red-500 flex items-center justify-center">
-                            x
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center mt-4">
-                      <input
-                        type="checkbox"
-                        id="isPublic"
-                        checked={isPublic}
-                        onChange={(e) => setIsPublic(e.target.checked)}
-                        className="mr-2"
-                      />
-                      <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
-                        Make this deck public
-                      </label>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handleCreateDeck}>Create Deck</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Button variant="outline" onClick={fetchDecks}>
-                <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-              </Button>
+                    <DialogFooter>
+                      <Button onClick={handleCreateDeck}>Create Deck</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Button variant="outline" onClick={fetchDecks} className="whitespace-nowrap">
+                  <RefreshCw className="h-4 w-4 mr-2" /> Refresh
+                </Button>
+              </div>
             </div>
           </div>
           {filteredDecks.length === 0 ? (
@@ -406,7 +428,7 @@ const DecksPage = () => {
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="decks">
                 {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {filteredDecks.map((deck, index) => (
                       deck && deck.id ? (
                         <Draggable key={deck.id} draggableId={deck.id} index={index}>
@@ -421,27 +443,27 @@ const DecksPage = () => {
                             >
                               <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700">
                                 <CardHeader>
-                                  <CardTitle className="text-black dark:text-gray-100">{deck.name}</CardTitle>
-                                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                                  <CardTitle className="text-black dark:text-gray-100 text-lg sm:text-xl">{deck.name}</CardTitle>
+                                  <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
                                     {deck.description}
                                   </CardDescription>
-                                  <div className="mt-2">
+                                  <div className="mt-2 flex flex-wrap">
                                     {deck.tags.map((tag) => (
-                                      <span key={tag.id} className={`inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
+                                      <span key={tag.id} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2 mb-2" style={{ backgroundColor: tag.color }}>
                                         {tag.name}
                                       </span>
                                     ))}
                                   </div>
                                 </CardHeader>
-                                <CardContent className="flex justify-between items-center">
+                                <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
                                   <Link href={`/decks/${deck.id}`}>
-                                    <Button variant="outline" className="text-black dark:text-gray-200">View Deck</Button>
+                                    <Button variant="outline" className="text-black dark:text-gray-200 w-full sm:w-auto">View Deck</Button>
                                   </Link>
-                                  <div className="flex space-x-2">
+                                  <div className="flex space-x-2 w-full sm:w-auto">
                                     <Button
                                       variant="outline"
                                       onClick={() => handleEditDeck(deck)}
-                                      className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600"
+                                      className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600 flex-grow sm:flex-grow-0"
                                     >
                                       Edit
                                     </Button>
