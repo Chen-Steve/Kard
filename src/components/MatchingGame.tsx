@@ -129,7 +129,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
             <div className="text-center">
               <button
                 onClick={startGame}
-                className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300 ease-in-out flex items-center justify-center w-full"
+                className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-8 py-3 rounded-sm text-lg font-semibold transition duration-300 ease-in-out flex items-center justify-center w-full"
               >
                 <FaPlay className="mr-2" /> Start Game
               </button>

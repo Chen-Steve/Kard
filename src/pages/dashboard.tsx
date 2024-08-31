@@ -300,9 +300,9 @@ const Dashboard = () => {
       </header>
       <main className="flex-grow p-4 mt-16">
         {decks.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
             {selectedDeckName && (
-              <h2 className="text-2xl font-bold text-black dark:text-white mr-16">
+              <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left sm:mb-0 sm:mr-16 w-full sm:w-auto">
                 {selectedDeckName}
               </h2>
             )}
