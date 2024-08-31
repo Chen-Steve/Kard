@@ -94,7 +94,10 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
                       onClick={() => handleDeckClick(deck.id)}
                       className="block w-full text-left py-1 px-2 text-base text-black dark:text-white hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors"
                     >
-                      {deck.name}
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-black dark:bg-white rounded-full mr-2"></span>
+                        {deck.name}
+                      </span>
                     </button>
                   ))}
                 </div>
