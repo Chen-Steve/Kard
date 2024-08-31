@@ -190,8 +190,19 @@ const Profile = () => {
             <Button onClick={handleSave} className="text-black bg-gray-400 hover:bg-gray-500 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">Save</Button>
           </CardFooter>
         )}
-        <CardFooter className="flex justify-end">
-          <Button variant="outline" onClick={handleDeleteAccount} className="mr-2 text-red-600 dark:bg-gray-800 dark:text-red-400">
+        <CardFooter className="flex justify-between">
+          <Button 
+            variant="outline" 
+            onClick={() => router.push('/privacy')} 
+            className="text-black dark:bg-gray-800 dark:text-white"
+          >
+            Privacy Policy
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleDeleteAccount} 
+            className="text-red-600 dark:bg-gray-800 dark:text-red-400"
+          >
             Delete Account
           </Button>
         </CardFooter>
