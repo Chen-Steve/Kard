@@ -206,7 +206,7 @@ const Profile = () => {
               <Button variant="outline" onClick={() => setIsModalOpen(false)} className="mr-2 text-black dark:text-white">
                 Cancel
               </Button>
-              <Button onClick={handleConfirmSave} className="text-black dark:text-white">Confirm</Button>
+              <Button onClick={handleConfirmSave} className="text-white dark:text-black">Confirm</Button>
             </div>
           </div>
         </div>
