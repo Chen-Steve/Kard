@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('GET decks error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
-  } else if (req.method === 'POST' || req.method === 'PUT') {
+  } else if (req.method === 'POST') {
     const { name, description, userId, tags, isPublic } = req.body;
 
     if (!name || !description || !userId) {
@@ -41,7 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
 
-    // Add this check for the character limit
     if (name.length > 20) {
       res.status(400).json({ error: 'Bad Request', details: 'Deck name must be 20 characters or less' });
       return;
@@ -81,7 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(201).json(deckWithTags);
     } catch (error) {
-      console.error(`${req.method} deck error:`, error as Error);
+      console.error('POST deck error:', error as Error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {
@@ -143,6 +142,78 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json({ message: 'Decks updated successfully' });
     } catch (error) {
       console.error('PATCH decks error:', error as Error);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
+  } else if (req.method === 'PUT') {
+    const { deckId, name, description, userId, tags, isPublic } = req.body;
+
+    if (!deckId || !name || !description || !userId) {
+      res.status(400).json({ error: 'Bad Request', details: 'deckId, name, description, and userId are required' });
+      return;
+    }
+
+    try {
+      // Update the deck
+      await prisma.deck.update({
+        where: { id: deckId },
+        data: {
+          name,
+          description,
+          isPublic: isPublic || false,
+        },
+      });
+
+      // Delete all existing tags for this deck
+      await prisma.deckTag.deleteMany({
+        where: { deckId: deckId },
+      });
+
+      // Create new tags
+      if (tags && tags.length > 0) {
+        for (const tag of tags) {
+          const existingTag = await prisma.tag.findUnique({
+            where: { name: tag.name },
+          });
+
+          let tagId;
+          if (existingTag) {
+            tagId = existingTag.id;
+          } else {
+            const newTag = await prisma.tag.create({
+              data: { name: tag.name, color: tag.color },
+            });
+            tagId = newTag.id;
+          }
+
+          await prisma.deckTag.create({
+            data: {
+              deckId: deckId,
+              tagId: tagId,
+            },
+          });
+        }
+      }
+
+      // Fetch the updated deck with tags
+      const deckWithTags = await prisma.deck.findUnique({
+        where: { id: deckId },
+        include: {
+          deckTags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+      });
+
+      const formattedDeck = {
+        ...deckWithTags,
+        tags: deckWithTags?.deckTags.map(dt => dt.tag) || [],
+      };
+
+      res.status(200).json(formattedDeck);
+    } catch (error) {
+      console.error('PUT deck error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else {

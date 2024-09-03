@@ -399,7 +399,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             onClick={handleFlipClick}
           >
             {getCurrentCard() ? (
-              <div>
+              <div className="w-5/6 max-w-lg overflow-auto">
                 <Markdown>{isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? ''}</Markdown>
               </div>
             ) : (

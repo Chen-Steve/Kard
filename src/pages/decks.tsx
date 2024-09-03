@@ -210,7 +210,7 @@ const DecksPage = () => {
       console.error('No deck to update');
       return;
     }
-
+  
     if (editingDeck.name.length > 20) {
       toast({
         title: "Error",
@@ -219,15 +219,15 @@ const DecksPage = () => {
       });
       return;
     }
-
+  
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
+  
     if (sessionError || !session) {
       console.error('Session error:', sessionError || 'No session found');
       router.push('/signin');
       return;
     }
-
+  
     try {
       const response = await fetch(`/api/decks`, {
         method: 'PUT',
@@ -243,17 +243,26 @@ const DecksPage = () => {
           isPublic: isPublic,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to update deck');
       }
-
+  
       const updatedDeck = await response.json();
       setDecks((prevDecks) => prevDecks.map((deck) => (deck.id === updatedDeck.id ? updatedDeck : deck)));
       setEditingDeck(null);
       setIsEditDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Deck updated successfully",
+      });
     } catch (error) {
       console.error('Error updating deck:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update deck. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -493,7 +502,6 @@ const DecksPage = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Deck</DialogTitle>
-              <DialogDescription>Edit the details of your deck.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
