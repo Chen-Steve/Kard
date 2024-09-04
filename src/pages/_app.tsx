@@ -54,5 +54,4 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
     </>
   );
 }
-
 export default MyApp;

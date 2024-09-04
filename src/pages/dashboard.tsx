@@ -237,7 +237,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
           <NavMenu onDeckSelect={handleDeckSelect} />
-        <div className="absolute top-4 right-8 flex items-center">
+        <div className="absolute top-4 right-2 sm:top-6 sm:right-6 flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
               <UserAvatar
@@ -246,7 +246,7 @@ const Dashboard = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               />
               {dropdownOpen && (
-                <div className="absolute right-0 mt-6 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
+                <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
                   <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="block font-medium">{user.name}</span>
                     <span className="block">{user.email}</span>
