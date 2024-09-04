@@ -153,7 +153,11 @@ const Profile = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center">
-            <UserAvatar avatarSvg={selectedAvatar || user.avatar_url} alt="User Avatar" />
+            <UserAvatar 
+              avatarSvg={selectedAvatar || user.avatar_url} 
+              alt="User Avatar" 
+              onClick={() => {}}
+            />
             <div className="w-full mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
               {isEditing ? (
