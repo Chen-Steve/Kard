@@ -64,7 +64,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         <div className="p-4 pt-24 sm:pt-28">
           {isOpen && (
             <>
-              <div className="px-2 space-y-6 mt-4"> 
+              <div className="px-2 space-y-2 mt-4"> 
                 <Link href="/dashboard" className="block hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors">
                   <div className="flex items-center text-black dark:text-white py-2 px-2">
                     <FaCircleNotch className="text-2xl mr-2" />

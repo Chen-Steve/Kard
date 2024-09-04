@@ -82,7 +82,11 @@ const config = {
       },
       height: {
         '64': '16rem',
-      }
+      },
+      fontSize: {
+        'kard': '16rem',
+        'title': '4rem',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
