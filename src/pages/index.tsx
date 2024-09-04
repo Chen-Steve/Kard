@@ -60,7 +60,7 @@ const HomePage: FC = () => {
           }`}
           aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          {isDarkMode ? <FaSun className="w-8 h-8" /> : <MdDarkMode className="w-8 h-8" />}
+          {isDarkMode ? <FaSun className="w-6 h-6" /> : <MdDarkMode className="w-6 h-6" />}
         </button>
       </header>
 
