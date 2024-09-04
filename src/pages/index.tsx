@@ -11,6 +11,9 @@ import { Button } from '../components/ui/Button';
 import Image from 'next/image';
 import { FaSun } from "react-icons/fa";
 import { MdDarkMode } from "react-icons/md"; 
+import DragAndDropDemo from '../components/demo/DragAndDropDemo';
+import FeaturesSection from '../components/demo/FeaturesSection';
+import FlipCard from '../components/demo/FlipCard';
 
 const HomePage: FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -53,7 +56,7 @@ const HomePage: FC = () => {
         <button 
           onClick={toggleDarkMode} 
           className={`p-3 rounded-full transition-colors duration-200 ${
-            isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600 border-2 border-white' : 'bg-gray-200 text-black hover:bg-gray-300 border-2 border-black'
           }`}
           aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         >
@@ -103,35 +106,23 @@ const HomePage: FC = () => {
           <h2 className={`text-4xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-black'}`}>Experience Kard in Action</h2>
           <div className="relative">
             {/* Drag and Drop Demo */}
-            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 md:w-3/4 md:mr-auto ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
+            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
               <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Drag & Drop</h3>
-              <div className={`h-64 border-2 border-dashed rounded-lg flex items-center justify-center ${isDarkMode ? 'border-gray-500 text-gray-300' : 'border-gray-400 text-gray-700'}`}>
-                <p>Drag & Drop demo placeholder</p>
-              </div>
+              <DragAndDropDemo />
             </div>
 
             {/* Flashcard Flip Demo */}
             <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg md:w-3/4 md:ml-auto md:-mt-16 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Flashcard Flip</h3>
-              <div className={`h-64 rounded-lg flex items-center justify-center cursor-pointer ${isDarkMode ? 'bg-blue-900/50 text-blue-200' : 'bg-blue-200/50 text-blue-700'}`}>
-                <p>Click to flip flashcard</p>
-              </div>
+              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Flashcard</h3>
+              <FlipCard
+                question="What is the capital of France?"
+                answer="Paris"
+                isDarkMode={isDarkMode}
+              />
             </div>
           </div>
 
-          {/* Additional Features */}
-          <div className="mt-20 text-center">
-            <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>More Features coming soon!</h3>
-            <ul className="grid grid-cols-2 gap-4">
-              {['Progress Tracking', 'Spaced Repetition', 'Custom Decks', 'Study Analytics'].map((feature) => (
-                <li key={feature} className={`backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 ${
-                  isDarkMode ? 'bg-gray-800/30 text-white border-white' : 'bg-white/30 text-black border-black'
-                }`}>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FeaturesSection isDarkMode={isDarkMode} />
         </div>
       </section>
 
