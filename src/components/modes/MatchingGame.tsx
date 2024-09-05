@@ -2,7 +2,7 @@ import '../app/globals.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft, FaPlay, FaInfoCircle } from 'react-icons/fa';
-import { Card, CardContent } from '../components/ui/Card';
+import { Card, CardContent } from '../../components/ui/Card';
 import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {

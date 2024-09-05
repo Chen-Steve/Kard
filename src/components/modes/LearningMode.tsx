@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent } from './ui/Card';
-import CustomButton from '../components/ui/CustomButton';
+import { Card, CardContent } from '../../components/ui/Card';
+import CustomButton from '../../components/ui/CustomButton';
 import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
 

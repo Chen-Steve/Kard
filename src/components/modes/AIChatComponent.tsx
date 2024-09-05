@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from './ui/Button';
-import { generateAIResponse, Message } from '../lib/openai';
+import { Button } from '../../components/ui/Button';
+import { generateAIResponse, Message } from '../../lib/openai';
 import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {
