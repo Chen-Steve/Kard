@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import MatchingGame from '../../../components/MatchingGame';
+import MatchingGame from '../../../components/modes/MatchingGame';
 import { useRouter } from 'next/router';
 
 interface Flashcard {

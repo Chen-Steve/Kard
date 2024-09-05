@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
-import AIChatComponent from '../../../components/AIChatComponent';
+import AIChatComponent from '../../../components/modes/AIChatComponent';
 
 interface Flashcard {
   id: string;

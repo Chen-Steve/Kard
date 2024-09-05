@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import LearningMode from '../../../components/LearningMode';
+import LearningMode from '../../../components/modes/LearningMode';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 
