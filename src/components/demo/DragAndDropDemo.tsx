@@ -123,7 +123,7 @@ const DragAndDropDemo: React.FC = () => {
                         <li
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className={`draggable border-2 border-black dark:border-gray-600 rounded-sm p-1 mb-1 relative bg-white ${
+                          className={`draggable border-2 border-black dark:border-gray-600 rounded-sm p-1 mb-1 relative bg-white dark:bg-gray-800 ${
                             snapshot.isDragging ? 'shadow-lg' : ''
                           }`}
                         >
@@ -132,7 +132,7 @@ const DragAndDropDemo: React.FC = () => {
                             className="absolute inset-0 cursor-grab active:cursor-grabbing"
                           />
                           <div className="rounded p-2 relative z-10 pointer-events-none">
-                            <div className="p-2">
+                            <div className="p-2 text-black dark:text-black">
                               <Markdown>
                                 {flippedCards.has(card.id) ? card.answer : card.question}
                               </Markdown>

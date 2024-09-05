@@ -27,11 +27,11 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ isDarkMode }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
             <div key={feature.name} className={`p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
-              isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'
+              isDarkMode ? 'bg-white' : 'bg-white'
             }`}>
-              <feature.icon className="text-4xl mb-4 text-black" />
-              <h4 className="text-xl font-semibold mb-2">{feature.name}</h4>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{feature.description}</p>
+              <feature.icon className="text-4xl mb-4 text-black dark:text-black" />
+              <h4 className="text-xl font-semibold mb-2 text-black dark:text-black">{feature.name}</h4>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-800' : 'text-gray-600'}`}>{feature.description}</p>
             </div>
           ))}
         </div>

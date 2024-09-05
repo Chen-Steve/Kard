@@ -106,7 +106,7 @@ const HomePage: FC = () => {
           <h2 className={`text-4xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-black'}`}>Experience Kard in Action</h2>
           <div className="relative">
             {/* Drag and Drop Demo */}
-            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
+            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray/30'}`}>
               <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Drag & Drop</h3>
               <DragAndDropDemo />
             </div>
