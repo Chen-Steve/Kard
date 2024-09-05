@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { RiMenu4Fill } from "react-icons/ri";
 import { FaFolder, FaRegFolder } from "react-icons/fa";
 import { FaCircleNotch } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
@@ -81,6 +82,12 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
                   <div className="flex items-center text-black dark:text-white py-2 px-2">
                     <FaRegFolder className="text-2xl mr-2" />
                     <span className="text-xl font-semibold">Public Decks</span>
+                  </div>
+                </Link>
+                <Link href="/DrawingBoardPage" className="block hover:bg-blue-200 dark:hover:bg-gray-700 rounded transition-colors">
+                  <div className="flex items-center text-black dark:text-white py-2 px-2">
+                    <FaPencilAlt className="text-2xl mr-2" />
+                    <span className="text-xl font-semibold">Drawing Board</span>
                   </div>
                 </Link>
                 <hr className="my-4 border-gray-600 dark:border-gray-400" />

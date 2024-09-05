@@ -244,3 +244,19 @@ nav {
   top: auto !important;
   left: auto !important;
 }
+
+.custom-element {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-primary);
+}
+
+.custom-element:hover {
+  background-color: var(--color-primary-light);
+}
