@@ -41,7 +41,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ isDarkMode }) => {
         <h3 className={`text-3xl font-bold mb-8 text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>More Features coming soon!</h3>
         <ul className="grid grid-cols-2 gap-4">
           {['Progress Tracking', 'Spaced Repetition', 'Customizable Dashboard', 'Generate flashcards from websites'].map((feature) => (
-            <li key={feature} className={`backdrop-blur-sm p-4 rounded-lg shadow-lg border-2 ${
+            <li key={feature} className={`backdrop-blur-sm p-4 rounded-lg shadow-lg border-dotted border ${
               isDarkMode ? 'bg-gray-800/30 text-white border-white' : 'bg-white/30 text-black border-black'
             }`}>
               {feature}

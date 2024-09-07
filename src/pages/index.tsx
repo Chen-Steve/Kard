@@ -1,7 +1,7 @@
 "use client";
 
 import '../app/globals.css';
-import { FC, useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
@@ -11,14 +11,21 @@ import { Button } from '../components/ui/Button';
 import Image from 'next/image';
 import { FaSun } from "react-icons/fa";
 import { MdDarkMode } from "react-icons/md"; 
-import DragAndDropDemo from '../components/demo/DragAndDropDemo';
-import FeaturesSection from '../components/demo/FeaturesSection';
+import dynamic from 'next/dynamic';
 import FlipCard from '../components/demo/FlipCard';
+import FeaturesSection from '../components/demo/FeaturesSection';
 
-const HomePage: FC = () => {
+const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
+  ssr: false,
+  loading: () => <p>Loading...</p>
+});
+
+const HomePage: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isNavSticky, setIsNavSticky] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const demoRef = useRef(null);
 
   useEffect(() => {
     // Check user's preference
@@ -36,6 +43,29 @@ const HomePage: FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const currentDemoRef = demoRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentDemoRef) {
+      observer.observe(currentDemoRef);
+    }
+
+    return () => {
+      if (currentDemoRef) {
+        observer.unobserve(currentDemoRef);
+      }
+    };
+  }, []);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -49,7 +79,7 @@ const HomePage: FC = () => {
   };
 
   const [text] = useTypewriter({
-    words: ['Welcome to Kard', 'Elevate your learning', 'Create, manage, master'],
+    words: ['Kard is a Quizlet Alternative', 'But better', ''],
     loop: true,
     delaySpeed: 2000,
   });
@@ -97,21 +127,21 @@ const HomePage: FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-16">
           <Link href="/signup">
             <Button
-              className={`px-6 py-3 rounded-md font-semibold shadow-lg shine-effect transition duration-300 ease-in-out transform hover:-translate-y-1 w-full sm:w-auto ${
+              className={`px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto ${
                 isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'
               }`}
               onClick={handleButtonClick}
             >
-              Get Started
+              <span className="text-lg">Get Started</span>
             </Button>
           </Link>
           <Link href="/signin">
             <Button
-              className={`px-6 py-3 rounded-md font-semibold shadow-lg shine-effect transition duration-300 ease-in-out transform hover:-translate-y-1 w-full sm:w-auto ${
-                isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'
+              className={`px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto ${
+                isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-white hover:bg-gray-100 text-black border-2 border-black'
               }`}
             >
-              Login
+              <span className="text-lg">Login</span>
             </Button>
           </Link>
         </div>
@@ -123,9 +153,13 @@ const HomePage: FC = () => {
           <h2 className={`text-4xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-black'}`}>Experience Kard in Action</h2>
           <div className="relative">
             {/* Drag and Drop Demo */}
-            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray/30'}`}>
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Drag & Drop</h3>
-              <DragAndDropDemo />
+            <div ref={demoRef}>
+              {isVisible && (
+                <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray/30'}`}>
+                  <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Drag & Drop</h3>
+                  <DynamicDragAndDropDemo />
+                </div>
+              )}
             </div>
 
             {/* Flashcard Flip Demo */}
