@@ -234,7 +234,7 @@ const Dashboard = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
           <NavMenu onDeckSelect={handleDeckSelect} />
         <div className="absolute top-4 right-2 sm:top-6 sm:right-6 flex items-center">
@@ -308,21 +308,21 @@ const Dashboard = () => {
             )}
             <div className="flex flex-wrap justify-center gap-2">
               <button
-                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleLearnClick}
               >
                 <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
                 <span className="font-semibold">Learn</span>
               </button>
               <button
-                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleTestClick}
               >
                 <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
                 <span className="font-semibold">Test</span>
               </button>
               <button
-                className="flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleMatchClick}
               >
                 <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
@@ -332,7 +332,7 @@ const Dashboard = () => {
                 <button
                   title="K-Chat"
                   className={`
-                    flex items-center space-x-2 bg-white dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                    flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
                     hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
                     focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
                   `}
