@@ -1,7 +1,7 @@
 "use client";
 
 import '../app/globals.css';
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import trackEvent from '@vercel/analytics';
@@ -17,11 +17,23 @@ import FlipCard from '../components/demo/FlipCard';
 
 const HomePage: FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isNavSticky, setIsNavSticky] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Check user's preference
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setIsDarkMode(prefersDarkMode);
+
+    const handleScroll = () => {
+      if (navRef.current) {
+        const navTop = navRef.current.getBoundingClientRect().top;
+        setIsNavSticky(navTop <= 0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleDarkMode = () => {
@@ -47,12 +59,17 @@ const HomePage: FC = () => {
       <header className={`w-full p-6 flex justify-between items-center ${isDarkMode ? 'bg-[#212121]' : 'bg-white'}`}>
         <div className="w-14">
         </div>
-        <nav className="flex space-x-20">
-          <Link href="/" className={`kard wiggle-effect ${isDarkMode ? 'text-white' : 'text-black'}`}>Kard</Link>
-          <div className="inner-nav hover:lighten-effect">
-            <Link href="/" className={`nav-item ${isDarkMode ? 'text-white' : 'text-black'}`}>Learn More</Link>
-          </div>
-        </nav>
+        <div 
+          ref={navRef}
+          className={`${isNavSticky ? 'fixed top-0 left-0 right-0 z-10 py-4 px-6' : ''}`}
+        >
+          <nav className={`flex space-x-20 max-w-7xl mx-auto ${isNavSticky ? 'bg-transparent' : ''}`}>
+            <Link href="/" className={`kard wiggle-effect ${isDarkMode ? 'text-white' : 'text-black'}`}>Kard</Link>
+            <div className="inner-nav hover:lighten-effect">
+              <Link href="/" className={`nav-item ${isDarkMode ? 'text-white' : 'text-black'}`}>Learn More</Link>
+            </div>
+          </nav>
+        </div>
         <button 
           onClick={toggleDarkMode} 
           className={`p-3 rounded-full transition-colors duration-200 ${
