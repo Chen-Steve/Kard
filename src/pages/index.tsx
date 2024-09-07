@@ -67,7 +67,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode(prevMode => !prevMode);
   };
 
   const handleButtonClick = () => {
@@ -102,8 +102,8 @@ const HomePage: React.FC = () => {
         </div>
         <button 
           onClick={toggleDarkMode} 
-          className={`p-3 rounded-full transition-colors duration-200 ${
-            isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600 border-2 border-white' : 'bg-gray-200 text-black hover:bg-gray-300 border-2 border-black'
+          className={`p-3 rounded-full transition-colors duration-200 z-20 ${
+            isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-black hover:bg-gray-300'
           }`}
           aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         >
