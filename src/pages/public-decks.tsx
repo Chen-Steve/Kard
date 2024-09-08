@@ -49,7 +49,7 @@ const PublicDecksPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col md:flex-row">
       <NavMenu onDeckSelect={handleDeckSelect} />
       <div className="flex-1 p-4 md:pl-64 md:pt-20">
         <main className="max-w-7xl mx-auto">

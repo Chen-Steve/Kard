@@ -259,7 +259,7 @@ const DecksPage = () => {
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-blue-100 dark:bg-gray-800 flex">
+    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex">
       <NavMenu onDeckSelect={handleDeckSelect} />
       <div className="flex-1 pl-0 sm:pl-64">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 mt-16">

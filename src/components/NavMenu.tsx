@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaCircleNotch , FaFolder, FaRegFolder, FaPenNib  } from "react-icons/fa";
+import { FaCircleNotch , FaFolder, FaRegFolder, FaPenNib, FaEllipsisH  } from "react-icons/fa";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 
@@ -16,6 +16,7 @@ interface NavMenuProps {
 const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [showDecks, setShowDecks] = useState(false);
 
   useEffect(() => {
     const fetchDecks = async () => {
@@ -35,18 +36,30 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
 
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-full p-2 flex space-x-2 shadow-lg">
+      <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-full p-2 flex items-center space-x-2 shadow-lg">
         <NavIcon href="/dashboard" icon={FaCircleNotch} label="Home" index={0} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} />
         <NavIcon href="/decks" icon={FaFolder} label="Your Library" index={1} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} />
         <NavIcon href="/public-decks" icon={FaRegFolder} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} />
         <NavIcon href="/DrawingBoardPage" icon={FaPenNib} label="Drawing Board" index={3} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} />
-        {decks.map((deck, index) => (
+        
+        <div className="h-8 w-px bg-gray-300 mx-2"></div>
+        
+        <NavIcon
+          onClick={() => setShowDecks(!showDecks)}
+          icon={FaEllipsisH}
+          label={showDecks ? "Hide Decks" : "Load Decks"}
+          index={4}
+          hoveredIndex={hoveredIndex}
+          setHoveredIndex={setHoveredIndex}
+        />
+        
+        {showDecks && decks.map((deck, index) => (
           <NavIcon
             key={deck.id}
             onClick={() => onDeckSelect(deck.id)}
             icon={FaFolder}
             label={deck.name}
-            index={index + 4}
+            index={index + 5}
             hoveredIndex={hoveredIndex}
             setHoveredIndex={setHoveredIndex}
           />

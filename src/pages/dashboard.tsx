@@ -256,7 +256,7 @@ const Dashboard = () => {
   if (!user) return <p data-cursor="text">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col" data-cursor="normal">
+    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col" data-cursor="normal">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative" data-cursor="normal">
         <NavMenu onDeckSelect={handleDeckSelect} />
         <div className="absolute top-4 right-2 sm:top-6 sm:right-6 flex items-center">
