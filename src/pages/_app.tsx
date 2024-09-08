@@ -42,18 +42,21 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
         <title>Kard - A Better Quizlet Alternative</title>
         <link rel="icon" href="/blob.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <html lang="en" />
       </Head>
-      <SessionProvider session={initialSession}>
-        <AuthWrapper>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Component {...pageProps} />
-            <Analytics />
-            <Toaster />
-            <ToastContainer />
-          </DragDropContext>
-        </AuthWrapper>
-      </SessionProvider>
+      <html lang="en">
+        <body>
+          <SessionProvider session={initialSession}>
+            <AuthWrapper>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Component {...pageProps} />
+                <Analytics />
+                <Toaster />
+                <ToastContainer />
+              </DragDropContext>
+            </AuthWrapper>
+          </SessionProvider>
+        </body>
+      </html>
     </>
   );
 }
