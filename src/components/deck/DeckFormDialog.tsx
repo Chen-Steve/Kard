@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import SketchPickerWrapper from '../SketchPickerWrapper';
 import { useToast } from "../ui/use-toast";
+import { updateCursor } from 'ipad-cursor';
 
 interface Tag {
   id: number;
@@ -120,6 +121,11 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
     }
   }, [initialDeck, isOpen]);
 
+  useEffect(() => {
+    // Update cursor when the component re-renders
+    updateCursor();
+  });
+
   const handleSubmit = () => {
     if (state.name.length > 20) {
       toast({
@@ -153,13 +159,15 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
             placeholder="Deck Name"
             value={state.name}
             onChange={(e) => dispatch({ type: 'SET_NAME', payload: e.target.value })}
+            data-cursor="text"
           />
           <Input
             placeholder="Deck Description"
             value={state.description}
             onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
+            data-cursor="text"
           />
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4" data-cursor="block">
             <div className="flex items-start space-x-4">
               <div className="flex flex-col space-y-2">
                 <label htmlFor="tag-name" className="sr-only">Tag Name</label>
@@ -170,27 +178,29 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
                   value={state.newTagName}
                   onChange={(e) => dispatch({ type: 'SET_NEW_TAG_NAME', payload: e.target.value })}
                   className="p-2 border-2 border-black dark:border-gray-600 rounded"
+                  data-cursor="text"
                 />
-                <Button onClick={() => dispatch({ type: 'ADD_TAG' })}>Add Tag</Button>
+                <Button onClick={() => dispatch({ type: 'ADD_TAG' })} data-cursor="block">Add Tag</Button>
               </div>
               <SketchPickerWrapper
                 color={state.newTagColor}
                 onChangeComplete={(color) => dispatch({ type: 'SET_NEW_TAG_COLOR', payload: color.hex })}
                 className="ml-4"
+                data-cursor="block"
               />
             </div>
           </div>
-          <div>
+          <div data-cursor="block">
             {state.tags.map((tag, index) => (
               <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
                 {tag.name}
-                <button onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center">
+                <button onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center" data-cursor="block">
                   x
                 </button>
               </span>
             ))}
           </div>
-          <div className="flex items-center mt-4">
+          <div className="flex items-center mt-4" data-cursor="block">
             <input
               type="checkbox"
               id="isPublic"
@@ -204,7 +214,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>{initialDeck ? 'Update Deck' : 'Create Deck'}</Button>
+          <Button onClick={handleSubmit} data-cursor="block">{initialDeck ? 'Update Deck' : 'Create Deck'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
