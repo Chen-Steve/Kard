@@ -17,6 +17,8 @@ import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
 import { HiLightningBolt } from "react-icons/hi";
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
+import DashSettings from '../components/DashSettings';
+import { DashboardComponent } from '../types/dashboard';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -29,6 +31,11 @@ const Dashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { dismiss } = useToast();
   const [userMembership, setUserMembership] = useState('free');
+  const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
+    { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
+    { id: 'buttons', name: 'Modes', visible: true, order: 1 },
+    // Add more components as needed
+  ]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -253,13 +260,23 @@ const Dashboard = () => {
     setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
   };
 
+  const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
+    setDashboardComponents(newComponents);
+  };
+
   if (!user) return <p data-cursor="text">Loading...</p>;
 
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col" data-cursor="normal">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative" data-cursor="normal">
-        <NavMenu onDeckSelect={handleDeckSelect} />
-        <div className="absolute top-4 right-2 sm:top-6 sm:right-6 flex items-center">
+        <div className="flex items-center">
+          <DashSettings
+            components={dashboardComponents}
+            onUpdateComponents={updateDashboardComponents}
+          />
+          <NavMenu onDeckSelect={handleDeckSelect} />
+        </div>
+        <div className="flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
               <UserAvatar
@@ -320,106 +337,138 @@ const Dashboard = () => {
           )}
         </div>
       </header>
-      <main className="flex-grow p-4 mt-16" data-cursor="normal">
+      
+      <main className="flex-grow p-4" data-cursor="normal">
         {decks.length > 0 && (
-          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
-            {selectedDeckName && (
-              <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left sm:mb-0 sm:mr-16 w-full sm:w-auto" data-cursor="text">
-                {selectedDeckName}
-              </h2>
-            )}
-            <div className="flex flex-wrap justify-center gap-2">
-              <button
-                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                onClick={handleLearnClick}
-                data-cursor="block"
-              >
-                <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-                <span className="font-semibold">Learn</span>
-              </button>
-              <button
-                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                onClick={handleTestClick}
-                data-cursor="block"
-              >
-                <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                <span className="font-semibold">Test</span>
-              </button>
-              <button
-                className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                onClick={handleMatchClick}
-                data-cursor="block"
-              >
-                <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                <span className="font-semibold">Match</span>
-              </button>
-              <div className="relative">
-                <button
-                  title="K-Chat"
-                  className={`
-                    flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
-                    hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
-                    focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
-                  `}
-                  onClick={async () => {
-                    if (userMembership === 'pro') {
-                      if (selectedDeckId) {
-                        router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
-                      } else {
-                        toast({
-                          title: 'No Deck Selected',
-                          description: 'Please select a deck to start the AI chat.',
-                        });
-                      }
-                    } else {
-                      toast({
-                        title: 'Upgrade to Pro',
-                        description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-                        action: (
+          <div className="mb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center">
+                {selectedDeckName && (
+                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 sm:mb-0" data-cursor="text">
+                    {selectedDeckName}
+                  </h2>
+                )}
+                <div className="flex flex-wrap justify-center gap-2 sm:ml-4">
+                  {dashboardComponents
+                    .filter(comp => comp.visible && comp.id === 'buttons')
+                    .map(comp => (
+                      <div key={comp.id} className="flex flex-wrap justify-center gap-2">
+                        <button
+                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                          onClick={handleLearnClick}
+                          data-cursor="block"
+                        >
+                          <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
+                          <span className="font-semibold">Learn</span>
+                        </button>
+                        <button
+                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                          onClick={handleTestClick}
+                          data-cursor="block"
+                        >
+                          <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                          <span className="font-semibold">Test</span>
+                        </button>
+                        <button
+                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                          onClick={handleMatchClick}
+                          data-cursor="block"
+                        >
+                          <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                          <span className="font-semibold">Match</span>
+                        </button>
+                        <div className="relative">
                           <button
-                            onClick={() => router.push('/pricing')}
-                            className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
+                            title="K-Chat"
+                            className={`
+                              flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                              hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
+                              focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
+                            `}
+                            onClick={async () => {
+                              if (userMembership === 'pro') {
+                                if (selectedDeckId) {
+                                  router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                                } else {
+                                  toast({
+                                    title: 'No Deck Selected',
+                                    description: 'Please select a deck to start the AI chat.',
+                                  });
+                                }
+                              } else {
+                                toast({
+                                  title: 'Upgrade to Pro',
+                                  description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
+                                  action: (
+                                    <button
+                                      onClick={() => router.push('/pricing')}
+                                      className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
+                                    >
+                                      Upgrade
+                                    </button>
+                                  ),
+                                });
+                              }
+                            }}
+                            data-cursor="block"
                           >
-                            Upgrade
+                            <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
+                            <span className="font-semibold">K-Chat</span>
                           </button>
-                        ),
-                      });
-                    }
-                  }}
-                  data-cursor="block"
-                >
-                  <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
-                  <span className="font-semibold">K-Chat</span>
-                </button>
-                {userMembership !== 'pro' && (
-                  <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none" 
-                       style={{
-                         backgroundImage: `repeating-linear-gradient(
-                           45deg,
-                           transparent,
-                           transparent 10px,
-                           rgba(0,0,0,0.1) 10px,
-                           rgba(0,0,0,0.1) 20px
-                         )`
-                       }}
-                  />
-                )}
-                {userMembership !== 'pro' && (
-                  <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
-                    <HiLightningBolt className="inline-block mr-1" />
-                    PRO
-                  </div>
-                )}
+                          {userMembership !== 'pro' && (
+                            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none"
+                                 style={{
+                                   backgroundImage: `repeating-linear-gradient(
+                                   45deg,
+                                  transparent,
+                                  transparent 10px,
+                                  rgba(0,0,0,0.1) 10px,
+                                  rgba(0,0,0,0.1) 20px
+                                )`
+                                 }}
+                            />
+                          )}
+                          {userMembership !== 'pro' && (
+                            <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
+                              <HiLightningBolt className="inline-block mr-1" />
+                              PRO
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
+            </div>
+            <div className="flex flex-col items-center justify-center mt-4">
+              {dashboardComponents
+                .filter(comp => comp.visible && comp.id !== 'buttons')
+                .sort((a, b) => a.order - b.order)
+                .map(comp => {
+                  switch (comp.id) {
+                    case 'flashcards':
+                      return selectedDeckId ? (
+                        <div key={comp.id} className="w-full max-w-3xl">
+                          <FlashcardComponent
+                            userId={user.id}
+                            deckId={selectedDeckId}
+                            decks={decks}
+                            onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
+                          />
+                        </div>
+                      ) : null;
+                    // Add more cases for other components
+                    default:
+                      return null;
+                  }
+                })}
             </div>
           </div>
         )}
-        {decks.length === 0 ? (
+        {decks.length === 0 && (
           <div className="flex justify-center mt-20 items-center h-full">
             <p className="text-xl font-semibold text-gray-700 dark:text-gray-300" data-cursor="text">Go to your library and create some decks!</p>
           </div>
-        ) : (
-          selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)} />
         )}
       </main>
       <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center" data-cursor="normal">

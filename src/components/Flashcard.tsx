@@ -534,7 +534,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {flashcards.length > 0 && (
           <button
             onClick={() => setShowDefinitions(!showDefinitions)}
-            className="fixed bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
+            className="fixed border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
           >
             {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
             {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
