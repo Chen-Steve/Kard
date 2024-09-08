@@ -39,7 +39,10 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
   return (
     <>
       <Head>
+        <title>Kard - A Better Quizlet Alternative</title>
         <link rel="icon" href="/blob.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <html lang="en" />
       </Head>
       <SessionProvider session={initialSession}>
         <AuthWrapper>
@@ -54,4 +57,5 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
     </>
   );
 }
+
 export default MyApp;

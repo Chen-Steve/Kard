@@ -1,5 +1,5 @@
 import '../app/globals.css';
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
@@ -7,6 +7,7 @@ import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 import Cookies from 'js-cookie';
 import { signIn } from 'next-auth/react';
+import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -16,9 +17,30 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initCursor({
+        normalStyle: { 
+          background: 'rgba(255, 255, 255, 0.3)',
+          border: '2px solid black'
+        },
+        textStyle: { 
+          background: 'rgba(255, 255, 255, 0.5)',
+          border: '2px solid black'
+        },
+        blockStyle: { 
+          background: 'rgba(255, 255, 255, 0.2)',
+          radius: 'auto',
+          border: '2px solid black'
+        },
+      });
+      updateCursor();
+    }
+  }, []);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true); // Set loading state
+    setLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -28,7 +50,7 @@ const SignIn = () => {
     if (error) {
       console.error('Error signing in:', error.message);
       setErrorMessage(error.message);
-      setLoading(false); // Reset loading state
+      setLoading(false);
     } else {
       console.log('Signed in successfully:', data);
       Cookies.set('session', JSON.stringify(data.session), { expires: 7 });
@@ -42,13 +64,22 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" data-cursor="normal">
       {loading ? (
         <Spinner />
       ) : (
         <>
-          <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
-            <Link href="/">
+          <div className="absolute top-4 left-4 sm:top-20 sm:left-40" data-cursor="block">
+            <Link 
+              href="/" 
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({ 
+                background: 'rgba(255, 255, 255, 0.4)',
+                width: '40px',
+                height: '40px',
+                radius: '50%'
+              })}
+            >
               <FaArrowLeft className="text-black text-2xl" />
             </Link>
           </div>
@@ -73,6 +104,7 @@ const SignIn = () => {
                          focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="you@example.com"
                   required
+                  data-cursor="text"
                 />
               </div>
               <div>
@@ -89,10 +121,12 @@ const SignIn = () => {
                            focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                     placeholder="••••••••"
                     required
+                    data-cursor="text"
                   />
                   <div
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
+                    data-cursor="block"
                   >
                     {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </div>
@@ -102,20 +136,25 @@ const SignIn = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 disabled={loading}
+                data-cursor="block"
+                data-cursor-style={customCursorStyle({ background: 'rgba(255, 255, 255, 0.4)' })}
               >
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
-              {/* <button
-                onClick={handleGoogleSignIn}
-                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Sign in with Google
-              </button> */}
             </form>
           </div>
-          <p className="text-center text-sm font-semibold text-black">
+          <p className="text-center text-sm font-semibold text-black mt-4">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-medium text-black underline hover:text-gray-800">
+            <Link 
+              href="/signup" 
+              className="font-medium text-black underline hover:text-gray-800" 
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({ 
+                background: 'rgba(0, 0, 0, 0.1)',
+                radius: '20px',
+                padding: '8px 10px'
+              })}
+            >
               Sign up
             </Link>
           </p>

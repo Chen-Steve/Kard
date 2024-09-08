@@ -16,7 +16,7 @@ import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
 import { HiLightningBolt } from "react-icons/hi";
-
+import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -31,6 +31,24 @@ const Dashboard = () => {
   const [userMembership, setUserMembership] = useState('free');
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initCursor({
+        normalStyle: { 
+          background: 'rgba(255, 255, 255, 0.3)',
+          border: '2px solid black'
+        },
+        textStyle: { 
+          background: 'rgba(255, 255, 255, 0.5)',
+          border: '2px solid black'
+        },
+        blockStyle: { 
+          background: 'rgba(255, 255, 255, 0.2)',
+          radius: 'auto',
+          border: '2px solid black'
+        },
+      });
+    }
+
     const getSession = async () => {
       const sessionData = Cookies.get('session');
       if (sessionData) {
@@ -180,6 +198,10 @@ const Dashboard = () => {
     }
   }, [selectedDeckId]);
 
+  useEffect(() => {
+    updateCursor(); // Call updateCursor after DOM updates
+  }, [isDarkMode, selectedDeckId, decks]);
+
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
@@ -231,12 +253,12 @@ const Dashboard = () => {
     setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (!user) return <p data-cursor="text">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col">
-      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative">
-          <NavMenu onDeckSelect={handleDeckSelect} />
+    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col" data-cursor="normal">
+      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative" data-cursor="normal">
+        <NavMenu onDeckSelect={handleDeckSelect} />
         <div className="absolute top-4 right-2 sm:top-6 sm:right-6 flex items-center">
           {user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
@@ -246,7 +268,7 @@ const Dashboard = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               />
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
+                <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10" data-cursor="normal">
                   <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="block font-medium">{user.name}</span>
                     <span className="block">{user.email}</span>
@@ -298,11 +320,11 @@ const Dashboard = () => {
           )}
         </div>
       </header>
-      <main className="flex-grow p-4 mt-16">
+      <main className="flex-grow p-4 mt-16" data-cursor="normal">
         {decks.length > 0 && (
           <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
             {selectedDeckName && (
-              <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left sm:mb-0 sm:mr-16 w-full sm:w-auto">
+              <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left sm:mb-0 sm:mr-16 w-full sm:w-auto" data-cursor="text">
                 {selectedDeckName}
               </h2>
             )}
@@ -310,6 +332,7 @@ const Dashboard = () => {
               <button
                 className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleLearnClick}
+                data-cursor="block"
               >
                 <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
                 <span className="font-semibold">Learn</span>
@@ -317,6 +340,7 @@ const Dashboard = () => {
               <button
                 className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleTestClick}
+                data-cursor="block"
               >
                 <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
                 <span className="font-semibold">Test</span>
@@ -324,6 +348,7 @@ const Dashboard = () => {
               <button
                 className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                 onClick={handleMatchClick}
+                data-cursor="block"
               >
                 <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
                 <span className="font-semibold">Match</span>
@@ -361,6 +386,7 @@ const Dashboard = () => {
                       });
                     }
                   }}
+                  data-cursor="block"
                 >
                   <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
                   <span className="font-semibold">K-Chat</span>
@@ -390,14 +416,14 @@ const Dashboard = () => {
         )}
         {decks.length === 0 ? (
           <div className="flex justify-center mt-20 items-center h-full">
-            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">Go to your library and create some decks!</p>
+            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300" data-cursor="text">Go to your library and create some decks!</p>
           </div>
         ) : (
           selectedDeckId && <FlashcardComponent userId={user.id} deckId={selectedDeckId} decks={decks} onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)} />
         )}
       </main>
-      <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center">
-        <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
+      <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center" data-cursor="normal">
+        <p data-cursor="text">&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
       <Toaster />
     </div>

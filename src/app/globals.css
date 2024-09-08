@@ -260,3 +260,28 @@ nav {
 .custom-element:hover {
   background-color: var(--color-primary-light);
 }
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Add this to your global CSS file */
+* {
+  cursor: none !important;
+}
+
+html, body {
+  cursor: none !important;
+}

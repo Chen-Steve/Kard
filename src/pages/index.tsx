@@ -9,11 +9,11 @@ import { RiFeedbackFill } from "react-icons/ri";
 import CookieConsent from '../components/CookieConsent';
 import { Button } from '../components/ui/Button';
 import Image from 'next/image';
-import { FaSun } from "react-icons/fa";
-import { MdDarkMode } from "react-icons/md"; 
 import dynamic from 'next/dynamic';
 import FlipCard from '../components/demo/FlipCard';
 import FeaturesSection from '../components/demo/FeaturesSection';
+import Head from 'next/head';
+import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
@@ -21,16 +21,30 @@ const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndD
 });
 
 const HomePage: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isNavSticky, setIsNavSticky] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const demoRef = useRef(null);
 
   useEffect(() => {
-    // Check user's preference
-    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDarkMode(prefersDarkMode);
+    if (typeof window !== 'undefined') {
+      initCursor({
+        normalStyle: { 
+          background: 'rgba(255, 255, 255, 0.3)',
+          border: '2px solid black'
+        },
+        textStyle: { 
+          background: 'rgba(255, 255, 255, 0.5)',
+          border: '2px solid black'
+        },
+        blockStyle: { 
+          background: 'rgba(255, 255, 255, 0.2)',
+          radius: 'auto',
+          border: '2px solid black'
+        },
+      });
+      updateCursor();
+    }
 
     const handleScroll = () => {
       if (navRef.current) {
@@ -66,10 +80,6 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(prevMode => !prevMode);
-  };
-
   const handleButtonClick = () => {
     trackEvent.track('button_click', { label: 'Get Started' });
   };
@@ -85,135 +95,134 @@ const HomePage: React.FC = () => {
   });
 
   return (
-    <div className={`min-h-screen flex flex-col relative ${isDarkMode ? 'bg-[#212121] text-white' : 'bg-white text-black'}`}>
-      <header className={`w-full p-6 flex justify-between items-center ${isDarkMode ? 'bg-[#212121]' : 'bg-white'}`}>
-        <div className="w-14">
-        </div>
-        <div 
-          ref={navRef}
-          className={`${isNavSticky ? 'fixed top-0 left-0 right-0 z-10 py-4 px-6' : ''}`}
-        >
-          <nav className={`flex space-x-20 max-w-7xl mx-auto ${isNavSticky ? 'bg-transparent' : ''}`}>
-            <Link href="/" className={`kard wiggle-effect ${isDarkMode ? 'text-white' : 'text-black'}`}>Kard</Link>
-            <div className="inner-nav hover:lighten-effect">
-              <Link href="/" className={`nav-item ${isDarkMode ? 'text-white' : 'text-black'}`}>Learn More</Link>
+    <>
+      <Head>
+        <title>Kard - A Better Quizlet Alternative</title>
+      </Head>
+      <div className="min-h-screen flex flex-col relative bg-white text-black">
+        <header className="w-full p-6 bg-transparent backdrop-blur-sm" data-cursor-ignore>
+          <div 
+            ref={navRef}
+            className={`${isNavSticky ? 'fixed top-0 left-0 right-0 z-10 py-4 px-6 bg-transparent backdrop-blur-sm' : ''}`}
+          >
+            <nav className={`flex justify-center items-center max-w-7xl mx-auto`}>
+              <Link 
+                href="/" 
+                className="kard wiggle-effect text-black mr-10" 
+                data-cursor="text"
+              >
+                Kard
+              </Link>
+              <div className="inner-nav hover:lighten-effect">
+                <Link 
+                  href="/" 
+                  className="nav-item text-black px-4 py-2 rounded-full" 
+                  data-cursor="block"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </nav>
+          </div>
+        </header>
+
+        <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
+          <div className="text-center mb-12" data-cursor="text">
+            <h1 className="text-title font-bold mb-2 mt-16 text-black">
+              {text}
+              <Cursor />
+            </h1>
+            <p className="text-xl max-w-2xl mx-auto text-gray-900">
+              A Flashcard App that scales with you.
+            </p>
+          </div>
+
+          <hr className="w-1/2 mb-10 border-black" />
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-16">
+            <Link href="/signup">
+              <Button
+                className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
+                onClick={handleButtonClick}
+                data-cursor="block"
+              >
+                <span className="text-lg">Get Started</span>
+              </Button>
+            </Link>
+            <Link href="/signin">
+              <Button
+                className="px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-white hover:bg-gray-100 text-black border-2 border-black"
+                data-cursor="block"
+              >
+                <span className="text-lg">Login</span>
+              </Button>
+            </Link>
+          </div>
+        </main>
+
+        <section className="py-16">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-4xl font-bold text-center mb-12 text-black">Experience Kard in Action</h2>
+            <div className="relative">
+              <div ref={demoRef}>
+                {isVisible && (
+                  <div className="backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 bg-gray/30">
+                    <h3 className="text-2xl font-semibold mb-4 text-black">Drag & Drop</h3>
+                    <DynamicDragAndDropDemo />
+                  </div>
+                )}
+              </div>
+
+              <div className="backdrop-blur-sm p-6 rounded-lg shadow-lg md:w-3/4 md:ml-auto md:-mt-16 bg-white/30">
+                <h3 className="text-2xl font-semibold mb-4 text-black">Flashcard</h3>
+                <FlipCard
+                  question="What is the capital of France?"
+                  answer="Paris"
+                />
+              </div>
             </div>
-          </nav>
-        </div>
-        <button 
-          onClick={toggleDarkMode} 
-          className={`p-3 rounded-full transition-colors duration-200 z-20 ${
-            isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-black hover:bg-gray-300'
-          }`}
-          aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+
+            <FeaturesSection />
+          </div>
+        </section>
+
+        <footer className="w-full p-6 flex flex-col items-center text-black" data-cursor="text">
+          <div className="flex flex-col items-center">
+            <div className="flex flex-row items-center mt-2">
+              <div className="relative w-12 h-12 sm:w-40 sm:h-40 md:w-60 md:h-60 lg:w-80 lg:h-80 mr-2 sm:mr-4">
+                <Image
+                  src="/blob.svg"
+                  alt="Blob"
+                  layout="fill"
+                  style={{ objectFit: 'contain' }}
+                />
+              </div>
+              <p className="text-3xl sm:text-4xl md:text-5xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
+            </div>
+            
+            <div className="w-full flex justify-end mr-44">
+              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">
+                <Link href="/privacy">Privacy Policy</Link>
+              </p>
+              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">
+                &copy; Kard {new Date().getFullYear()}
+              </p>
+            </div>
+          </div>
+        </footer>
+
+        <button
+          className="fixed bottom-4 right-4 text-md font-bold px-4 py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
+          onClick={handleSupportClick}
+          data-cursor="block"
         >
-          {isDarkMode ? <FaSun className="w-6 h-6" /> : <MdDarkMode className="w-6 h-6" />}
+          <RiFeedbackFill className="mr-2" />
+          Feedback
         </button>
-      </header>
 
-      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className={`text-title font-bold mb-2 mt-16 ${isDarkMode ? 'text-white' : 'text-black'}`}>
-            {text}
-            <Cursor />
-          </h1>
-          <p className={`text-xl max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-            A Flashcard App that scales with you.
-          </p>
-        </div>
-
-        <hr className={`w-1/2 mb-10 ${isDarkMode ? 'border-white' : 'border-black'}`} />
-
-        <div className="flex flex-col sm:flex-row gap-4 mb-16">
-          <Link href="/signup">
-            <Button
-              className={`px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto ${
-                isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'
-              }`}
-              onClick={handleButtonClick}
-            >
-              <span className="text-lg">Get Started</span>
-            </Button>
-          </Link>
-          <Link href="/signin">
-            <Button
-              className={`px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto ${
-                isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-white hover:bg-gray-100 text-black border-2 border-black'
-              }`}
-            >
-              <span className="text-lg">Login</span>
-            </Button>
-          </Link>
-        </div>
-      </main>
-
-      {/* New Demo Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className={`text-4xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-black'}`}>Experience Kard in Action</h2>
-          <div className="relative">
-            {/* Drag and Drop Demo */}
-            <div ref={demoRef}>
-              {isVisible && (
-                <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray/30'}`}>
-                  <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Drag & Drop</h3>
-                  <DynamicDragAndDropDemo />
-                </div>
-              )}
-            </div>
-
-            {/* Flashcard Flip Demo */}
-            <div className={`backdrop-blur-sm p-6 rounded-lg shadow-lg md:w-3/4 md:ml-auto md:-mt-16 ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>Flashcard</h3>
-              <FlipCard
-                question="What is the capital of France?"
-                answer="Paris"
-                isDarkMode={isDarkMode}
-              />
-            </div>
-          </div>
-
-          <FeaturesSection isDarkMode={isDarkMode} />
-        </div>
-      </section>
-
-      <footer className={`w-full p-6 flex flex-col items-center ${isDarkMode ? 'text-white' : 'text-black'}`}>
-        <div className="flex flex-col items-center">
-          <div className="flex flex-row items-center mt-2">
-            <div className="relative w-12 h-12 sm:w-40 sm:h-40 md:w-60 md:h-60 lg:w-80 lg:h-80 mr-2 sm:mr-4">
-              <Image
-                src={isDarkMode ? "/wblob.svg" : "/blob.svg"}
-                alt="Blob"
-                layout="fill"
-                objectFit="contain"
-              />
-            </div>
-            <p className="text-3xl sm:text-4xl md:text-5xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
-          </div>
-          
-          <div className="w-full flex justify-end mr-44">
-            <p className={`text-sm backdrop-blur-sm p-2 rounded-lg ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
-              <Link href="/privacy">Privacy Policy</Link>
-            </p>
-            <p className={`text-sm backdrop-blur-sm p-2 rounded-lg ${isDarkMode ? 'bg-gray-800/30' : 'bg-white/30'}`}>
-              &copy; Kard {new Date().getFullYear()}
-            </p>
-          </div>
-        </div>
-      </footer>
-
-      <button
-        className={`fixed bottom-4 right-4 text-md font-bold px-4 py-2 rounded-full shadow-lg transition duration-300 flex items-center ${
-          isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-background text-foreground hover:bg-gray-200'
-        }`}
-        onClick={handleSupportClick}
-      >
-        <RiFeedbackFill className="mr-2" />
-        Feedback
-      </button>
-
-      <CookieConsent />
-    </div>
+        <CookieConsent />
+      </div>
+    </>
   );
 };
 

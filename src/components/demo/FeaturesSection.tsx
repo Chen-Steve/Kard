@@ -4,6 +4,7 @@ import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { FaEllipsisH } from 'react-icons/fa';
+import { customCursorStyle } from 'ipad-cursor';
 
 const features = [
   { icon: SiStagetimer, name: 'Learn Mode', description: 'Master your flashcards at your own pace' },
@@ -13,37 +14,52 @@ const features = [
   { icon: FaEllipsisH, name: 'And More!', description: 'Discover additional features to enhance your learning' },
 ];
 
-interface FeaturesSectionProps {
-  isDarkMode: boolean;
-}
-
-const FeaturesSection: React.FC<FeaturesSectionProps> = ({ isDarkMode }) => {
+const FeaturesSection: React.FC = () => {
   return (
     <>
-      <div className="mt-40">
-        <h3 className={`text-3xl font-bold mb-8 text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>
+      <div className="mt-40" data-cursor="text">
+        <h3 className="text-3xl font-bold mb-8 text-center text-black">
           Powerful Features to Accelerate Your Learning
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
-            <div key={feature.name} className={`p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
-              isDarkMode ? 'bg-white' : 'bg-white'
-            }`}>
-              <feature.icon className="text-4xl mb-4 text-black dark:text-black" />
-              <h4 className="text-xl font-semibold mb-2 text-black dark:text-black">{feature.name}</h4>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-800' : 'text-gray-600'}`}>{feature.description}</p>
+            <div 
+              key={feature.name} 
+              className="p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white"
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({
+                background: 'rgba(30, 64, 175, 0.4)',
+                border: '2px solid black',
+                radius: '8px'
+              })}
+            >
+              <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
+                   style={{
+                     background: 'radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(30, 64, 175, 0.4) 0%, transparent 50%)',
+                   }}
+              />
+              <feature.icon className="text-4xl mb-4 text-black relative z-10" />
+              <h4 className="text-xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
+              <p className="text-sm text-gray-600 relative z-10">{feature.description}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-40 text-center">
-        <h3 className={`text-3xl font-bold mb-8 text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>More Features coming soon!</h3>
+      <div className="mt-40 text-center" data-cursor="text">
+        <h3 className="text-3xl font-bold mb-8 text-center text-black">More Features coming soon!</h3>
         <ul className="grid grid-cols-2 gap-4">
           {['Progress Tracking', 'Spaced Repetition', 'Customizable Dashboard', 'Generate flashcards from websites'].map((feature) => (
-            <li key={feature} className={`backdrop-blur-sm p-4 rounded-lg shadow-lg border-dotted border ${
-              isDarkMode ? 'bg-gray-800/30 text-white border-white' : 'bg-white/30 text-black border-black'
-            }`}>
+            <li 
+              key={feature} 
+              className="backdrop-blur-sm p-4 rounded-lg shadow-lg border-dotted border bg-white/30 text-black border-black"
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({
+                background: 'rgba(30, 64, 175, 0.2)',
+                border: '2px solid black',
+                radius: '4px'
+              })}
+            >
               {feature}
             </li>
           ))}

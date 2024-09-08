@@ -1,11 +1,12 @@
 import '../app/globals.css';
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,27 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initCursor({
+        normalStyle: { 
+          background: 'rgba(255, 255, 255, 0.3)',
+          border: '2px solid black'
+        },
+        textStyle: { 
+          background: 'rgba(255, 255, 255, 0.5)',
+          border: '2px solid black'
+        },
+        blockStyle: { 
+          background: 'rgba(255, 255, 255, 0.2)',
+          radius: 'auto',
+          border: '2px solid black'
+        },
+      });
+      updateCursor();
+    }
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,13 +96,22 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" data-cursor="normal">
       {loading ? (
         <Spinner />
       ) : (
         <>
-          <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
-            <Link href="/">
+          <div className="absolute top-4 left-4 sm:top-20 sm:left-40" data-cursor="block">
+            <Link 
+              href="/"
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({ 
+                background: 'rgba(255, 255, 255, 0.4)',
+                width: '40px',
+                height: '40px',
+                radius: '50%'
+              })}
+            >
               <FaArrowLeft className="text-black text-2xl" />
             </Link>
           </div>
@@ -105,6 +136,7 @@ const SignUp = () => {
                              focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="you@example.com"
                   required
+                  data-cursor="text"
                 />
               </div>
               <div>
@@ -120,6 +152,7 @@ const SignUp = () => {
                              focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="Your username"
                   required
+                  data-cursor="text"
                 />
               </div>
               <div>
@@ -136,10 +169,12 @@ const SignUp = () => {
                                focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                     placeholder="••••••••"
                     required
+                    data-cursor="text"
                   />
                   <div
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
+                    data-cursor="block"
                   >
                     {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </div>
@@ -153,6 +188,8 @@ const SignUp = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black-500"
                 disabled={loading}
+                data-cursor="block"
+                data-cursor-style={customCursorStyle({ background: 'rgba(255, 255, 255, 0.4)' })}
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -160,7 +197,16 @@ const SignUp = () => {
           </div>
           <p className="text-center text-sm font-semibold text-black">
             Already have an account?{' '}
-            <Link href="/signin" className="font-medium text-black underline hover:text-gray-800">
+            <Link 
+              href="/signin" 
+              className="font-medium text-black underline hover:text-gray-800"
+              data-cursor="block"
+              data-cursor-style={customCursorStyle({ 
+                background: 'rgba(0, 0, 0, 0.1)',
+                radius: '20px',
+                padding: '8px 10px'
+              })}
+            >
               Sign in
             </Link>
           </p>

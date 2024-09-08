@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
-import Markdown from 'markdown-to-jsx';
+import { customCursorStyle } from 'ipad-cursor';
 
 interface FlipCardProps {
   question: string;
   answer: string;
-  isDarkMode: boolean;
 }
 
-const FlipCard: React.FC<FlipCardProps> = ({ question, answer, isDarkMode }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+const FlipCard: React.FC<FlipCardProps> = ({ question, answer }) => {
+  const [showAnswer, setShowAnswer] = useState(false);
 
-  const handleFlipClick = () => {
-    setIsFlipped(!isFlipped);
+  const handleClick = () => {
+    setShowAnswer(!showAnswer);
   };
 
   return (
     <div
-      className={`border-2 ${isDarkMode ? 'border-gray-600 bg-white' : 'border-black bg-card'} w-full h-64 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4`}
-      onClick={handleFlipClick}
+      className="w-full h-64 bg-white text-black p-6 rounded-lg shadow-md flex items-center justify-center cursor-pointer"
+      onClick={handleClick}
+      data-cursor="block"
+      data-cursor-style={customCursorStyle({
+        background: 'rgba(30, 64, 175, 0.2)',
+        border: '2px solid black',
+        radius: '8px'
+      })}
     >
-      <div className="w-5/6 max-w-lg overflow-auto text-black dark:text-black">
-        <Markdown>{isFlipped ? answer : question}</Markdown>
-      </div>
+      <p className="text-center text-xl">
+        {showAnswer ? answer : question}
+      </p>
     </div>
   );
 };
