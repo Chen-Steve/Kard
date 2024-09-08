@@ -10,7 +10,6 @@ import '../lib/fontAwesome';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from '../components/ui/toaster';
-import { initCursor, updateCursor } from 'ipad-cursor';
 
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -35,21 +34,7 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
     if (darkMode) {
       document.documentElement.classList.add('dark');
     }
-
-    // Initialize iPad cursor
-    initCursor();
-
-    // Clean up function
-    return () => {
-      // If there's a cleanup function for the cursor, call it here
-      // For example: disposeCursor();
-    };
   }, []);
-
-  useEffect(() => {
-    // Update cursor when the component re-renders
-    updateCursor();
-  });
 
   return (
     <>
