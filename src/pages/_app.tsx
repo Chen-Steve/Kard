@@ -71,20 +71,16 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
         <link rel="icon" href="/blob.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <html lang="en">
-        <body>
-          <SessionProvider session={initialSession}>
-            <AuthWrapper>
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Component {...pageProps} />
-                <Analytics />
-                <Toaster />
-                <ToastContainer />
-              </DragDropContext>
-            </AuthWrapper>
-          </SessionProvider>
-        </body>
-      </html>
+      <SessionProvider session={initialSession}>
+        <AuthWrapper>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Component {...pageProps} />
+            <Analytics />
+            <Toaster />
+            <ToastContainer />
+          </DragDropContext>
+        </AuthWrapper>
+      </SessionProvider>
     </>
   );
 }
