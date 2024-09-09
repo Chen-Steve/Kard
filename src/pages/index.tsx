@@ -14,6 +14,8 @@ import FlipCard from '../components/demo/FlipCard';
 import FeaturesSection from '../components/demo/FeaturesSection';
 import Head from 'next/head';
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
+import Modal from '../components/EmailModal';
+import EmailForm from '../components/EmailForm';
 
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
@@ -25,6 +27,7 @@ const HomePage: React.FC = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const demoRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -88,6 +91,11 @@ const HomePage: React.FC = () => {
     window.open('https://forms.gle/bP14r8vtGhmj8s7S7', '_blank');
   };
 
+  const handleLearnMoreClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
+
   const [text] = useTypewriter({
     words: ['Kard is a Quizlet Alternative', 'But better', ''],
     loop: true,
@@ -114,13 +122,14 @@ const HomePage: React.FC = () => {
                 Kard
               </Link>
               <div className="inner-nav hover:lighten-effect">
-                <Link 
-                  href="/" 
+                <a 
+                  href="#" 
                   className="nav-item text-black px-4 py-2 rounded-full" 
                   data-cursor="block"
+                  onClick={handleLearnMoreClick}
                 >
                   Learn More
-                </Link>
+                </a>
               </div>
             </nav>
           </div>
@@ -193,7 +202,7 @@ const HomePage: React.FC = () => {
                 <Image
                   src="/blob.svg"
                   alt="Blob"
-                  layout="fill"
+                  fill
                   style={{ objectFit: 'contain' }}
                 />
               </div>
@@ -219,6 +228,10 @@ const HomePage: React.FC = () => {
           <RiFeedbackFill className="mr-2" />
           Feedback
         </button>
+
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <EmailForm />
+        </Modal>
 
         <CookieConsent />
       </div>
