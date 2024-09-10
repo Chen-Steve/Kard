@@ -167,7 +167,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
             onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
             data-cursor="text"
           />
-          <div className="flex flex-col space-y-4" data-cursor="block">
+          <div className="flex flex-col space-y-4">
             <div className="flex items-start space-x-4">
               <div className="flex flex-col space-y-2">
                 <label htmlFor="tag-name" className="sr-only">Tag Name</label>
@@ -186,15 +186,15 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
                 color={state.newTagColor}
                 onChangeComplete={(color) => dispatch({ type: 'SET_NEW_TAG_COLOR', payload: color.hex })}
                 className="ml-4"
-                data-cursor="block"
+                data-cursor="text"
               />
             </div>
           </div>
-          <div data-cursor="block">
+          <div>
             {state.tags.map((tag, index) => (
               <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
                 {tag.name}
-                <button onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center" data-cursor="block">
+                <button onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center" data-cursor="text">
                   x
                 </button>
               </span>

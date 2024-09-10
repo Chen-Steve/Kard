@@ -41,7 +41,7 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
 
   return (
     <div className="flex flex-col mt-4 space-y-4 w-full px-4 sm:px-0 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
-      <div className="relative w-full sm:w-auto sm:flex-grow" data-cursor="block" data-cursor-style={roundedBlockStyle}>
+      <div className="relative w-full sm:w-auto sm:flex-grow" data-cursor="text" data-cursor-style={roundedBlockStyle}>
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" />
         <Input
           type="text"

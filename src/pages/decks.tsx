@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DeckFormDialog from '../components/deck/DeckFormDialog';
 import DeckSearchAndFilter from '../components/deck/DeckSearchAndFilter';
 import DeckCard from '../components/deck/DeckCard';
-import { Deck } from '../types/deck'; // Import the Deck type
+import { Deck } from '../types/deck';
 
 interface Tag {
   id: number;
