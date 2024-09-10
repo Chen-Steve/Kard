@@ -3,6 +3,7 @@ import { Card, CardContent } from '../../components/ui/Card';
 import CustomButton from '../../components/ui/CustomButton';
 import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
+import PerformanceSummary from '../../micro-components/PerformanceSummary';
 
 interface Flashcard {
   id: string;
@@ -13,7 +14,7 @@ interface Flashcard {
 interface LearningModeProps {
   flashcards: Flashcard[];
 }
-
+ 
 const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
   const [currentCards, setCurrentCards] = useState<Flashcard[]>([]);
   const [options, setOptions] = useState<string[]>([]);
@@ -25,6 +26,9 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [lastAnswerWasIncorrect, setLastAnswerWasIncorrect] = useState(false);
   const incorrectCards = useRef<Set<string>>(new Set());
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [retriedCards, setRetriedCards] = useState(new Set<string>());
 
   useEffect(() => {
     setCurrentCards(shuffle([...flashcards]));
@@ -92,9 +96,13 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
       setCorrectAnswers(prev => Math.min(prev + 1, flashcards.length));
       incorrectCards.current.delete(currentCards[0].id);
       setLastAnswerWasIncorrect(false);
+      setCurrentStreak(prev => prev + 1);
+      setMaxStreak(prev => Math.max(prev, currentStreak + 1));
     } else {
       incorrectCards.current.add(currentCards[0].id);
       setLastAnswerWasIncorrect(true);
+      setRetriedCards(prev => new Set(prev).add(currentCards[0].id));
+      setCurrentStreak(0);
     }
   };
 
@@ -118,7 +126,12 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
       <div className="max-w-2xl mx-auto mt-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Great job!</h2>
         <p className="mb-4">You&apos;ve completed all the flashcards in this deck.</p>
-        <p className="mb-4">Final score: {correctAnswers}/{flashcards.length}</p>
+        <PerformanceSummary
+          totalCards={flashcards.length}
+          correctAnswers={correctAnswers}
+          maxStreak={maxStreak}
+          retriedCards={retriedCards.size}
+        />
       </div>
     );
   }

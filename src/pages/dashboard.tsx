@@ -344,7 +344,7 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center">
               <div className="flex flex-col sm:flex-row items-center sm:items-center">
                 {selectedDeckName && (
-                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 sm:mb-0" data-cursor="text">
+                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0" data-cursor="text">
                     {selectedDeckName}
                   </h2>
                 )}
