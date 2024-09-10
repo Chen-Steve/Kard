@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft, FaPlay, FaInfoCircle } from 'react-icons/fa';
 import { Card, CardContent } from '../../components/ui/Card';
+import CustomButton from '../../components/ui/CustomButton';
+import PerformanceSummary from '../../micro-components/PerformanceSummary';
 import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {
@@ -93,9 +95,9 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-6xl bg-white dark:bg-black text-black dark:text-gray-200">
+    <div className="container mx-auto p-8 max-w-6xl">
       {!gameStarted && !gameEnded && (
-        <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
           <div className="absolute top-6 left-6">
             <Link href="/dashboard" passHref>
               <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
@@ -103,42 +105,42 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
               </span>
             </Link>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md w-full">
-            <h1 className="text-3xl font-bold mb-2 text-center text-gray-800 dark:text-gray-200">{deckTitle}</h1>
-            <h2 className="text-xl font-semibold mb-6 text-center text-gray-600 dark:text-gray-400">Matching Game</h2>
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center text-gray-700 dark:text-gray-300">
-                <FaInfoCircle className="mr-2 text-gray-500 dark:text-gray-400" />
-                <p className="text-sm">Match terms with their definitions as quickly as possible.</p>
+          <Card className="max-w-md w-full">
+            <CardContent className="p-8">
+              <h1 className="text-3xl font-bold mb-2 text-center">{deckTitle}</h1>
+              <h2 className="text-xl font-semibold mb-6 text-center">Matching Game</h2>
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center">
+                  <FaInfoCircle className="mr-2 text-gray-500" />
+                  <p className="text-sm">Match terms with their definitions as quickly as possible.</p>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                    Click cards to select
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                    Pair terms with definitions
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                    Avoid mistakes to save time
+                  </li>
+                </ul>
               </div>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                  Click cards to select
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                  Pair terms with definitions
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                  Avoid mistakes to save time
-                </li>
-              </ul>
-            </div>
-            <div className="text-center">
-              <button
+              <CustomButton
                 onClick={startGame}
-                className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-8 py-3 rounded-sm text-lg font-semibold transition duration-300 ease-in-out flex items-center justify-center w-full"
+                className="w-full flex items-center justify-center"
               >
                 <FaPlay className="mr-2" /> Start Game
-              </button>
-            </div>
-          </div>
+              </CustomButton>
+            </CardContent>
+          </Card>
         </div>
       )}
       {gameEnded && (
-        <div className="cover-screen fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
           <div className="absolute top-6 left-6">
             <Link href="/dashboard" passHref>
               <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
@@ -146,85 +148,87 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
               </span>
             </Link>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md w-full">
-            <h1 className="text-3xl font-bold mb-2 text-center text-gray-800 dark:text-gray-200">{deckTitle}</h1>
-            <h2 className="text-xl font-semibold mb-6 text-center text-gray-600 dark:text-gray-400">Game Over</h2>
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center justify-center text-gray-700 dark:text-gray-300">
-                <p className="text-lg">Congratulations! You&apos;ve matched all the terms.</p>
+          <Card className="max-w-md w-full">
+            <CardContent className="p-8">
+              <h1 className="text-3xl font-bold mb-2 text-center">{deckTitle}</h1>
+              <h2 className="text-xl font-semibold mb-6 text-center">Game Over</h2>
+              <PerformanceSummary
+                totalCards={cards.length}
+                correctAnswers={cards.length}
+                maxStreak={cards.length}
+                retriedCards={attempts - cards.length}
+              />
+              <div className="mt-8">
+                <CustomButton
+                  onClick={startGame}
+                  className="w-full flex items-center justify-center"
+                >
+                  <FaPlay className="mr-2" /> Play Again
+                </CustomButton>
               </div>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Your Time</h3>
-                <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{formatTime(time)}</p>
-              </div>
-              {records.length > 1 && (
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Previous Times</h3>
-                  <ul className="space-y-1">
-                    {records.slice(0, -1).map((record, index) => (
-                      <li key={index} className="text-gray-600 dark:text-gray-400">
-                        {formatTime(record)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            <div className="text-center">
-              <button
-                onClick={startGame}
-                className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300 ease-in-out flex items-center justify-center w-full"
-              >
-                <FaPlay className="mr-2" /> Play Again
-              </button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
       <div className={`game-content ${gameStarted && !gameEnded ? 'transition-curtain' : ''}`}>
-        <div className="mb-4 bg-white dark:bg-gray-700">
+        <div className="mb-4">
           <Link href="/dashboard" passHref>
-            <span className="text-black bg-white dark:text-gray-200 dark:bg-black hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
+            <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
               <FaArrowLeft className="mr-2" /> Back to Dashboard
             </span>
           </Link>
         </div>
-        <div className="text-center mb-4">
-          <p className="text-lg">Time: {formatTime(time)}</p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {shuffledCards.map((card, index) => {
-            const isSelected = selectedCards.includes(card);
-            const isMatched = matchedCards.has(card.id);
-            return (
-              <div key={index} className="aspect-w-1 aspect-h-1">
-                <Card
-                  onClick={() => handleCardClick(card)}
-                  className={`cursor-pointer transition-colors flex items-center justify-center text-center h-full
-                    ${isMatched ? 'bg-green-300 dark:bg-green-500' : 
-                    isSelected ? 'bg-blue-100 dark:bg-blue-300' : 
-                    'hover:bg-gray-200 dark:hover:bg-gray-400'}
-                    ${shakeCards && isSelected ? 'animate-rotate-shake bg-orange-100 dark:bg-orange-300' : ''}`}
-                >
-                  <CardContent className="p-2 overflow-auto h-full w-full flex items-center justify-center">
-                    <div className="text-sm">
-                      <Markdown
-                        options={{
-                          overrides: {
-                            strong: { component: 'strong', props: { className: 'font-bold' } },
-                            em: { component: 'em', props: { className: 'italic' } },
-                            u: { component: 'u', props: { className: 'underline' } },
-                          },
-                        }}
-                      >
-                        {card.content}
-                      </Markdown>
-                    </div>
-                  </CardContent>
-                </Card>
+        <Card className="mb-4">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">{deckTitle}</h2>
+              <div className="text-lg font-bold text-blue-600">
+                {matchedCards.size}/{cards.length}
               </div>
-            );
-          })}
+            </div>
+            <div className="text-center mb-4">
+              <p className="text-lg">Time: {formatTime(time)}</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {shuffledCards.map((card, index) => {
+                const isSelected = selectedCards.includes(card);
+                const isMatched = matchedCards.has(card.id);
+                return (
+                  <div key={index} className="aspect-w-1 aspect-h-1">
+                    <CustomButton
+                      onClick={() => handleCardClick(card)}
+                      className={`h-full w-full flex items-center justify-center text-center
+                        ${isMatched ? 'bg-green-500 text-white' : 
+                        isSelected ? 'bg-blue-500 text-white' : 
+                        'bg-white text-black border border-gray-300'}
+                        ${shakeCards && isSelected ? 'animate-rotate-shake bg-red-500 text-white' : ''}`}
+                      disabled={isMatched}
+                    >
+                      <div className="text-sm overflow-auto">
+                        <Markdown
+                          options={{
+                            overrides: {
+                              strong: { component: 'strong', props: { className: 'font-bold' } },
+                              em: { component: 'em', props: { className: 'italic' } },
+                              u: { component: 'u', props: { className: 'underline' } },
+                            },
+                          }}
+                        >
+                          {card.content}
+                        </Markdown>
+                      </div>
+                    </CustomButton>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+          <div 
+            className="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" 
+            style={{ width: `${(matchedCards.size / cards.length) * 100}%` }}
+          ></div>
         </div>
       </div>
     </div>

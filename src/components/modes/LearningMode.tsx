@@ -4,6 +4,7 @@ import CustomButton from '../../components/ui/CustomButton';
 import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
 import PerformanceSummary from '../../micro-components/PerformanceSummary';
+import { FaPlay } from 'react-icons/fa';
 
 interface Flashcard {
   id: string;
@@ -117,6 +118,16 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
     return { __html: sanitizedHtml };
   };
 
+  const resetSession = () => {
+    setCurrentCards(shuffle([...flashcards]));
+    setCorrectAnswers(0);
+    setMaxStreak(0);
+    setCurrentStreak(0);
+    setRetriedCards(new Set<string>());
+    setIsSessionComplete(false);
+    incorrectCards.current.clear();
+  };
+
   if (currentCards.length === 0 && !isSessionComplete) {
     return <div>Loading...</div>;
   }
@@ -126,12 +137,24 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
       <div className="max-w-2xl mx-auto mt-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Great job!</h2>
         <p className="mb-4">You&apos;ve completed all the flashcards in this deck.</p>
-        <PerformanceSummary
-          totalCards={flashcards.length}
-          correctAnswers={correctAnswers}
-          maxStreak={maxStreak}
-          retriedCards={retriedCards.size}
-        />
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <PerformanceSummary
+              totalCards={flashcards.length}
+              correctAnswers={correctAnswers}
+              maxStreak={maxStreak}
+              retriedCards={retriedCards.size}
+            />
+            <div className="mt-8">
+              <CustomButton
+                onClick={resetSession}
+                className="w-full flex items-center justify-center"
+              >
+                <FaPlay className="mr-2" /> Learn Again
+              </CustomButton>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
