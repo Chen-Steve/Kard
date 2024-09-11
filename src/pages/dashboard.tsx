@@ -19,6 +19,19 @@ import { HiLightningBolt } from "react-icons/hi";
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 import DashSettings from '../components/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
+import StickerSelector from '../components/sticker-selector';
+import React from 'react';
+
+interface StickerWithUrl {
+  id: string;
+  path: string;
+  signedUrl: string;
+  publicUrl: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -34,8 +47,15 @@ const Dashboard = () => {
   const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
+    { id: 'stickers', name: 'Stickers', visible: true, order: 2 },
     // Add more components as needed
   ]);
+  const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
+
+  const getStickersVisibility = () => {
+    const stickersComponent = dashboardComponents.find(comp => comp.id === 'stickers');
+    return stickersComponent ? stickersComponent.visible : false;
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -338,7 +358,16 @@ const Dashboard = () => {
         </div>
       </header>
       
-      <main className="flex-grow p-4" data-cursor="normal">
+      <main className="flex-grow p-4 relative" data-cursor="normal">
+
+        <div className="absolute inset-0">
+          {getStickersVisibility() && (
+            <StickerSelector
+              stickers={stickers}
+              setStickers={setStickers}
+            />
+          )}
+        </div>
         {decks.length > 0 && (
           <div className="mb-4">
             <div className="flex flex-col sm:flex-row items-center justify-center">

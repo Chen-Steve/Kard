@@ -395,9 +395,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
         <div className="flex flex-col items-center mb-8">
           <div
-            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4"
+            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4 relative"
             onClick={handleFlipClick}
           >
+            {/* Add this new div for the label */}
+            <div className="absolute top-2 left-2 text-sm font-semibold text-muted-foreground dark:text-gray-400">
+              {isFlipped ? 'Answer' : 'Question'}
+            </div>
             {getCurrentCard() ? (
               <div className="w-5/6 max-w-lg overflow-auto">
                 <Markdown>{isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? ''}</Markdown>

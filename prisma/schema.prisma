@@ -17,6 +17,7 @@ model User {
   flashcards Flashcard[]
   decks      Deck[]
   generations Generation[]
+  stickers   Sticker[]
 
   @@map("users")
 }
@@ -77,4 +78,14 @@ model Generation {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("generations")
+}
+
+model Sticker {
+  id        String   @id @default(uuid())
+  imageUrl  String   @db.Text
+  position  Json
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stickers")
 }
