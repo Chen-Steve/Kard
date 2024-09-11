@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import supabase from '../lib/supabaseClient';
 
@@ -30,6 +30,14 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dragInfo, setDragInfo] = useState<DragInfo | null>(null);
+  const initialFetchRef = useRef(false);
+
+  useEffect(() => {
+    if (!initialFetchRef.current) {
+      initialFetchRef.current = true;
+      loadStickersFromLocalStorage();
+    }
+  }, []);
 
   useEffect(() => {
     if (stickers.length === 0) {
@@ -38,6 +46,28 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       setIsLoading(false);
     }
   }, [stickers]);
+
+  useEffect(() => {
+    if (stickers.length > 0) {
+      saveStickersToLocalStorage();
+    }
+  }, [stickers]);
+
+  const loadStickersFromLocalStorage = () => {
+    const savedStickers = localStorage.getItem('stickers');
+    if (savedStickers) {
+      setStickers(JSON.parse(savedStickers));
+      setIsLoading(false);
+    } else if (stickers.length === 0) {
+      fetchStickers();
+    } else {
+      setIsLoading(false);
+    }
+  };
+
+  const saveStickersToLocalStorage = () => {
+    localStorage.setItem('stickers', JSON.stringify(stickers));
+  };
 
   const fetchStickers = async () => {
     try {
@@ -61,6 +91,7 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
 
       const newStickers = await Promise.all(stickerPromises);
       setStickers(newStickers);
+      saveStickersToLocalStorage();
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching stickers:', error);
@@ -95,9 +126,10 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
     }
   }, [dragInfo, setStickers]);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDragInfo(null);
-  };
+    saveStickersToLocalStorage();
+  }, [saveStickersToLocalStorage]);
 
   useEffect(() => {
     if (dragInfo) {

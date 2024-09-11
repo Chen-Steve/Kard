@@ -382,31 +382,37 @@ const Dashboard = () => {
                     .filter(comp => comp.visible && comp.id === 'buttons')
                     .map(comp => (
                       <div key={comp.id} className="flex flex-wrap justify-center gap-2">
-                        <button
-                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                          onClick={handleLearnClick}
-                          data-cursor="block"
-                        >
-                          <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-                          <span className="font-semibold">Learn</span>
-                        </button>
-                        <button
-                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                          onClick={handleTestClick}
-                          data-cursor="block"
-                        >
-                          <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                          <span className="font-semibold">Test</span>
-                        </button>
-                        <button
-                          className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                          onClick={handleMatchClick}
-                          data-cursor="block"
-                        >
-                          <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                          <span className="font-semibold">Match</span>
-                        </button>
-                        <div className="relative">
+                        <div className="relative" style={{ zIndex: 1001 }}>
+                          <button
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            onClick={handleLearnClick}
+                            data-cursor="block"
+                          >
+                            <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
+                            <span className="font-semibold">Learn</span>
+                          </button>
+                        </div>
+                        <div className="relative" style={{ zIndex: 1001 }}>
+                          <button
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            onClick={handleTestClick}
+                            data-cursor="block"
+                          >
+                            <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                            <span className="font-semibold">Test</span>
+                          </button>
+                        </div>
+                        <div className="relative" style={{ zIndex: 1001 }}>
+                          <button
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            onClick={handleMatchClick}
+                            data-cursor="block"
+                          >
+                            <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                            <span className="font-semibold">Match</span>
+                          </button>
+                        </div>
+                        <div className="relative" style={{ zIndex: 1001 }}>
                           <button
                             title="K-Chat"
                             className={`

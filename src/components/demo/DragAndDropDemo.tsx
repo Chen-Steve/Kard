@@ -106,9 +106,9 @@ const DragAndDropDemo: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         {columns.map(column => (
-          <div key={column.id} className="flex-1">
+          <div key={column.id} className="w-full sm:w-1/3">
             <h3 className="text-lg font-semibold mb-2">{column.title}</h3>
             <Droppable droppableId={column.id}>
               {(provided) => (
@@ -132,7 +132,7 @@ const DragAndDropDemo: React.FC = () => {
                             className="absolute inset-0 cursor-grab active:cursor-grabbing"
                           />
                           <div className="rounded p-2 relative z-10 pointer-events-none">
-                            <div className="p-2 text-black dark:text-black">
+                            <div className="p-2 text-black dark:text-black text-sm sm:text-base">
                               <Markdown>
                                 {flippedCards.has(card.id) ? card.answer : card.question}
                               </Markdown>
