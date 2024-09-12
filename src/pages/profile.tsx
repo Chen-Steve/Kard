@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import UserAvatar from '../components/UserAvatar';
+import StatsContainer from '../components/stats-container';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -45,11 +46,36 @@ const Profile = () => {
         setEmail(userData.email);
         setSelectedAvatar(userData.avatar_url);
         console.log('Fetched user data:', userData);
+
+        // Update streak if user visits today
+        const today = new Date().toISOString().split('T')[0];
+        if (userData.last_visit !== today) {
+          const { data, error } = await supabase
+            .from('users')
+            .update({ 
+              last_visit: today,
+              streak: userData.last_visit === getYesterday() ? (userData.streak || 0) + 1 : 1
+            })
+            .eq('id', userData.id)
+            .select();
+          
+          if (error) {
+            console.error('Error updating streak:', error);
+          } else {
+            setUser(data[0]);
+          }
+        }
       }
     };
 
     getSession();
   }, [router]);
+
+  const getYesterday = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toISOString().split('T')[0];
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -135,82 +161,90 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md mb-4">
+      <div className="w-full max-w-4xl mb-4">
         <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:bg-gray-700 dark:text-white">
           <FaArrowLeft className="mr-2" /> Back to Dashboard
         </Button>
       </div>
-      <Card className="w-full max-w-md bg-white dark:bg-gray-700">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-black dark:text-white">Profile</CardTitle>
-            {!isEditing && (
-              <Button variant="outline" onClick={handleEdit} className="text-black dark:bg-gray-800 dark:text-white">
-                Edit
+      <div className="w-full max-w-4xl flex flex-col md:flex-row gap-4">
+        <StatsContainer 
+          createdAt={user.created_at} 
+          streak={user.streak} 
+        />
+
+        {/* Main Profile Container */}
+        <Card className="w-full md:w-2/3 bg-white dark:bg-gray-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-black dark:text-white">Profile</CardTitle>
+              {!isEditing && (
+                <Button variant="outline" onClick={handleEdit} className="text-black dark:bg-gray-800 dark:text-white">
+                  Edit
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center">
+              <UserAvatar 
+                avatarSvg={selectedAvatar || user.avatar_url} 
+                alt="User Avatar" 
+                onClick={() => {}}
+              />
+              <div className="w-full mt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                {isEditing ? (
+                  <Input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
+                  />
+                ) : (
+                  <p className="mt-1 text-gray-600 dark:text-gray-300">{user.name}</p>
+                )}
+              </div>
+              <div className="w-full mt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                {isEditing ? (
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
+                  />
+                ) : (
+                  <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+          {isEditing && (
+            <CardFooter className="flex justify-end">
+              <Button variant="outline" onClick={() => setIsEditing(false)} className="mr-2 text-black dark:text-white">
+                Cancel
               </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center">
-            <UserAvatar 
-              avatarSvg={selectedAvatar || user.avatar_url} 
-              alt="User Avatar" 
-              onClick={() => {}}
-            />
-            <div className="w-full mt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-              {isEditing ? (
-                <Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
-                />
-              ) : (
-                <p className="mt-1 text-gray-600 dark:text-gray-300">{user.name}</p>
-              )}
-            </div>
-            <div className="w-full mt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-              {isEditing ? (
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
-                />
-              ) : (
-                <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-        {isEditing && (
-          <CardFooter className="flex justify-end">
-            <Button variant="outline" onClick={() => setIsEditing(false)} className="mr-2 text-black dark:text-white">
-              Cancel
+              <Button onClick={handleSave} className="text-black bg-gray-400 hover:bg-gray-500 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">Save</Button>
+            </CardFooter>
+          )}
+          <CardFooter className="flex justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => router.push('/privacy')} 
+              className="text-black dark:bg-gray-800 dark:text-white"
+            >
+              Privacy Policy
             </Button>
-            <Button onClick={handleSave} className="text-black bg-gray-400 hover:bg-gray-500 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">Save</Button>
+            <Button 
+              variant="outline" 
+              onClick={handleDeleteAccount} 
+              className="text-red-600 dark:bg-gray-800 dark:text-red-400"
+            >
+              Delete Account
+            </Button>
           </CardFooter>
-        )}
-        <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => router.push('/privacy')} 
-            className="text-black dark:bg-gray-800 dark:text-white"
-          >
-            Privacy Policy
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleDeleteAccount} 
-            className="text-red-600 dark:bg-gray-800 dark:text-red-400"
-          >
-            Delete Account
-          </Button>
-        </CardFooter>
-      </Card>
+        </Card>
+      </div>
       <Toaster />
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

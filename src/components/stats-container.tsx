@@ -1,0 +1,110 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import { FaUser, FaFire, FaCalendar, FaQuestion } from 'react-icons/fa';
+
+interface StatsContainerProps {
+  createdAt?: string;
+  streak: number;
+}
+
+const StatsContainer: React.FC<StatsContainerProps> = ({ createdAt, streak }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const getMemberDuration = (dateString?: string) => {
+    if (!dateString) return null;
+    const days = Math.floor((Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
+    return days > 0 ? `${days} days` : 'Less than a day';
+  };
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isHovered) return;
+
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = (y - centerY) / 10;
+      const rotateY = (centerX - x) / 10;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+    };
+
+    const handleMouseLeave = () => {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+    };
+
+    card.addEventListener('mousemove', handleMouseMove);
+    card.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      card.removeEventListener('mousemove', handleMouseMove);
+      card.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [isHovered]);
+
+  return (
+    <div
+      ref={cardRef}
+      className="w-full md:w-1/3 bg-card rounded-lg flex flex-col items-center justify-center text-card-foreground transition-all duration-300 ease-out relative overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="absolute inset-0 border-4 border-black rounded-lg pointer-events-none" />
+      <div className="absolute top-0 left-0 w-24 h-24 transition-all duration-300 ease-out">
+        <Image
+          src="/blob.svg"
+          alt="Background"
+          layout="fill"
+          objectFit="cover"
+          priority
+        />
+      </div>
+      <div className={`flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <h3 className="text-xl font-bold">Your Stats</h3>
+        <div className="space-y-2 text-sm">
+          {createdAt ? (
+            <>
+              <div className="flex items-center">
+                <FaCalendar className="mr-2 text-green-300" />
+                <span>Joined: {formatDate(createdAt)}</span>
+              </div>
+              <div className="flex items-center">
+                <FaUser className="mr-2 text-blue-300" />
+                <span>Member for: {getMemberDuration(createdAt)}</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center">
+              <FaQuestion className="mr-2 text-yellow-300" />
+              <span>Join date unknown</span>
+            </div>
+          )}
+          <div className="flex items-center">
+            <FaFire className="mr-2 text-orange-300" />
+            <span>Current streak: {streak || 0} days</span>
+          </div>
+        </div>
+      </div>
+      <div className="absolute bottom-4 right-4 text-xl font-bold text-black">
+        KARD
+      </div>
+    </div>
+  );
+};
+
+export default StatsContainer;

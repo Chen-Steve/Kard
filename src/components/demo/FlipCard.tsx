@@ -17,7 +17,7 @@ const FlipCard: React.FC<FlipCardProps> = ({ question, answer }) => {
     <div
       className="w-full h-64 bg-white text-black p-6 rounded-lg shadow-md flex items-center justify-center cursor-pointer"
       onClick={handleClick}
-      data-cursor="block"
+      data-cursor="text"
       data-cursor-style={customCursorStyle({
         background: 'rgba(30, 64, 175, 0.2)',
         border: '2px solid black',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash, FaQuestionCircle } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash, FaQuestionCircle, FaEllipsisH } from 'react-icons/fa';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
@@ -45,6 +45,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [isImportVisible, setIsImportVisible] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false); 
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const flashcardRef = useRef<HTMLDivElement>(null);
@@ -437,12 +438,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                       onClick={() => fileInputRef.current?.click()}
                       className={`px-4 py-2 rounded w-full mb-2 ${csvFile ? 'bg-green-500 text-white' : 'bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200'}`}
                       style={csvFile ? { background: 'repeating-linear-gradient(45deg, rgba(0, 128, 0, 0.5), rgba(0, 128, 0, 0.5) 10px, rgba(0, 128, 0, 0.3) 10px, rgba(0, 128, 0, 0.3) 20px)' } : {}}
+                      arial-Label="Choose csv file"
                     >
                       Choose csv file
                     </button>
                     <button
                       onClick={importFlashcardsFromCsv}
                       className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full"
+                      arial-Label="Import flashcards"
                     >
                       Import Flashcards
                     </button>
@@ -484,21 +487,32 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             <button
               onClick={handleAddCard}
               className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+              aria-label="Add flashcard"
             >
               <FaPlus className="mr-2" /> Add Flashcard
             </button>
           )}
-          <button
-            onClick={() => setShowList(!showList)}
-            className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
-          >
-            {showList ? 'Hide List' : 'Show List'}
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowList(!showList)}
+              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+              aria-label={showList ? "Hide list" : "Show list"}
+            >
+              {showList ? 'Hide List' : 'Show List'}
+            </button>
+            <button
+              onClick={() => setIsScrollable(!isScrollable)}
+              className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-3 py-2 rounded flex items-center"
+              aria-label={isScrollable ? "Expand list" : "Make list scrollable"}
+            >
+              <FaEllipsisH />
+            </button>
+          </div>
         </div>
         <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-2" />
 
         {showList && (
-          <div className="mt-2">
+          <div className={`mt-2 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
             <DragDropContext onDragEnd={handleDrop}>
               <Droppable droppableId="flashcards">
                 {(provided) => (

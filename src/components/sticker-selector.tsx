@@ -32,44 +32,11 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
   const [dragInfo, setDragInfo] = useState<DragInfo | null>(null);
   const initialFetchRef = useRef(false);
 
-  useEffect(() => {
-    if (!initialFetchRef.current) {
-      initialFetchRef.current = true;
-      loadStickersFromLocalStorage();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (stickers.length === 0) {
-      fetchStickers();
-    } else {
-      setIsLoading(false);
-    }
-  }, [stickers]);
-
-  useEffect(() => {
-    if (stickers.length > 0) {
-      saveStickersToLocalStorage();
-    }
-  }, [stickers]);
-
-  const loadStickersFromLocalStorage = () => {
-    const savedStickers = localStorage.getItem('stickers');
-    if (savedStickers) {
-      setStickers(JSON.parse(savedStickers));
-      setIsLoading(false);
-    } else if (stickers.length === 0) {
-      fetchStickers();
-    } else {
-      setIsLoading(false);
-    }
-  };
-
-  const saveStickersToLocalStorage = () => {
+  const saveStickersToLocalStorage = useCallback(() => {
     localStorage.setItem('stickers', JSON.stringify(stickers));
-  };
+  }, [stickers]);
 
-  const fetchStickers = async () => {
+  const fetchStickers = useCallback(async () => {
     try {
       const { data, error } = await supabase.storage.from('stickers').list();
       if (error) throw error;
@@ -98,7 +65,40 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       setError('Failed to load stickers');
       setIsLoading(false);
     }
-  };
+  }, [setStickers, saveStickersToLocalStorage]);
+
+  const loadStickersFromLocalStorage = useCallback(() => {
+    const savedStickers = localStorage.getItem('stickers');
+    if (savedStickers) {
+      setStickers(JSON.parse(savedStickers));
+      setIsLoading(false);
+    } else if (stickers.length === 0) {
+      fetchStickers();
+    } else {
+      setIsLoading(false);
+    }
+  }, [setStickers, stickers, fetchStickers, setIsLoading]);
+
+  useEffect(() => {
+    if (!initialFetchRef.current) {
+      initialFetchRef.current = true;
+      loadStickersFromLocalStorage();
+    }
+  }, [loadStickersFromLocalStorage]);
+
+  useEffect(() => {
+    if (stickers.length === 0) {
+      fetchStickers();
+    } else {
+      setIsLoading(false);
+    }
+  }, [stickers, fetchStickers]);
+
+  useEffect(() => {
+    if (stickers.length > 0) {
+      saveStickersToLocalStorage();
+    }
+  }, [stickers, saveStickersToLocalStorage]);
 
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent, stickerId: string) => {
     e.preventDefault(); // Prevent default drag behavior
@@ -150,7 +150,7 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       window.removeEventListener('touchmove', handleDragMove);
       window.removeEventListener('touchend', handleDragEnd);
     };
-  }, [dragInfo, handleDragMove]);
+  }, [dragInfo, handleDragMove, handleDragEnd]);
 
   if (isLoading) return <div>Loading stickers...</div>;
   if (error) return <div>Error: {error}</div>;

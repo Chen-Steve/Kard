@@ -47,7 +47,7 @@ const Dashboard = () => {
   const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
-    { id: 'stickers', name: 'Stickers', visible: true, order: 2 },
+    { id: 'stickers', name: 'Stickers', visible: false, order: 2 },
     // Add more components as needed
   ]);
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);

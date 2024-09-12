@@ -10,7 +10,7 @@ interface UserAvatarProps {
 const UserAvatar: React.FC<UserAvatarProps> = ({ avatarSvg, alt, onClick }) => {
   return (
     <button
-      title="Change Avatar"
+      aria-label="Change Avatar"
       onClick={onClick}
       className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
     >
