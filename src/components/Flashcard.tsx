@@ -6,7 +6,7 @@ import type { DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './EditFlashcard';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
-import { MdSettings } from "react-icons/md";
+import { BiCloudUpload } from "react-icons/bi";
 import { PiSparkleBold } from "react-icons/pi";
 import Papa from 'papaparse';
 import Popup from './Popup';
@@ -420,7 +420,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             )}
             {!readOnly && (
               <div className="relative" ref={settingsRef}>
-                <MdSettings
+                <BiCloudUpload
                   className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
                   onClick={() => setIsImportVisible(!isImportVisible)}
                 />

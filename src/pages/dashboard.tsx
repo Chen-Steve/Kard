@@ -288,7 +288,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col" data-cursor="normal">
-      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative" data-cursor="normal">
+      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50" data-cursor="normal">
         <div className="flex items-center">
           <DashSettings
             components={dashboardComponents}
@@ -382,7 +382,7 @@ const Dashboard = () => {
                     .filter(comp => comp.visible && comp.id === 'buttons')
                     .map(comp => (
                       <div key={comp.id} className="flex flex-wrap justify-center gap-2">
-                        <div className="relative" style={{ zIndex: 1001 }}>
+                        <div className="relative">
                           <button
                             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleLearnClick}
@@ -392,7 +392,7 @@ const Dashboard = () => {
                             <span className="font-semibold">Learn</span>
                           </button>
                         </div>
-                        <div className="relative" style={{ zIndex: 1001 }}>
+                        <div className="relative">
                           <button
                             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleTestClick}
@@ -402,7 +402,7 @@ const Dashboard = () => {
                             <span className="font-semibold">Test</span>
                           </button>
                         </div>
-                        <div className="relative" style={{ zIndex: 1001 }}>
+                        <div className="relative">
                           <button
                             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleMatchClick}
@@ -412,7 +412,7 @@ const Dashboard = () => {
                             <span className="font-semibold">Match</span>
                           </button>
                         </div>
-                        <div className="relative" style={{ zIndex: 1001 }}>
+                        <div className="relative">
                           <button
                             title="K-Chat"
                             className={`

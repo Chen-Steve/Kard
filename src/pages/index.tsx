@@ -107,7 +107,7 @@ const HomePage: React.FC = () => {
       <Head>
         <title>Kard - A Better Quizlet Alternative</title>
       </Head>
-      <div className="min-h-screen flex flex-col relative bg-white text-black">
+      <div className="min-h-screen flex flex-col relative bg-[#F8F7F6] text-black">
         <header className="w-full p-6 bg-transparent backdrop-blur-sm" data-cursor-ignore>
           <div 
             ref={navRef}
