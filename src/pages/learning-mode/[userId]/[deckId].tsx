@@ -42,7 +42,7 @@ const LearningModePage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
-      <div className="mb-4">
+      <div className="mb-4"> 
         <Link href="/dashboard" passHref>
           <span className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
             <FaArrowLeft className="mr-2" /> Back to Dashboard

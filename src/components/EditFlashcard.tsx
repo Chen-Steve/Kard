@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'markdown-to-jsx';
+import { initCursor, updateCursor, disposeCursor, customCursorStyle } from 'ipad-cursor'; // Adjust the import path as necessary
 
 interface EditFlashcardProps {
   id: string;
@@ -23,6 +24,19 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   const [editedQuestion, setEditedQuestion] = useState(question);
   const [editedAnswer, setEditedAnswer] = useState(answer);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    // Initialize the custom cursor on mount
+    initCursor({
+      className: 'ipad-cursor',
+      enableAutoTextCursor: true, // Automatically use text cursor for text inputs
+    });
+
+    return () => {
+      // Dispose the custom cursor on unmount
+      disposeCursor();
+    };
+  }, []);
 
   useEffect(() => {
     setEditedQuestion(question);

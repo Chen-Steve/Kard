@@ -5,6 +5,7 @@ import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
 import PerformanceSummary from './micro-components/PerformanceSummary';
 import { FaPlay } from 'react-icons/fa';
+import { FaClock } from 'react-icons/fa';
 
 interface Flashcard {
   id: string;
@@ -14,9 +15,10 @@ interface Flashcard {
 
 interface LearningModeProps {
   flashcards: Flashcard[];
+  initialMode?: 'normal' | 'timed';
 }
- 
-const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
+
+const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = 'normal' }) => {
   const [currentCards, setCurrentCards] = useState<Flashcard[]>([]);
   const [options, setOptions] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -30,6 +32,12 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
   const [maxStreak, setMaxStreak] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [retriedCards, setRetriedCards] = useState(new Set<string>());
+  const [mode, setMode] = useState<'normal' | 'timed'>(initialMode);
+  const [timeLeft, setTimeLeft] = useState(5);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isAnswerSelected, setIsAnswerSelected] = useState(false);
+  const [timerExpired, setTimerExpired] = useState(false);  // Add a new state to track timer expiration
 
   useEffect(() => {
     setCurrentCards(shuffle([...flashcards]));
@@ -51,47 +59,98 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
   }, [generateOptions]);
 
   const handleNextCard = useCallback(() => {
+    if (currentCardIndex + 1 >= flashcards.length) {
+      setIsSessionComplete(true);
+      return;
+    }
+
     setIsTransitioning(true);
+    // Only increment the card index if the last answer was correct or if it's timed mode
+    if (isCorrect || mode === 'timed') {
+      setCurrentCardIndex(prev => prev + 1);
+    }
     setCurrentCards((prevCards) => {
-      const newCards = prevCards.slice(1);
-      if (newCards.length === 0 && incorrectCards.current.size > 0) {
-        return shuffle(flashcards.filter(card => incorrectCards.current.has(card.id)));
+      if (!isCorrect && mode === 'normal') {
+        // If the answer was incorrect in normal mode, add the current card to the end of the deck
+        return [...prevCards.slice(1), prevCards[0]];
+      } else {
+        // Otherwise, just move to the next card
+        return prevCards.slice(1);
       }
-      return newCards;
     });
     setSelectedAnswer(null);
     setIsCorrect(null);
     setShowNextPrompt(false);
-
-    if (currentCards.length === 1 && incorrectCards.current.size === 0) {
-      setIsSessionComplete(true);
-    }
+    setIsAnswerSelected(false);
+    setTimeLeft(5);
 
     setTimeout(() => {
       setIsTransitioning(false);
     }, 300);
-  }, [currentCards.length, flashcards, incorrectCards]);
+  }, [currentCardIndex, flashcards.length, isCorrect, mode]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.code === 'Space' && showNextPrompt && !isTransitioning) {
+      if (event.code === 'Space' && mode === 'normal' && showNextPrompt) {
+        event.preventDefault();
         handleNextCard();
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
+
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [showNextPrompt, handleNextCard, isTransitioning]);
+  }, [mode, showNextPrompt, handleNextCard]);
+
+  useEffect(() => {
+    console.log("Timer useEffect setup", { mode, isTransitioning, isSessionComplete, isAnswerSelected });
+    if (mode === 'timed' && !isTransitioning && !isSessionComplete && !isAnswerSelected && !timerExpired) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          console.log("Timer tick", { prevTime });
+          if (prevTime <= 1) {
+            console.log("Timer about to expire, should clear and call handleNextCard");
+            if (timerRef.current !== null) {
+              clearInterval(timerRef.current as NodeJS.Timeout);  // Type assertion here
+              timerRef.current = null;
+              console.log("Timer cleared");
+            }
+            setTimerExpired(true);
+            return 5;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current as NodeJS.Timeout);  // Type assertion here
+        timerRef.current = null;
+      }
+    };
+  }, [mode, isTransitioning, handleNextCard, isSessionComplete, isAnswerSelected, timerExpired]);
+
+  useEffect(() => {
+    if (timerExpired) {
+      handleNextCard();
+      setTimerExpired(false);  // Reset the flag after handling the card transition
+    }
+  }, [timerExpired, handleNextCard]);
 
   const handleAnswerSelect = (answer: string) => {
-    if (selectedAnswer !== null || isTransitioning) return;
+    if (selectedAnswer !== null || isTransitioning) {
+      console.log("handleAnswerSelect early exit", { selectedAnswer, isTransitioning });
+      return;
+    }
 
+    console.log("Answer selected", { answer });
     setSelectedAnswer(answer);
+    setIsAnswerSelected(true);
     const isAnswerCorrect = answer === currentCards[0].answer;
     setIsCorrect(isAnswerCorrect);
-    setShowNextPrompt(true);
 
     if (isAnswerCorrect) {
       setCorrectAnswers(prev => Math.min(prev + 1, flashcards.length));
@@ -104,6 +163,25 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
       setLastAnswerWasIncorrect(true);
       setRetriedCards(prev => new Set(prev).add(currentCards[0].id));
       setCurrentStreak(0);
+    }
+
+    if (mode === 'normal') {
+      setShowNextPrompt(true);
+    } else {
+      // In timed mode, move to next card after a brief delay
+      setTimeout(() => {
+        console.log("Moving to next card after answer in timed mode");
+        handleNextCard();
+      }, 1000);
+    }
+
+    if (mode === 'timed') {
+      setTimeLeft(5);
+      if (timerRef.current) {
+        console.log("Clearing timer after answer selection");
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     }
   };
 
@@ -125,7 +203,16 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
     setCurrentStreak(0);
     setRetriedCards(new Set<string>());
     setIsSessionComplete(false);
+    setCurrentCardIndex(0);
     incorrectCards.current.clear();
+  };
+
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === 'normal' ? 'timed' : 'normal'));
+    setTimeLeft(5);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
   };
 
   if (currentCards.length === 0 && !isSessionComplete) {
@@ -163,6 +250,12 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
+      <div className="flex justify-between items-center">
+        <CustomButton onClick={toggleMode} className="flex items-center">
+          {mode === 'normal' ? <FaClock className="mr-2" /> : <FaPlay className="mr-2" />}
+          {mode === 'normal' ? 'Switch to Timed' : 'Switch to Normal'}
+        </CustomButton>
+      </div>
       <Card className="mb-4">
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-4">
@@ -171,7 +264,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
               dangerouslySetInnerHTML={renderFormattedText(currentCard.question)}
             />
             <div className={`text-lg font-bold ${lastAnswerWasIncorrect ? 'text-orange-500' : 'text-blue-600'}`}>
-              {correctAnswers}/{flashcards.length}
+              {currentCardIndex + 1}/{flashcards.length}
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -204,7 +297,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
             style={{ width: `${(correctAnswers / flashcards.length) * 100}%` }}
           ></div>
         </div>
-        {showNextPrompt && (
+        {mode === 'normal' && showNextPrompt && (
           <p className="text-center mb-4">
             Press space to move to the next question
           </p>
@@ -215,6 +308,11 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards }) => {
           </p>
         )}
       </div>
+      {mode === 'timed' && (
+        <div className="mt-4 text-center">
+          <p className="text-lg font-bold">Time left: {timeLeft}s</p>
+        </div>
+      )}
     </div>
   );
 };

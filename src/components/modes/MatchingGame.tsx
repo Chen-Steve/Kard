@@ -100,8 +100,8 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
         <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
           <div className="absolute top-6 left-6">
             <Link href="/dashboard" passHref>
-              <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
-                <FaArrowLeft className="mr-2" /> Back
+              <span className="text-black dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center pl-10">
+                <FaArrowLeft className="mr-2" /> Back to Dashboard
               </span>
             </Link>
           </div>
