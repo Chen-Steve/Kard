@@ -384,7 +384,7 @@ const Dashboard = () => {
                       <div key={comp.id} className="flex flex-wrap justify-center gap-2">
                         <div className="relative">
                           <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleLearnClick}
                             data-cursor="block"
                           >
@@ -394,7 +394,7 @@ const Dashboard = () => {
                         </div>
                         <div className="relative">
                           <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleTestClick}
                             data-cursor="block"
                           >
@@ -404,7 +404,7 @@ const Dashboard = () => {
                         </div>
                         <div className="relative">
                           <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
                             onClick={handleMatchClick}
                             data-cursor="block"
                           >
@@ -416,7 +416,7 @@ const Dashboard = () => {
                           <button
                             title="K-Chat"
                             className={`
-                              flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                              flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
                               hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
                               focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
                             `}

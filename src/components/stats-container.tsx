@@ -60,11 +60,11 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => 
   return (
     <div
       ref={cardRef}
-      className="w-full md:w-1/3 bg-card rounded-lg flex flex-col items-center justify-center text-card-foreground transition-all duration-300 ease-out relative overflow-hidden"
+      className="w-full md:w-1/3 bg-card dark:bg-gray-800 rounded-t-[2rem] rounded-b-lg flex flex-col items-center justify-center text-card-foreground dark:text-gray-200 transition-all duration-300 ease-out relative overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="absolute inset-0 border-4 border-black rounded-lg pointer-events-none" />
+      <div className="absolute inset-0 border-4 border-black dark:border-gray-700 rounded-t-[2rem] rounded-b-lg pointer-events-none" />
       <div className="absolute top-0 left-0 w-24 h-24 transition-all duration-300 ease-out">
         <Image
           src="/blob.svg"
@@ -74,33 +74,33 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => 
           priority
         />
       </div>
-      <div className={`flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black dark:text-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
         <h3 className="text-xl font-bold">Your Stats</h3>
         <div className="space-y-2 text-sm">
           {joinedAt ? (
             <>
               <div className="flex items-center">
-                <FaCalendar className="mr-2 text-green-300" />
+                <FaCalendar className="mr-2 text-green-300 dark:text-green-400" />
                 <span>Joined: {formatDate(joinedAt)}</span>
               </div>
               <div className="flex items-center">
-                <FaUser className="mr-2 text-blue-300" />
+                <FaUser className="mr-2 text-blue-300 dark:text-blue-400" />
                 <span>Member for: {getMemberDuration(joinedAt)}</span>
               </div>
             </>
           ) : (
             <div className="flex items-center">
-              <FaQuestion className="mr-2 text-yellow-300" />
+              <FaQuestion className="mr-2 text-yellow-300 dark:text-yellow-400" />
               <span>Join date unknown</span>
             </div>
           )}
           <div className="flex items-center">
-            <FaFire className="mr-2 text-orange-300" />
+            <FaFire className="mr-2 text-orange-300 dark:text-orange-400" />
             <span>Current streak: {streak || 0} days</span>
           </div>
         </div>
       </div>
-      <div className="absolute bottom-4 right-4 text-xl font-bold text-black">
+      <div className="absolute bottom-4 right-4 text-xl font-bold text-black dark:text-gray-200">
         KARD
       </div>
     </div>

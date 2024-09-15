@@ -414,14 +414,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           <div className="flex justify-between w-full mt-0">
             {!readOnly && (
               <PiSparkleBold
-                className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer mr-2"
+                className="text-3xl text-black dark:text-gray-400 cursor-pointer mr-2"
                 onClick={() => setIsPopupVisible(true)}
               />
             )}
             {!readOnly && (
               <div className="relative" ref={settingsRef}>
                 <BiCloudUpload
-                  className="text-3xl text-muted-foreground dark:text-gray-400 cursor-pointer"
+                  className="text-3xl text-black dark:text-gray-400 cursor-pointer"
                   onClick={() => setIsImportVisible(!isImportVisible)}
                 />
                 {isImportVisible && (

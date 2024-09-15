@@ -47,7 +47,7 @@ model Deck {
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
   order       Int      @default(0)
-  user        User         @relation(fields: [userId], references: [id])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   flashcards  Flashcard[]
   deckTags    DeckTag[]
   
