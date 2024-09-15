@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { FaUser, FaFire, FaCalendar, FaQuestion } from 'react-icons/fa';
 
 interface StatsContainerProps {
-  createdAt?: string;
+  joinedAt: string;
   streak: number;
 }
 
-const StatsContainer: React.FC<StatsContainerProps> = ({ createdAt, streak }) => {
+const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -77,15 +77,15 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ createdAt, streak }) =>
       <div className={`flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
         <h3 className="text-xl font-bold">Your Stats</h3>
         <div className="space-y-2 text-sm">
-          {createdAt ? (
+          {joinedAt ? (
             <>
               <div className="flex items-center">
                 <FaCalendar className="mr-2 text-green-300" />
-                <span>Joined: {formatDate(createdAt)}</span>
+                <span>Joined: {formatDate(joinedAt)}</span>
               </div>
               <div className="flex items-center">
                 <FaUser className="mr-2 text-blue-300" />
-                <span>Member for: {getMemberDuration(createdAt)}</span>
+                <span>Member for: {getMemberDuration(joinedAt)}</span>
               </div>
             </>
           ) : (

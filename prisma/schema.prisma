@@ -18,6 +18,9 @@ model User {
   decks      Deck[]
   generations Generation[]
   stickers   Sticker[]
+  streak    Int       @default(0)
+  lastLogin DateTime? @map("last_login")
+  joinedAt  DateTime  @default(now()) @map("joined_at")
 
   @@map("users")
 }

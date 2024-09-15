@@ -168,7 +168,7 @@ const Profile = () => {
       </div>
       <div className="w-full max-w-4xl flex flex-col md:flex-row gap-4">
         <StatsContainer 
-          createdAt={user.created_at} 
+          joinedAt={user.joined_at} 
           streak={user.streak} 
         />
 
