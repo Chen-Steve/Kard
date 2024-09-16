@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'markdown-to-jsx';
-import { initCursor, updateCursor, disposeCursor, customCursorStyle } from 'ipad-cursor'; // Adjust the import path as necessary
+import { initCursor, updateCursor, disposeCursor, customCursorStyle } from 'ipad-cursor';
+import { TbEdit } from "react-icons/tb";
+import { MdDeleteOutline, MdOutlineSave } from "react-icons/md";
 
 interface EditFlashcardProps {
   id: string;
@@ -102,26 +104,26 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             {isEditing ? (
               <button
                 onClick={handleSave}
-                className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
+                className="bg-green-500 text-white p-1 rounded text-sm hover:bg-green-600 transition-colors"
                 title="Save"
               >
-                Save
+                <MdOutlineSave size={20} />
               </button>
             ) : (
               <button
                 onClick={handleEdit}
-                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
+                className="bg-blue-500 text-white p-1 rounded text-sm hover:bg-blue-600 transition-colors"
                 title="Edit"
               >
-                Edit
+                <TbEdit size={20} />
               </button>
             )}
             <button
               onClick={handleDelete}
-              className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
+              className="bg-red-500 text-white p-1 rounded text-sm hover:bg-red-600 transition-colors"
               title="Delete"
             >
-              Delete
+              <MdDeleteOutline size={20} />
             </button>
           </>
         )}
