@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
 
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
           <div className="text-center mb-12" data-cursor="text">
-            <h1 className="text-title font-bold mb-2 mt-16 text-black">
+            <h1 className="text-title font-bold mb-2 mt-20 text-black">
               {text}
               <Cursor />
             </h1>

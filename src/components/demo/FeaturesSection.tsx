@@ -16,16 +16,16 @@ const features = [
 
 const FeaturesSection: React.FC = () => {
   return (
-    <>
-      <div className="mt-40" data-cursor="text">
-        <h3 className="text-3xl font-bold mb-8 text-center text-black">
-          Powerful Features to Accelerate Your Learning
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => (
+    <div className="mt-40" data-cursor="text">
+      <h3 className="text-3xl font-bold mb-8 text-center text-black">
+        Powerful Features to Accelerate Your Learning
+      </h3>
+      <div className="relative overflow-hidden">
+        <div className="flex animate-marquee">
+          {[...features, ...features].map((feature, index) => (
             <div 
-              key={feature.name} 
-              className="p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white"
+              key={index} 
+              className="flex-shrink-0 w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
               data-cursor="block"
               data-cursor-style={customCursorStyle({
                 background: 'rgba(30, 64, 175, 0.4)',
@@ -45,27 +45,17 @@ const FeaturesSection: React.FC = () => {
           ))}
         </div>
       </div>
-
-      <div className="mt-40 text-center" data-cursor="text">
-        <h3 className="text-3xl font-bold mb-8 text-center text-black">More Features coming soon!</h3>
-        <ul className="grid grid-cols-2 gap-4">
-          {['Progress Tracking', 'Spaced Repetition', 'Customizable Dashboard', 'Generate flashcards from websites'].map((feature) => (
-            <li 
-              key={feature} 
-              className="backdrop-blur-sm p-4 rounded-lg shadow-lg border-dotted border bg-white/30 text-black border-black"
-              data-cursor="block"
-              data-cursor-style={customCursorStyle({
-                background: 'rgba(30, 64, 175, 0.2)',
-                border: '2px solid black',
-                radius: '4px'
-              })}
-            >
-              {feature}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+          width: 200%;
+        }
+      `}</style>
+    </div>
   );
 };
 
