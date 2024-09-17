@@ -16,6 +16,8 @@ import Head from 'next/head';
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
+import { useSpring, animated } from '@react-spring/web';
+import BubbleBackground from '../components/demo/BubbleBackground';
 
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
@@ -28,6 +30,22 @@ const HomePage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const demoRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  const bubbleProps = [
+    useSpring({
+      opacity: scrollY / 300,
+      transform: `translate3d(${Math.sin(scrollY / 100) * 50}px, ${Math.min(scrollY / 3, 200)}px, 0) scale(${1 + scrollY / 2000})`,
+    }),
+    useSpring({
+      opacity: scrollY / 400,
+      transform: `translate3d(${Math.sin(scrollY / 90) * 30}px, ${Math.min(scrollY / 2.5, 250)}px, 0) scale(${1 + scrollY / 1800})`,
+    }),
+    useSpring({
+      opacity: scrollY / 500,
+      transform: `translate3d(${Math.sin(scrollY / 110) * 40}px, ${Math.min(scrollY / 3.5, 180)}px, 0) scale(${1 + scrollY / 2200})`,
+    }),
+  ];
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -54,6 +72,7 @@ const HomePage: React.FC = () => {
         const navTop = navRef.current.getBoundingClientRect().top;
         setIsNavSticky(navTop <= 0);
       }
+      setScrollY(window.scrollY);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -107,7 +126,9 @@ const HomePage: React.FC = () => {
       <Head>
         <title>Kard - A Better Quizlet Alternative</title>
       </Head>
-      <div className="min-h-screen flex flex-col relative bg-[#F8F7F6] text-black">
+      <div className="min-h-screen flex flex-col relative bg-[#F8F7F6] text-black overflow-hidden">
+        <BubbleBackground scrollY={scrollY} />
+        
         <header className="w-full p-6 bg-transparent backdrop-blur-sm" data-cursor-ignore>
           <div 
             ref={navRef}
