@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useSpring, animated, to } from '@react-spring/web';
 
 interface BubbleBackgroundProps {
@@ -13,10 +13,10 @@ const bubbleConfigs = [
   { top: '85%', left: '40%', size: 'w-40 h-40', colors: 'from-red-300 to-orange-300', speed: 105, amplitude: 45 },
 ];
 
-const Bubble: React.FC<{ config: typeof bubbleConfigs[0], scrollY: number }> = React.memo(({ config, scrollY }) => {
+const Bubble: React.FC<{ config: typeof bubbleConfigs[0], scrollY: number, mouseX: number, mouseY: number }> = React.memo(({ config, scrollY, mouseX, mouseY }) => {
   const { x, y } = useSpring({
-    x: Math.sin(scrollY / config.speed) * config.amplitude,
-    y: Math.cos(scrollY / (config.speed * 1.5)) * (config.amplitude * 0.7), // Add vertical movement
+    x: Math.sin(scrollY / config.speed) * config.amplitude + (mouseX - window.innerWidth / 2) * 0.05,
+    y: Math.cos(scrollY / (config.speed * 1.5)) * (config.amplitude * 0.7) + (mouseY - window.innerHeight / 2) * 0.05,
     config: { mass: 1, tension: 120, friction: 14 },
   });
 
@@ -35,11 +35,31 @@ const Bubble: React.FC<{ config: typeof bubbleConfigs[0], scrollY: number }> = R
 Bubble.displayName = 'Bubble';
 
 const BubbleBackground: React.FC<BubbleBackgroundProps> = ({ scrollY }) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   const memoizedBubbles = useMemo(() => 
     bubbleConfigs.map((config, index) => (
-      <Bubble key={index} config={config} scrollY={scrollY} />
+      <Bubble 
+        key={index} 
+        config={config} 
+        scrollY={scrollY} 
+        mouseX={mousePosition.x} 
+        mouseY={mousePosition.y} 
+      />
     )),
-  [scrollY]
+  [scrollY, mousePosition]
   );
 
   return <>{memoizedBubbles}</>;
