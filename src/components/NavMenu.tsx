@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaCircleNotch, FaFolder, FaRegFolder, FaPenNib, FaEllipsisH, FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
@@ -18,6 +18,28 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showDecks, setShowDecks] = useState(false);
   const [isVertical, setIsVertical] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [left, setLeft] = useState(() => window.innerWidth / 2);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!isVertical) {
+      setIsDragging(true);
+      setStartX(e.clientX - left);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || isVertical) return;
+    const newLeft = e.clientX - startX;
+    const navWidth = navRef.current?.offsetWidth || 0;
+    setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   useEffect(() => {
     const fetchDecks = async () => {
@@ -35,8 +57,38 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
     fetchDecks();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (!isVertical) {
+        const navWidth = navRef.current?.offsetWidth || 0;
+        setLeft((prevLeft) => Math.max(navWidth / 2, Math.min(prevLeft, window.innerWidth - navWidth / 2)));
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isVertical]);
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, startX, isVertical]);
+
   return (
-    <div className={`fixed ${isVertical ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' : 'bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2'} z-50`}>
+    <div 
+      ref={navRef}
+      className={`fixed ${isVertical ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' : `bottom-2 sm:bottom-4`} z-50`}
+      style={{ 
+        left: isVertical ? undefined : `${left}px`, 
+        transform: isVertical ? 'translateY(-50%)' : 'translateX(-50%)',
+        cursor: isVertical ? 'default' : 'move' 
+      }}
+      onMouseDown={handleMouseDown}
+    >
       <div className={`bg-white bg-opacity-20 backdrop-blur-lg rounded-full p-1 sm:p-2 shadow-lg flex ${isVertical ? 'flex-col items-center space-y-1 sm:space-y-2' : 'items-center space-x-1 sm:space-x-2'}`}>
         {isVertical && (
           <NavIcon
