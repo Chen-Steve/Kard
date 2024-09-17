@@ -20,7 +20,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   const [isVertical, setIsVertical] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
-  const [left, setLeft] = useState(() => window.innerWidth / 2);
+  const [left, setLeft] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -77,6 +77,10 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, startX, isVertical]);
+
+  useEffect(() => {
+    setLeft(window.innerWidth / 2);
+  }, []);
 
   return (
     <div 
