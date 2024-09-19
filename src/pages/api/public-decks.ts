@@ -11,18 +11,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name: true,
           description: true,
           userId: true,
+          starCount: true,
           user: {
             select: {
               name: true,
             },
           },
-          _count: {
-            select: { stars: true },
-          },
         },
       });
 
-      res.status(200).json(publicDecks);
+      // Transform the data to match the expected format
+      const transformedDecks = publicDecks.map(deck => ({
+        ...deck,
+        _count: {
+          stars: deck.starCount
+        }
+      }));
+
+      res.status(200).json(transformedDecks);
     } catch (error) {
       console.error('Error fetching public decks:', error);
       res.status(500).json({ error: 'Internal Server Error' });
