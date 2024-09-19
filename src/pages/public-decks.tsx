@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import NavMenu from '../components/NavMenu';
 import { FaCopy } from 'react-icons/fa';
+import { IoMdStar, IoMdStarOutline } from "react-icons/io";
 import { useToast } from "@/components/ui/use-toast";
+import supabase from '../lib/supabaseClient';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
 
 interface PublicDeck {
   id: string;
@@ -14,31 +18,85 @@ interface PublicDeck {
   user: {
     name: string;
   };
+  _count: {
+    stars: number;
+  };
+  isStarred: boolean;
 }
 
 const PublicDecksPage: React.FC = () => {
   const [publicDecks, setPublicDecks] = useState<PublicDeck[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const router = useRouter();
 
-  const filteredDecks = publicDecks.filter(deck =>
-    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fetchPublicDecks = useCallback(async () => {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      console.error('Session error:', sessionError || 'No session found');
+      router.push('/signin');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/public-decks', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch public decks');
+      }
+
+      const data = await response.json();
+      setPublicDecks(data);
+    } catch (error) {
+      console.error('Error fetching public decks:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
 
   useEffect(() => {
-    const fetchPublicDecks = async () => {
-      const response = await fetch('/api/public-decks');
-      if (response.ok) {
-        const data = await response.json();
-        setPublicDecks(data);
-      }
-    };
-
     fetchPublicDecks();
-  }, []);
+  }, [fetchPublicDecks]);
 
-  const handleDeckSelect = (deckId: string) => {
-    console.log(`Selected deck: ${deckId}`);
+  const handleStarClick = async (deckId: string) => {
+    try {
+      const response = await fetch(`/api/public-decks/${deckId}/star`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const updatedDeck = await response.json();
+        setPublicDecks(prevDecks =>
+          prevDecks.map(deck =>
+            deck.id === deckId 
+              ? { ...deck, _count: { stars: updatedDeck.starCount }, isStarred: updatedDeck.isStarred } 
+              : deck
+          )
+        );
+        toast({
+          title: updatedDeck.isStarred ? "Deck Starred" : "Star Removed",
+          description: updatedDeck.isStarred ? "You've starred this deck." : "You've removed your star from this deck.",
+        });
+      } else {
+        throw new Error('Failed to update star');
+      }
+    } catch (error) {
+      console.error('Error updating star:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update star. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCopyClick = () => {
@@ -48,9 +106,15 @@ const PublicDecksPage: React.FC = () => {
     });
   };
 
+  const filteredDecks = publicDecks.filter(deck =>
+    deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
+
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col md:flex-row">
-      <NavMenu onDeckSelect={handleDeckSelect} />
+      <NavMenu onDeckSelect={handleStarClick} />
       <div className="flex-1 p-4 md:pl-64 md:pt-20">
         <main className="max-w-7xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-4 md:mb-8 mt-20 md:mt-0">Public Decks</h1>
@@ -65,7 +129,17 @@ const PublicDecksPage: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredDecks.map((deck) => (
-              <Card key={deck.id} className="bg-white dark:bg-gray-700">
+              <Card key={deck.id} className="bg-white dark:bg-gray-700 relative">
+                <div 
+                  className="absolute top-2 right-2 cursor-pointer text-2xl"
+                  onClick={() => handleStarClick(deck.id)}
+                >
+                  {deck.isStarred ? (
+                    <IoMdStar className="text-yellow-500" />
+                  ) : (
+                    <IoMdStarOutline className="text-gray-400 hover:text-yellow-500" />
+                  )}
+                </div>
                 <CardHeader>
                   <CardTitle className="text-lg md:text-xl text-black dark:text-gray-100">{deck.name}</CardTitle>
                   <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
@@ -74,19 +148,26 @@ const PublicDecksPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2">Created by: {deck.user.name}</p>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    <Link href={`/public-decks/${deck.id}`}>
-                      <Button variant="outline" className="w-full sm:w-auto text-black dark:text-gray-200">View Public Deck</Button>
-                    </Link>
+                  <div className="flex justify-between items-center mb-2">
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto text-black dark:text-gray-200 flex items-center justify-center"
+                      className="text-yellow-500"
+                    >
+                      <IoMdStar className="mr-2" />
+                      {deck._count?.stars || 0} {(deck._count?.stars || 0) === 1 ? 'Star' : 'Stars'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-black dark:text-gray-200"
                       onClick={handleCopyClick}
                     >
                       <FaCopy className="mr-2" />
                       Copy Deck
                     </Button>
                   </div>
+                  <Link href={`/public-decks/${deck.id}`}>
+                    <Button variant="outline" className="w-full text-black dark:text-gray-200">View Public Deck</Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}

@@ -50,6 +50,7 @@ model Deck {
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   flashcards  Flashcard[]
   deckTags    DeckTag[]
+  starCount   Int          @default(0)
   
   @@map("decks")
 }

@@ -5,6 +5,7 @@ import { Input } from '../ui/Input';
 import SketchPickerWrapper from '../SketchPickerWrapper';
 import { useToast } from "../ui/use-toast";
 import { updateCursor } from 'ipad-cursor';
+import { LuDelete } from "react-icons/lu";
 
 interface Tag {
   id: number;
@@ -194,13 +195,13 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
             {state.tags.map((tag, index) => (
               <span key={index} className={`inline-flex items-center text-gray-800 text-xs px-2 py-1 rounded mr-2`} style={{ backgroundColor: tag.color }}>
                 {tag.name}
-                <button onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center" data-cursor="text">
-                  x
+                <button aria-label="Delete Tag" onClick={() => dispatch({ type: 'DELETE_TAG', payload: index })} className="ml-2 text-red-500 flex items-center justify-center">
+                  <LuDelete size={14} />
                 </button>
               </span>
             ))}
           </div>
-          <div className="flex items-center mt-4" data-cursor="block">
+          <div className="flex items-center justify-start mt-4">
             <input
               type="checkbox"
               id="isPublic"
@@ -208,7 +209,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
               onChange={(e) => dispatch({ type: 'SET_IS_PUBLIC', payload: e.target.checked })}
               className="mr-2"
             />
-            <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+            <label htmlFor="isPublic" className="text-sm mb-0.5 text-gray-700 dark:text-gray-300">
               Make this deck public
             </label>
           </div>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Trash2 } from 'lucide-react';
+import { IoMdStar, IoMdStarOutline } from "react-icons/io";
 import { Button } from '../ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/Card';
 import { Deck } from '../../types/deck';
@@ -13,10 +14,18 @@ interface DeckCardProps {
 }
 
 const DeckCard: React.FC<DeckCardProps> = ({ deck, isSelected, onEdit, onDelete }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
   return (
     <Card className={`hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700 ${
       isSelected ? 'border-2 border-blue-500' : ''
-    }`}>
+    } relative`}>
+      <button
+        onClick={() => setIsFavorite(!isFavorite)}
+        className="absolute top-2 right-2 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+      >
+        {isFavorite ? <IoMdStar size={24} /> : <IoMdStarOutline size={24} />}
+      </button>
       <CardHeader>
         <CardTitle className="text-black dark:text-gray-100 text-lg sm:text-xl">{deck.name}</CardTitle>
         <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
