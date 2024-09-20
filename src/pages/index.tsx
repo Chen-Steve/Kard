@@ -4,6 +4,7 @@ import '../app/globals.css';
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
+import { useMediaQuery } from 'react-responsive';
 import trackEvent from '@vercel/analytics';
 import { RiFeedbackFill } from "react-icons/ri";
 import CookieConsent from '../components/CookieConsent';
@@ -17,16 +18,63 @@ import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
 
-// Add this near the top of the file, with other imports
+// Dynamically import the DragAndDropDemo component
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
-  loading: () => <p>Loading...</p>
+  loading: () => <p>Loading drag and drop demo...</p>
 });
 
+interface DynamicTitleProps {
+  isMobile: boolean;
+  text: string;
+}
+
+const DynamicTitle = dynamic<DynamicTitleProps>(() => Promise.resolve(({ isMobile, text }) => (
+  <h1 className="font-bold mb-2 mt-20 text-black text-4xl md:text-5xl lg:text-6xl">
+    {isMobile ? (
+      "Kard is a Better Quizlet Alternative"
+    ) : (
+      <>
+        {text}
+        <Cursor />
+      </>
+    )}
+  </h1>
+)), { ssr: false });
+
 const HomePage: React.FC = () => {
-  const [isNavSticky] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isNavSticky, setIsNavSticky] = useState(false);
+  const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setIsMobile(window.innerWidth <= 767);
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+
+    const updateNavHeight = () => {
+      if (navRef.current) {
+        setNavHeight(navRef.current.offsetHeight);
+      }
+    };
+
+    updateNavHeight();
+    window.addEventListener('resize', updateNavHeight);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', updateNavHeight);
+    };
+  }, []);
+
+  const [text] = useTypewriter({
+    words: ['Kard is a Quizlet Alternative', 'But better', ''],
+    loop: true,
+    delaySpeed: 2000,
+  });
 
   const handleButtonClick = () => {
     trackEvent.track('button_click', { label: 'Get Started' });
@@ -41,54 +89,51 @@ const HomePage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const [text] = useTypewriter({
-    words: ['Kard is a Quizlet Alternative', 'But better', ''],
-    loop: true,
-    delaySpeed: 2000,
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <Head>
         <title>Kard - A Better Quizlet Alternative</title>
       </Head>
-      <div className="min-h-screen flex flex-col relative bg-[#F8F7F6] text-black overflow-hidden">
-        <Bubbles />
+      <div className={`min-h-screen flex flex-col relative bg-[#F8F7F6] text-black overflow-hidden ${isMounted && !isMobile ? 'cursor-none' : ''}`}>
+        {isMounted && <Bubbles />}
         
-        <header className="w-full p-6 bg-transparent backdrop-blur-sm" data-cursor-ignore>
-          <div 
-            ref={navRef}
-            className={`${isNavSticky ? 'fixed top-0 left-0 right-0 z-10 py-4 px-6 bg-transparent backdrop-blur-sm' : ''}`}
-          >
-            <nav className={`flex justify-center items-center max-w-7xl mx-auto`}>
-              <Link 
-                href="/" 
-                className="kard wiggle-effect text-black mr-10" 
-                data-cursor="text"
+        <header className="w-full fixed top-0 left-0 right-0 z-50 px-4 py-2" data-cursor-ignore={!isMobile}>
+          <nav ref={navRef} className="flex justify-center items-center py-2 px-6 max-w-7xl mx-auto">
+            <Link 
+              href="/" 
+              className="kard wiggle-effect text-black mr-10" 
+              data-cursor={!isMobile ? "text" : undefined}
+            >
+              Kard
+            </Link>
+            <div className="inner-nav hover:lighten-effect">
+              <a 
+                href="#" 
+                className="nav-item text-black px-4 py-2 rounded-full" 
+                data-cursor={!isMobile ? "block" : undefined}
+                onClick={handleLearnMoreClick}
               >
-                Kard
-              </Link>
-              <div className="inner-nav hover:lighten-effect">
-                <a 
-                  href="#" 
-                  className="nav-item text-black px-4 py-2 rounded-full" 
-                  data-cursor="block"
-                  onClick={handleLearnMoreClick}
-                >
-                  Learn More
-                </a>
-              </div>
-            </nav>
-          </div>
+                Learn More
+              </a>
+            </div>
+          </nav>
         </header>
 
+        {/* Add a placeholder div to prevent content from being hidden behind the fixed header */}
+        <div style={{ height: `${navHeight}px` }} />
+
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
-          <div className="text-center mb-12" data-cursor="text">
-            <h1 className="text-title font-bold mb-2 mt-20 text-black">
-              {text}
-              <Cursor />
-            </h1>
-            <p className="text-xl max-w-2xl mx-auto text-gray-900">
+          <div className="text-center mb-12 fixed-title" data-cursor={isMounted && !isMobile ? "text" : undefined}>
+            {isMounted ? (
+              <DynamicTitle isMobile={isMobile} text={text} />
+            ) : (
+              <h1 className="font-bold mb-2 text-black text-4xl md:text-5xl lg:text-6xl">
+                Kard is a Better Quizlet Alternative
+              </h1>
+            )}
+            <p className="max-w-2xl mx-auto text-gray-900 text-base md:text-xl">
               A Flashcard App that scales with you.
             </p>
           </div>
@@ -100,7 +145,7 @@ const HomePage: React.FC = () => {
               <Button
                 className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
                 onClick={handleButtonClick}
-                data-cursor="block"
+                data-cursor={!isMobile ? "block" : undefined}
               >
                 <span className="text-lg">Get Started</span>
               </Button>
@@ -108,7 +153,7 @@ const HomePage: React.FC = () => {
             <Link href="/signin">
               <Button
                 className="px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-white hover:bg-gray-100 text-black border-2 border-black"
-                data-cursor="block"
+                data-cursor={!isMobile ? "block" : undefined}
               >
                 <span className="text-lg">Login</span>
               </Button>
@@ -137,7 +182,7 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
-        <footer className="w-full p-6 flex flex-col items-center text-black" data-cursor="text">
+        <footer className="w-full p-6 flex flex-col items-center text-black" data-cursor={!isMobile ? "text" : undefined}>
           <div className="flex flex-col items-center">
             <div className="flex flex-row items-center mt-2">
               <div className="relative w-12 h-12 sm:w-40 sm:h-40 md:w-60 md:h-60 lg:w-80 lg:h-80 mr-2 sm:mr-4">
@@ -165,7 +210,7 @@ const HomePage: React.FC = () => {
         <button
           className="fixed bottom-4 right-4 text-md font-bold px-4 py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
           onClick={handleSupportClick}
-          data-cursor="block"
+          data-cursor={isMounted && !isMobile ? "block" : undefined}
         >
           <RiFeedbackFill className="mr-2" />
           Feedback

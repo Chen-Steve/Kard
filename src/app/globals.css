@@ -315,3 +315,9 @@ html, body {
     scrollbar-color: #d55959 #e7e7e7;
   }
 }
+
+@media (max-width: 767px) {
+  .text-title {
+    font-size: 1.75rem; /* Adjust this value as needed */
+  }
+}

@@ -7,60 +7,67 @@ interface Bubble {
   color: string;
 }
 
-const generateBubble = (id: number): Bubble => ({
-  id,
-  size: Math.random() * 150 + 100,
-  position: {
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-  },
-  color: `hsl(${Math.random() * 360}, 70%, 70%)`,
-});
+const generateBubble = (id: number, maxWidth: number, maxHeight: number): Bubble => {
+  const screenSize = Math.min(maxWidth, maxHeight);
+  const minSize = screenSize * 0.05; // 5% of screen size
+  const maxSize = screenSize * 0.15; // 15% of screen size
+  return {
+    id,
+    size: Math.random() * (maxSize - minSize) + minSize,
+    position: {
+      x: Math.random() * maxWidth,
+      y: Math.random() * maxHeight,
+    },
+    color: `hsl(${Math.random() * 360}, 70%, 70%)`,
+  };
+};
 
 const Bubbles: React.FC = () => {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    setBubbles(Array.from({ length: 10 }, (_, i) => generateBubble(i)));
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', updateDimensions);
     };
   }, []);
 
+  useEffect(() => {
+    if (dimensions.width > 0 && dimensions.height > 0) {
+      setBubbles(Array.from({ length: 8 }, (_, i) => 
+        generateBubble(i, dimensions.width, dimensions.height)
+      ));
+    }
+  }, [dimensions]);
+
   return (
-    <>
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
       {bubbles.map((bubble) => (
         <div
           key={bubble.id}
-          className="bubble absolute rounded-full pointer-events-none"
+          className="bubble absolute rounded-full"
           style={{
             width: `${bubble.size}px`,
             height: `${bubble.size}px`,
-            left: `calc(${bubble.position.x}% + ${(mousePosition.x / window.innerWidth - 0.5) * 20}px)`,
-            top: `calc(${bubble.position.y}% + ${(mousePosition.y / window.innerHeight - 0.5) * 20}px)`,
+            left: `${bubble.position.x}px`,
+            top: `${bubble.position.y}px`,
             background: `radial-gradient(circle at 30% 30%, ${bubble.color}, transparent)`,
-            filter: 'blur(20px)',
-            opacity: 0.5,
-            transition: 'left 0.3s ease-out, top 0.3s ease-out',
+            filter: 'blur(10px)',
+            opacity: 0.3,
           }}
         />
       ))}
-      <style jsx>{`
-        .bubble {
-          transition: all 0.3s ease-in-out;
-        }
-      `}</style>
-    </>
+    </div>
   );
 };
 
