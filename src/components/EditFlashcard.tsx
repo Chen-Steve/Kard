@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'markdown-to-jsx';
-import { initCursor, updateCursor, disposeCursor, customCursorStyle } from 'ipad-cursor';
 import { TbEdit } from "react-icons/tb";
 import { MdDeleteOutline, MdOutlineSave } from "react-icons/md";
 
@@ -26,19 +25,6 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   const [editedQuestion, setEditedQuestion] = useState(question);
   const [editedAnswer, setEditedAnswer] = useState(answer);
   const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    // Initialize the custom cursor on mount
-    initCursor({
-      className: 'ipad-cursor',
-      enableAutoTextCursor: true, // Automatically use text cursor for text inputs
-    });
-
-    return () => {
-      // Dispose the custom cursor on unmount
-      disposeCursor();
-    };
-  }, []);
 
   useEffect(() => {
     setEditedQuestion(question);
@@ -120,7 +106,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             )}
             <button
               onClick={handleDelete}
-              className="bg-red-500 text-white p-1 rounded text-sm hover:bg-red-600 transition-colors"
+              className="p-1 rounded border-2 border-red-500"
               title="Delete"
             >
               <MdDeleteOutline size={20} />
