@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FaCircleNotch, FaFolder, FaRegFolder, FaPenNib, FaEllipsisH, FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
@@ -30,14 +30,32 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
     }
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isVertical) {
+      setIsDragging(true);
+      setStartX(e.touches[0].clientX - left);
+    }
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging || isVertical) return;
     const newLeft = e.clientX - startX;
     const navWidth = navRef.current?.offsetWidth || 0;
     setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
-  };
+  }, [isDragging, isVertical, startX]);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDragging || isVertical) return;
+    const newLeft = e.touches[0].clientX - startX;
+    const navWidth = navRef.current?.offsetWidth || 0;
+    setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
+  }, [isDragging, isVertical, startX]);
 
   const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchEnd = () => {
     setIsDragging(false);
   };
 
@@ -72,11 +90,15 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isDragging, startX, isVertical]);
+  }, [handleMouseMove, handleTouchMove]);
 
   useEffect(() => {
     setLeft(window.innerWidth / 2);
@@ -92,6 +114,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         cursor: isVertical ? 'default' : 'move' 
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div className={`bg-white bg-opacity-20 backdrop-blur-lg rounded-full p-1 sm:p-2 shadow-lg flex ${isVertical ? 'flex-col items-center space-y-1 sm:space-y-2' : 'items-center space-x-1 sm:space-x-2'}`}>
         {isVertical && (
