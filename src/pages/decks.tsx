@@ -10,12 +10,6 @@ import DeckSearchAndFilter from '../components/deck/DeckSearchAndFilter';
 import DeckCard from '../components/deck/DeckCard';
 import { Deck } from '../types/deck';
 
-interface Tag {
-  id: number;
-  name: string;
-  color: string;
-}
-
 const DecksPage = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);
