@@ -260,12 +260,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Failed to update flashcards: ${errorData.error}, ${errorData.details}`);
+        console.error(`Failed to update flashcards: ${errorData.error}, ${errorData.details}`);
+        throw new Error('Failed to update flashcard order');
       }
       setError(null);
     } catch (error) {
       console.error('Error updating flashcard order:', error);
-      setError('Failed to update flashcard order. Please try again.');
+      toast.error('Failed to update flashcard order. Please try again.');
     }
   };
 
