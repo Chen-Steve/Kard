@@ -49,12 +49,17 @@ const Profile = () => {
 
         // Update streak if user visits today
         const today = new Date().toISOString().split('T')[0];
-        if (userData.last_visit !== today) {
+        const lastVisit = userData.last_login ? new Date(userData.last_login).toISOString().split('T')[0] : null;
+
+        if (lastVisit !== today) {
+          const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
+          const newStreak = lastVisit === yesterday ? (userData.streak || 0) + 1 : 1;
+
           const { data, error } = await supabase
             .from('users')
             .update({ 
-              last_visit: today,
-              streak: userData.last_visit === getYesterday() ? (userData.streak || 0) + 1 : 1
+              last_login: today,
+              streak: newStreak
             })
             .eq('id', userData.id)
             .select();
