@@ -6,7 +6,7 @@ import { SiStagetimer } from 'react-icons/si';
 import { RiTimerFill } from 'react-icons/ri';
 import { PiCardsFill } from 'react-icons/pi';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
-import FlashcardComponent from '../../components/Flashcard';
+import FlashcardComponent from '../../components/dashboard/Flashcard';
 import { Button } from '../../components/ui/Button';
 import { useToast } from "@/components/ui/use-toast";
 

@@ -11,13 +11,13 @@ import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { MdDarkMode } from "react-icons/md"; 
 import { FaSun } from "react-icons/fa";
 import NavMenu from '../components/NavMenu';
-import FlashcardComponent from '../components/Flashcard';
+import FlashcardComponent from '../components/dashboard/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
 import { HiLightningBolt } from "react-icons/hi";
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
-import DashSettings from '../components/DashSettings';
+import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
 import React from 'react';
@@ -80,41 +80,43 @@ const Dashboard = () => {
       const sessionData = Cookies.get('session');
       if (sessionData) {
         const session = JSON.parse(sessionData);
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        if (session && session.user) {  // Add this check
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-        if (userError) {
-          if (userError.code === 'PGRST116') {
-            console.error('No user data found for this ID');
+          if (userError) {
+            if (userError.code === 'PGRST116') {
+              console.error('No user data found for this ID');
+            } else {
+              console.error('Error fetching user data:', userError);
+            }
           } else {
-            console.error('Error fetching user data:', userError);
+            userData.avatarUrl = getMicahAvatarSvg(userData.email);
+            setUser(userData);
+            setUserMembership(userData.membership || 'free');
           }
-        } else {
-          userData.avatarUrl = getMicahAvatarSvg(userData.email);
-          setUser(userData);
-          setUserMembership(userData.membership || 'free');
-        }
 
-        const { data: decksData, error: decksError } = await supabase
-          .from('decks')
-          .select('*')
-          .eq('userId', session.user.id);
+          const { data: decksData, error: decksError } = await supabase
+            .from('decks')
+            .select('*')
+            .eq('userId', session.user.id);
 
-        if (decksError) {
-          console.error('Error fetching decks:', decksError);
-        } else {
-          setDecks(decksData);
-          const savedDeckId = localStorage.getItem('selectedDeckId');
-          if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-            setSelectedDeckId(savedDeckId);
-            const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-            setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-          } else if (decksData.length > 0) {
-            setSelectedDeckId(decksData[0].id);
-            setSelectedDeckName(decksData[0].name);
+          if (decksError) {
+            console.error('Error fetching decks:', decksError);
+          } else {
+            setDecks(decksData);
+            const savedDeckId = localStorage.getItem('selectedDeckId');
+            if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+              setSelectedDeckId(savedDeckId);
+              const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+              setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+            } else if (decksData.length > 0) {
+              setSelectedDeckId(decksData[0].id);
+              setSelectedDeckName(decksData[0].name);
+            }
           }
         }
       } else {
@@ -126,41 +128,43 @@ const Dashboard = () => {
           return;
         }
 
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        if (session && session.user) {  // Add this check
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-        if (userError) {
-          if (userError.code === 'PGRST116') {
-            console.error('No user data found for this ID');
+          if (userError) {
+            if (userError.code === 'PGRST116') {
+              console.error('No user data found for this ID');
+            } else {
+              console.error('Error fetching user data:', userError);
+            }
           } else {
-            console.error('Error fetching user data:', userError);
+            userData.avatarUrl = getMicahAvatarSvg(userData.email);
+            setUser(userData);
+            setUserMembership(userData.membership || 'free');
           }
-        } else {
-          userData.avatarUrl = getMicahAvatarSvg(userData.email);
-          setUser(userData);
-          setUserMembership(userData.membership || 'free');
-        }
 
-        const { data: decksData, error: decksError } = await supabase
-          .from('decks')
-          .select('*')
-          .eq('userId', session.user.id);
+          const { data: decksData, error: decksError } = await supabase
+            .from('decks')
+            .select('*')
+            .eq('userId', session.user.id);
 
-        if (decksError) {
-          console.error('Error fetching decks:', decksError);
-        } else {
-          setDecks(decksData);
-          const savedDeckId = localStorage.getItem('selectedDeckId');
-          if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-            setSelectedDeckId(savedDeckId);
-            const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-            setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-          } else if (decksData.length > 0) {
-            setSelectedDeckId(decksData[0].id);
-            setSelectedDeckName(decksData[0].name);
+          if (decksError) {
+            console.error('Error fetching decks:', decksError);
+          } else {
+            setDecks(decksData);
+            const savedDeckId = localStorage.getItem('selectedDeckId');
+            if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+              setSelectedDeckId(savedDeckId);
+              const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+              setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+            } else if (decksData.length > 0) {
+              setSelectedDeckId(decksData[0].id);
+              setSelectedDeckName(decksData[0].name);
+            }
           }
         }
       }
@@ -358,154 +362,156 @@ const Dashboard = () => {
         </div>
       </header>
       
-      <main className="flex-grow p-4 relative" data-cursor="normal">
+      {user && (  // Add this check
+        <main className="flex-grow p-4 relative" data-cursor="normal">
 
-        <div className="absolute inset-0">
-          {getStickersVisibility() && (
-            <StickerSelector
-              stickers={stickers}
-              setStickers={setStickers}
-            />
-          )}
-        </div>
-        {decks.length > 0 && (
-          <div className="mb-4">
-            <div className="flex flex-col sm:flex-row items-center justify-center">
-              <div className="flex flex-col sm:flex-row items-center sm:items-center">
-                {selectedDeckName && (
-                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0" data-cursor="text">
-                    {selectedDeckName}
-                  </h2>
-                )}
-                <div className="flex flex-wrap justify-center gap-2 sm:ml-4">
-                  {dashboardComponents
-                    .filter(comp => comp.visible && comp.id === 'buttons')
-                    .map(comp => (
-                      <div key={comp.id} className="flex flex-wrap justify-center gap-2">
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleLearnClick}
-                            data-cursor="block"
-                          >
-                            <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-                            <span className="font-semibold">Learn</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleTestClick}
-                            data-cursor="block"
-                          >
-                            <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">Test</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleMatchClick}
-                            data-cursor="block"
-                          >
-                            <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">Match</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            title="K-Chat"
-                            className={`
-                              flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
-                              hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
-                              focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
-                            `}
-                            onClick={async () => {
-                              if (userMembership === 'pro') {
-                                if (selectedDeckId) {
-                                  router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+          <div className="absolute inset-0">
+            {getStickersVisibility() && (
+              <StickerSelector
+                stickers={stickers}
+                setStickers={setStickers}
+              />
+            )}
+          </div>
+          {decks.length > 0 && (
+            <div className="mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center">
+                <div className="flex flex-col sm:flex-row items-center sm:items-center">
+                  {selectedDeckName && (
+                    <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0" data-cursor="text">
+                      {selectedDeckName}
+                    </h2>
+                  )}
+                  <div className="flex flex-wrap justify-center gap-2 sm:ml-4">
+                    {dashboardComponents
+                      .filter(comp => comp.visible && comp.id === 'buttons')
+                      .map(comp => (
+                        <div key={comp.id} className="flex flex-wrap justify-center gap-2">
+                          <div className="relative">
+                            <button
+                              className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                              onClick={handleLearnClick}
+                              data-cursor="block"
+                            >
+                              <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
+                              <span className="font-semibold">Learn</span>
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <button
+                              className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                              onClick={handleTestClick}
+                              data-cursor="block"
+                            >
+                              <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                              <span className="font-semibold">Test</span>
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <button
+                              className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+                              onClick={handleMatchClick}
+                              data-cursor="block"
+                            >
+                              <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                              <span className="font-semibold">Match</span>
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <button
+                              title="K-Chat"
+                              className={`
+                                flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
+                                hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
+                                focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
+                              `}
+                              onClick={async () => {
+                                if (userMembership === 'pro') {
+                                  if (selectedDeckId) {
+                                    router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
+                                  } else {
+                                    toast({
+                                      title: 'No Deck Selected',
+                                      description: 'Please select a deck to start the AI chat.',
+                                    });
+                                  }
                                 } else {
                                   toast({
-                                    title: 'No Deck Selected',
-                                    description: 'Please select a deck to start the AI chat.',
+                                    title: 'Upgrade to Pro',
+                                    description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
+                                    action: (
+                                      <button
+                                        onClick={() => router.push('/pricing')}
+                                        className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
+                                      >
+                                        Upgrade
+                                      </button>
+                                    ),
                                   });
                                 }
-                              } else {
-                                toast({
-                                  title: 'Upgrade to Pro',
-                                  description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-                                  action: (
-                                    <button
-                                      onClick={() => router.push('/pricing')}
-                                      className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
-                                    >
-                                      Upgrade
-                                    </button>
-                                  ),
-                                });
-                              }
-                            }}
-                            data-cursor="block"
-                          >
-                            <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">K-Chat</span>
-                          </button>
-                          {userMembership !== 'pro' && (
-                            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none"
-                                 style={{
-                                   backgroundImage: `repeating-linear-gradient(
-                                   45deg,
-                                  transparent,
-                                  transparent 10px,
-                                  rgba(0,0,0,0.1) 10px,
-                                  rgba(0,0,0,0.1) 20px
-                                )`
-                                 }}
-                            />
-                          )}
-                          {userMembership !== 'pro' && (
-                            <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
-                              <HiLightningBolt className="inline-block mr-1" />
-                              PRO
-                            </div>
-                          )}
+                              }}
+                              data-cursor="block"
+                            >
+                              <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
+                              <span className="font-semibold">K-Chat</span>
+                            </button>
+                            {userMembership !== 'pro' && (
+                              <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none"
+                                   style={{
+                                     backgroundImage: `repeating-linear-gradient(
+                                     45deg,
+                                    transparent,
+                                    transparent 10px,
+                                    rgba(0,0,0,0.1) 10px,
+                                    rgba(0,0,0,0.1) 20px
+                                  )`
+                                   }}
+                              />
+                            )}
+                            {userMembership !== 'pro' && (
+                              <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
+                                <HiLightningBolt className="inline-block mr-1" />
+                                PRO
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
                 </div>
               </div>
+              <div className="flex flex-col items-center justify-center mt-4">
+                {dashboardComponents
+                  .filter(comp => comp.visible && comp.id !== 'buttons')
+                  .sort((a, b) => a.order - b.order)
+                  .map(comp => {
+                    switch (comp.id) {
+                      case 'flashcards':
+                        return selectedDeckId ? (
+                          <div key={comp.id} className="w-full max-w-3xl">
+                            <FlashcardComponent
+                              userId={user.id}
+                              deckId={selectedDeckId}
+                              decks={decks}
+                              onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
+                            />
+                          </div>
+                        ) : null;
+                      // Add more cases for other components
+                      default:
+                        return null;
+                    }
+                  })}
+              </div>
             </div>
-            <div className="flex flex-col items-center justify-center mt-4">
-              {dashboardComponents
-                .filter(comp => comp.visible && comp.id !== 'buttons')
-                .sort((a, b) => a.order - b.order)
-                .map(comp => {
-                  switch (comp.id) {
-                    case 'flashcards':
-                      return selectedDeckId ? (
-                        <div key={comp.id} className="w-full max-w-3xl">
-                          <FlashcardComponent
-                            userId={user.id}
-                            deckId={selectedDeckId}
-                            decks={decks}
-                            onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
-                          />
-                        </div>
-                      ) : null;
-                    // Add more cases for other components
-                    default:
-                      return null;
-                  }
-                })}
+          )}
+          {decks.length === 0 && (
+            <div className="flex justify-center mt-20 items-center h-full">
+              <p className="text-xl font-semibold text-gray-700 dark:text-gray-300" data-cursor="text">Go to your library and create some decks!</p>
             </div>
-          </div>
-        )}
-        {decks.length === 0 && (
-          <div className="flex justify-center mt-20 items-center h-full">
-            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300" data-cursor="text">Go to your library and create some decks!</p>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      )}
       <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center" data-cursor="normal">
         <p data-cursor="text">&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>

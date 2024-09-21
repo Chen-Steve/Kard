@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useCallback } from 'react';
-import FlashcardComponent from '../../components/Flashcard';
+import FlashcardComponent from '../../components/dashboard/Flashcard';
 import supabase from '../../lib/supabaseClient';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';

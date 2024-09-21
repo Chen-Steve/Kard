@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { LuSettings2 } from "react-icons/lu";
-import { DashboardComponent } from '../types/dashboard';
+import { DashboardComponent } from '../../types/dashboard';
 
 interface DashSettingsProps {
+
   components: DashboardComponent[];
   onUpdateComponents: (components: DashboardComponent[]) => void;
 }

@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash, FaQuestionCircle, FaEllipsisH } from 'react-icons/fa';
-import KeyboardShortcuts from './KeyboardShortcuts';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import type { DropResult } from '@hello-pangea/dnd';
-import EditFlashcard from './EditFlashcard';
+import { FaChevronLeft, FaChevronRight, FaPlus, FaEye, FaEyeSlash, FaQuestionCircle, FaEllipsisH, FaTable, FaList, FaTrash } from 'react-icons/fa';
+import KeyboardShortcuts from '../KeyboardShortcuts';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import EditFlashcard from './FlashcardList';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
 import { BiCloudUpload } from "react-icons/bi";
 import { PiSparkleBold } from "react-icons/pi";
 import Papa from 'papaparse';
-import Popup from './Popup';
+import Popup from '../Popup';
 import Markdown from 'markdown-to-jsx';
+import FlashcardTable from './FlashcardTable';
 
 interface FlashcardProps {
   userId: string;
@@ -18,6 +18,7 @@ interface FlashcardProps {
   decks: Deck[];
   onDeckChange?: (newDeckId: string) => void;
   readOnly?: boolean;
+  isTableView?: boolean;
 }
 
 interface Flashcard {
@@ -34,7 +35,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -46,6 +47,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false); 
   const [isScrollable, setIsScrollable] = useState(false);
+  const [isTableViewActive, setIsTableViewActive] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const flashcardRef = useRef<HTMLDivElement>(null);
@@ -99,6 +101,24 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     return () => {
       observer.disconnect();
     };
+  }, []);
+
+  useEffect(() => {
+    // Safely check for meta tag
+    const checkMetaTag = () => {
+      const metaTag = document.querySelector("meta[property='og:type']") as HTMLMetaElement | null;
+      if (metaTag) {
+        console.log("Meta tag content:", metaTag.content);
+        // Do something with the meta tag content if needed
+      } else {
+        console.log("Meta tag not found");
+      }
+    };
+
+    // Run the check after a short delay to ensure DOM is loaded
+    const timeoutId = setTimeout(checkMetaTag, 0);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const handlePrevious = () => {
@@ -238,58 +258,23 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   }, 500);
 
-  const handleDrop = async (result: DropResult) => {
-    if (!result.destination) return;
-
-    const reorderedFlashcards = Array.from(flashcards);
-    const [movedCard] = reorderedFlashcards.splice(result.source.index, 1);
-    reorderedFlashcards.splice(result.destination.index, 0, movedCard);
-
-    const updatedWithOrder = reorderedFlashcards.map((card, index) => ({
-      ...card,
-      order: index + 1,
-    }));
-
-    setFlashcards(updatedWithOrder);
-
-    try {
-      const response = await fetch('/api/flashcard', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flashcards: updatedWithOrder }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error(`Failed to update flashcards: ${errorData.error}, ${errorData.details}`);
-        throw new Error('Failed to update flashcard order');
-      }
-      setError(null);
-    } catch (error) {
-      console.error('Error updating flashcard order:', error);
-      toast.error('Failed to update flashcard order. Please try again.');
+  const handleReorder = useCallback((result: DropResult) => {
+    if (!result.destination) {
+      return;
     }
-  };
 
-  const handleDeleteCard = async (id: string) => {
-    const originalFlashcards = [...flashcards];
+    const items = Array.from(flashcards);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setFlashcards(items);
+
+    // You might want to add an API call here to update the order on the server
+  }, [flashcards]);
+
+  const handleDeleteCard = (id: string) => {
     setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== id));
     setError(null);
-
-    try {
-      const response = await fetch('/api/flashcard', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to delete flashcard: ${errorData.error}, ${errorData.details}`);
-      }
-    } catch (error) {
-      console.error('Error deleting flashcard:', error);
-      setError('Failed to delete flashcard. Please try again.');
-      setFlashcards(originalFlashcards);
-    }
   };
 
   const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -390,6 +375,15 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   };
 
+  const handleSaveCard = (id: string, updatedQuestion: string, updatedAnswer: string) => {
+    setFlashcards((prevFlashcards) =>
+      prevFlashcards.map((card) =>
+        card.id === id ? { ...card, question: updatedQuestion, answer: updatedAnswer } : card
+      )
+    );
+    // You might want to add an API call here to save the changes to the backend
+  };
+
   return (
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
@@ -397,19 +391,18 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
         <div className="flex flex-col items-center mb-8">
           <div
-            className="border-2 border-black dark:border-gray-600 w-full h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4 relative"
+            className="border-2 border-black dark:border-gray-600 w-full h-64 sm:h-96 bg-card dark:bg-gray-600 shadow-lg rounded-lg flex items-center justify-center mb-4 cursor-pointer text-center p-4 relative"
             onClick={handleFlipClick}
           >
-            {/* Add this new div for the label */}
-            <div className="absolute top-2 left-2 text-sm font-semibold text-muted-foreground dark:text-gray-400">
+            <div className="absolute top-2 left-2 text-xs sm:text-sm font-semibold text-muted-foreground dark:text-gray-400">
               {isFlipped ? 'Answer' : 'Question'}
             </div>
             {getCurrentCard() ? (
-              <div className="w-5/6 max-w-lg overflow-auto">
+              <div className="w-full sm:w-5/6 max-w-lg overflow-auto text-sm sm:text-base">
                 <Markdown>{isFlipped ? getCurrentCard()?.answer ?? '' : getCurrentCard()?.question ?? ''}</Markdown>
               </div>
             ) : (
-              <p className="text-xl text-muted-foreground dark:text-gray-400">No cards</p>
+              <p className="text-lg sm:text-xl text-muted-foreground dark:text-gray-400">No cards</p>
             )}
           </div>
           <div className="flex justify-between w-full mt-0">
@@ -483,80 +476,91 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           </div>
         </div>
 
-        <div className="flex justify-between space-x-4">
+        <div className="flex justify-between space-x-4 flex-wrap">
           {!readOnly && (
             <button
               onClick={handleAddCard}
-              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-1 sm:px-4 sm:py-2 rounded flex items-center text-sm sm:text-base"
               aria-label="Add flashcard"
             >
-              <FaPlus className="mr-2" /> Add Flashcard
+              <FaPlus className="mr-1 sm:mr-2" /> <span className="hidden sm:inline">Add Flashcard</span>
             </button>
           )}
           <div className="flex space-x-2">
             <button
               onClick={() => setShowList(!showList)}
-              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded flex items-center"
+              className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-1 sm:px-4 sm:py-2 rounded flex items-center text-sm sm:text-base"
               aria-label={showList ? "Hide list" : "Show list"}
             >
-              {showList ? 'Hide List' : 'Show List'}
+              {showList ? <span className="hidden sm:inline">Hide List</span> : <span className="hidden sm:inline">Show List</span>}
+              <span className="sm:hidden">{showList ? 'Hide' : 'Show'}</span>
             </button>
             <button
               onClick={() => setIsScrollable(!isScrollable)}
-              className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-3 py-2 rounded flex items-center"
+              className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-2 py-1 sm:px-3 sm:py-2 rounded flex items-center"
               aria-label={isScrollable ? "Expand list" : "Make list scrollable"}
             >
               <FaEllipsisH />
+            </button>
+            <button
+              onClick={() => setIsTableViewActive(!isTableViewActive)}
+              className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-2 py-1 sm:px-3 sm:py-2 rounded flex items-center"
+              aria-label={isTableViewActive ? "Switch to list view" : "Switch to table view"}
+            >
+              {isTableViewActive ? <FaList /> : <FaTable />}
             </button>
           </div>
         </div>
         <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-2" />
 
         {showList && (
-          <div className={`mt-2 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
-            <DragDropContext onDragEnd={handleDrop}>
-              <Droppable droppableId="flashcards">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {flashcards.map((card, index) => (
-                      <Draggable key={card.id} draggableId={card.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-white dark:bg-gray-800 rounded mb-2"
-                          >
-                            <EditFlashcard
-                              id={card.id}
-                              question={card.question}
-                              answer={card.answer}
-                              showDefinitions={showDefinitions}
-                              onSave={(id, updatedQuestion, updatedAnswer) => {
-                                debouncedSaveCard(id, updatedQuestion, updatedAnswer);
-                              }}
-                              onDelete={handleDeleteCard}
-                              readOnly={readOnly}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+          <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
+            {isTableViewActive ? (
+              <FlashcardTable 
+                flashcards={flashcards}
+                onDelete={handleDeleteCard}
+                onSave={handleSaveCard}
+                onReorder={handleReorder}
+                readOnly={readOnly}
+              />
+            ) : (
+              <DragDropContext onDragEnd={handleReorder}>
+                <Droppable droppableId="flashcards">
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+                      {flashcards.map((card, index) => (
+                        <EditFlashcard
+                          key={card.id}
+                          id={card.id}
+                          question={card.question}
+                          answer={card.answer}
+                          showDefinitions={showDefinitions}
+                          onSave={(id, updatedQuestion, updatedAnswer) => {
+                            debouncedSaveCard(id, updatedQuestion, updatedAnswer);
+                          }}
+                          onDelete={handleDeleteCard}
+                          readOnly={readOnly}
+                          index={index}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            )}
           </div>
         )}
 
         {flashcards.length > 0 && (
           <button
             onClick={() => setShowDefinitions(!showDefinitions)}
-            className="fixed border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-4 py-2 rounded-full shadow-lg flex items-center"
+            className="fixed border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-2 sm:px-4 py-2 rounded-full shadow-lg flex items-center"
           >
-            {showDefinitions ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
-            {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
+            {showDefinitions ? <FaEyeSlash className="text-lg sm:mr-2" /> : <FaEye className="text-lg sm:mr-2" />}
+            <span className="hidden sm:inline">
+              {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
+            </span>
           </button>
         )}
 
