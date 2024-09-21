@@ -1,3 +1,5 @@
+import { Flashcard } from './flashcard'; // Make sure to create this type if it doesn't exist
+
 export interface Tag {
     id: number;
     name: string;
@@ -8,8 +10,9 @@ export interface Tag {
     id: string;
     name: string;
     description: string;
-    tags: Tag[];
+    userId: string;
+    tags: Array<{ id: number; name: string; color: string }>;
     isPublic: boolean;
-    order: number; 
-    userId?: string;
+    order?: number;
+    flashcards?: Flashcard[]; // Add this line
   }

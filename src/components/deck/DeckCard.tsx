@@ -18,11 +18,11 @@ interface DeckCardProps {
 const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, onDelete }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  // If index is provided, wrap with Draggable, otherwise just render the Card
   const content = (
     <Card
       className={`hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700 ${
@@ -61,14 +61,20 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button
               variant="outline"
-              onClick={() => onEdit(deck)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(deck);
+              }}
               className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600 flex-grow sm:flex-grow-0"
             >
               Edit
             </Button>
             <Button
               variant="ghost"
-              onClick={() => onDelete(deck.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(deck.id);
+              }}
               className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
             >
               <Trash2 className="h-4 w-4" />
