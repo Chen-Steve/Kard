@@ -52,6 +52,7 @@ const Dashboard = () => {
     // Add more components as needed
   ]);
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const getStickersVisibility = () => {
     const stickersComponent = dashboardComponents.find(comp => comp.id === 'stickers');
@@ -78,116 +79,136 @@ const Dashboard = () => {
     }
 
     const getSession = async () => {
-      const sessionData = Cookies.get('session');
-      if (sessionData) {
-        const session = JSON.parse(sessionData);
-        if (session && session.user) {  // Add this check
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+      const anonymousUserId = localStorage.getItem('anonymousUserId');
+      
+      if (anonymousUserId) {
+        setIsAnonymous(true);
+        const anonymousUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+        setUser(anonymousUserData);
+        setUserMembership(anonymousUserData.membership || 'free');
 
-          if (userError) {
-            if (userError.code === 'PGRST116') {
-              console.error('No user data found for this ID');
-            } else {
-              console.error('Error fetching user data:', userError);
-            }
-          } else {
-            userData.avatarUrl = getMicahAvatarSvg(userData.email);
-            setUser(userData);
-            setUserMembership(userData.membership || 'free');
+        // Generate avatar for anonymous user
+        anonymousUserData.avatarUrl = getMicahAvatarSvg(anonymousUserData.id);
 
-            // Update streak
-            const today = new Date();
-            const lastVisit = userData.last_login ? new Date(userData.last_login) : null;
+        // Fetch or create decks for anonymous user
+        const localDecks = JSON.parse(localStorage.getItem(`decks_${anonymousUserId}`) || '[]');
+        setDecks(localDecks);
+        if (localDecks.length > 0) {
+          setSelectedDeckId(localDecks[0].id);
+          setSelectedDeckName(localDecks[0].name);
+        }
+      } else {
+        const sessionData = Cookies.get('session');
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          if (session && session.user) {  // Add this check
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
 
-            if (!lastVisit || differenceInDays(today, lastVisit) >= 1) {
-              const newStreak = calculateNewStreak(lastVisit, userData.streak || 0);
-
-              const { data, error } = await supabase
-                .from('users')
-                .update({ 
-                  last_login: today.toISOString(),
-                  streak: newStreak
-                })
-                .eq('id', userData.id)
-                .select();
-              
-              if (error) {
-                console.error('Error updating streak:', error);
+            if (userError) {
+              if (userError.code === 'PGRST116') {
+                console.error('No user data found for this ID');
               } else {
-                setUser(data[0]);
+                console.error('Error fetching user data:', userError);
+              }
+            } else {
+              userData.avatarUrl = getMicahAvatarSvg(userData.email);
+              setUser(userData);
+              setUserMembership(userData.membership || 'free');
+
+              // Update streak
+              const today = new Date();
+              const lastVisit = userData.last_login ? new Date(userData.last_login) : null;
+
+              if (!lastVisit || differenceInDays(today, lastVisit) >= 1) {
+                const newStreak = calculateNewStreak(lastVisit, userData.streak || 0);
+
+                const { data, error } = await supabase
+                  .from('users')
+                  .update({ 
+                    last_login: today.toISOString(),
+                    streak: newStreak
+                  })
+                  .eq('id', userData.id)
+                  .select();
+                
+                if (error) {
+                  console.error('Error updating streak:', error);
+                } else {
+                  setUser(data[0]);
+                }
+              }
+            }
+
+            const { data: decksData, error: decksError } = await supabase
+              .from('decks')
+              .select('*')
+              .eq('userId', session.user.id);
+
+            if (decksError) {
+              console.error('Error fetching decks:', decksError);
+            } else {
+              setDecks(decksData);
+              const savedDeckId = localStorage.getItem('selectedDeckId');
+              if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+                setSelectedDeckId(savedDeckId);
+                const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+                setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+              } else if (decksData.length > 0) {
+                setSelectedDeckId(decksData[0].id);
+                setSelectedDeckName(decksData[0].name);
               }
             }
           }
+        } else {
+          const { data: { session }, error } = await supabase.auth.getSession();
 
-          const { data: decksData, error: decksError } = await supabase
-            .from('decks')
-            .select('*')
-            .eq('userId', session.user.id);
-
-          if (decksError) {
-            console.error('Error fetching decks:', decksError);
-          } else {
-            setDecks(decksData);
-            const savedDeckId = localStorage.getItem('selectedDeckId');
-            if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-              setSelectedDeckId(savedDeckId);
-              const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-              setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-            } else if (decksData.length > 0) {
-              setSelectedDeckId(decksData[0].id);
-              setSelectedDeckName(decksData[0].name);
-            }
+          if (error || !session) {
+            console.error('No active session found.');
+            router.push('/signin');
+            return;
           }
-        }
-      } else {
-        const { data: { session }, error } = await supabase.auth.getSession();
 
-        if (error || !session) {
-          console.error('No active session found.');
-          router.push('/signin');
-          return;
-        }
+          if (session && session.user) {  // Add this check
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
 
-        if (session && session.user) {  // Add this check
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-          if (userError) {
-            if (userError.code === 'PGRST116') {
-              console.error('No user data found for this ID');
+            if (userError) {
+              if (userError.code === 'PGRST116') {
+                console.error('No user data found for this ID');
+              } else {
+                console.error('Error fetching user data:', userError);
+              }
             } else {
-              console.error('Error fetching user data:', userError);
+              userData.avatarUrl = getMicahAvatarSvg(userData.email);
+              setUser(userData);
+              setUserMembership(userData.membership || 'free');
             }
-          } else {
-            userData.avatarUrl = getMicahAvatarSvg(userData.email);
-            setUser(userData);
-            setUserMembership(userData.membership || 'free');
-          }
 
-          const { data: decksData, error: decksError } = await supabase
-            .from('decks')
-            .select('*')
-            .eq('userId', session.user.id);
+            const { data: decksData, error: decksError } = await supabase
+              .from('decks')
+              .select('*')
+              .eq('userId', session.user.id);
 
-          if (decksError) {
-            console.error('Error fetching decks:', decksError);
-          } else {
-            setDecks(decksData);
-            const savedDeckId = localStorage.getItem('selectedDeckId');
-            if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-              setSelectedDeckId(savedDeckId);
-              const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-              setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-            } else if (decksData.length > 0) {
-              setSelectedDeckId(decksData[0].id);
-              setSelectedDeckName(decksData[0].name);
+            if (decksError) {
+              console.error('Error fetching decks:', decksError);
+            } else {
+              setDecks(decksData);
+              const savedDeckId = localStorage.getItem('selectedDeckId');
+              if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
+                setSelectedDeckId(savedDeckId);
+                const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
+                setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+              } else if (decksData.length > 0) {
+                setSelectedDeckId(decksData[0].id);
+                setSelectedDeckName(decksData[0].name);
+              }
             }
           }
         }
@@ -269,7 +290,13 @@ const Dashboard = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (isAnonymous) {
+      localStorage.removeItem('anonymousUserId');
+      localStorage.removeItem('anonymousUserData');
+      localStorage.removeItem(`decks_${user.id}`);
+    } else {
+      await supabase.auth.signOut();
+    }
     router.push('/signin');
   };
 
@@ -306,6 +333,9 @@ const Dashboard = () => {
     setSelectedDeckId(deckId);
     const selectedDeck = decks.find(deck => deck.id === deckId);
     setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+    if (isAnonymous) {
+      localStorage.setItem('selectedDeckId', deckId);
+    }
   };
 
   const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
@@ -328,6 +358,11 @@ const Dashboard = () => {
       // User missed more than one day, reset streak
       return 1;
     }
+  };
+
+  const saveAnonymousDecks = (updatedDecks: any[]) => {
+    localStorage.setItem(`decks_${user.id}`, JSON.stringify(updatedDecks));
+    setDecks(updatedDecks);
   };
 
   if (!user) return <p data-cursor="text">Loading...</p>;
@@ -402,6 +437,7 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+        
       </header>
       
       {user && (  // Add this check
@@ -548,8 +584,15 @@ const Dashboard = () => {
             </div>
           )}
           {decks.length === 0 && (
-            <div className="flex justify-center mt-20 items-center h-full">
-              <p className="text-xl font-semibold text-gray-700 dark:text-gray-300" data-cursor="text">Go to your library and create some decks!</p>
+            <div className="flex flex-col justify-center items-center h-full mt-20">
+              <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4" data-cursor="text">
+                Go to your library and create some decks!
+              </p>
+              {isAnonymous && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-md" data-cursor="text">
+                  You are using an anonymous account. Your data is stored locally in your browser.
+                </p>
+              )}
             </div>
           )}
         </main>

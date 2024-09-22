@@ -17,6 +17,7 @@ import Head from 'next/head';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
+import { useRouter } from 'next/router';
 
 // Dynamically import the DragAndDropDemo component
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
@@ -48,6 +49,7 @@ const HomePage: React.FC = () => {
   const [isNavSticky, setIsNavSticky] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -76,10 +78,6 @@ const HomePage: React.FC = () => {
     delaySpeed: 2000,
   });
 
-  const handleButtonClick = () => {
-    trackEvent.track('button_click', { label: 'Get Started' });
-  };
-
   const handleSupportClick = () => {
     window.open('https://forms.gle/bP14r8vtGhmj8s7S7', '_blank');
   };
@@ -90,6 +88,32 @@ const HomePage: React.FC = () => {
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAnonymousSignIn = () => {
+    // Generate a unique ID for the anonymous user
+    const anonymousId = 'anon_' + Math.random().toString(36).substr(2, 9);
+    
+    // Generate a random name
+    const adjectives = ['Happy', 'Clever', 'Brave', 'Kind', 'Witty'];
+    const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox'];
+    const randomName = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
+    
+    // Save anonymous user data
+    const anonymousUserData = {
+      id: anonymousId,
+      name: randomName,
+      email: '',
+      avatarUrl: '',
+      membership: 'free',
+      streak: 0,
+      last_login: new Date().toISOString()
+    };
+    
+    localStorage.setItem('anonymousUserId', anonymousId);
+    localStorage.setItem('anonymousUserData', JSON.stringify(anonymousUserData));
+    
+    router.push('/dashboard');
+  };
 
   return (
     <>
@@ -141,21 +165,20 @@ const HomePage: React.FC = () => {
           <hr className="w-1/2 mb-10 border-black" />
 
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            <Link href="/signup">
-              <Button
-                className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
-                onClick={handleButtonClick}
-                data-cursor={!isMobile ? "block" : undefined}
-              >
-                <span className="text-lg">Get Started</span>
-              </Button>
-            </Link>
             <Link href="/signin">
               <Button
                 className="px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-white hover:bg-gray-100 text-black border-2 border-black"
                 data-cursor={!isMobile ? "block" : undefined}
               >
                 <span className="text-lg">Login</span>
+              </Button>
+            </Link>
+            <Link href="#" onClick={handleAnonymousSignIn}>
+              <Button
+                className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
+                data-cursor={!isMobile ? "block" : undefined}
+              >
+                <span className="text-lg">Create Now</span>
               </Button>
             </Link>
           </div>

@@ -19,34 +19,53 @@ const Profile = () => {
   const [email, setEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const router = useRouter();
   const { dismiss } = useToast();
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-
-      if (error || !session) {
-        console.error('No active session found.');
-        router.push('/signin');
-        return;
-      }
-
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (userError) {
-        console.error('Error fetching user data:', userError);
+      const anonymousUserId = localStorage.getItem('anonymousUserId');
+      
+      if (anonymousUserId) {
+        setIsAnonymous(true);
+        const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+        setUser({
+          id: anonymousUserId,
+          name: localUserData.name || 'Anonymous User',
+          email: '',
+          avatar_url: localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId),
+          streak: localUserData.streak || 0,
+          joined_at: localUserData.joined_at || new Date().toISOString(),
+        });
+        setName(localUserData.name || 'Anonymous User');
+        setEmail('');
+        setSelectedAvatar(localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId));
       } else {
-        userData.avatar_url = getMicahAvatarSvg(userData.email);
-        setUser(userData);
-        setName(userData.name);
-        setEmail(userData.email);
-        setSelectedAvatar(userData.avatar_url);
-        console.log('Fetched user data:', userData);
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error || !session) {
+          console.error('No active session found.');
+          router.push('/signin');
+          return;
+        }
+
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userError) {
+          console.error('Error fetching user data:', userError);
+        } else {
+          userData.avatar_url = getMicahAvatarSvg(userData.email);
+          setUser(userData);
+          setName(userData.name);
+          setEmail(userData.email);
+          setSelectedAvatar(userData.avatar_url);
+          console.log('Fetched user data:', userData);
+        }
       }
     };
 
@@ -57,8 +76,25 @@ const Profile = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    setIsModalOpen(true);
+  const handleSave = async () => {
+    if (isAnonymous) {
+      const updatedUserData = {
+        name: name.trim(),
+        email: email.trim(),
+        avatar_url: selectedAvatar,
+        streak: user.streak,
+        joined_at: user.joined_at,
+      };
+      localStorage.setItem('anonymousUserData', JSON.stringify(updatedUserData));
+      setUser({ ...user, ...updatedUserData });
+      setIsEditing(false);
+      toast({
+        title: 'Profile Updated',
+        description: 'Your profile has been updated locally.',
+      });
+    } else {
+      setIsModalOpen(true);
+    }
   };
 
   const handleConfirmSave = async () => {
@@ -107,15 +143,21 @@ const Profile = () => {
         <div className="flex space-x-2">
           <button
             onClick={async () => {
-              const { error } = await supabase.auth.admin.deleteUser(user.id);
-              if (error) {
-                console.error('Error deleting account:', error);
-                toast({
-                  title: 'Error',
-                  description: 'There was an error deleting your account. Please try again.',
-                });
+              if (isAnonymous) {
+                localStorage.removeItem('anonymousUserId');
+                localStorage.removeItem('anonymousUserData');
+                router.push('/');
               } else {
-                router.push('/signin');
+                const { error } = await supabase.auth.admin.deleteUser(user.id);
+                if (error) {
+                  console.error('Error deleting account:', error);
+                  toast({
+                    title: 'Error',
+                    description: 'There was an error deleting your account. Please try again.',
+                  });
+                } else {
+                  router.push('/signin');
+                }
               }
             }}
             className="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
@@ -131,6 +173,10 @@ const Profile = () => {
         </div>
       ),
     });
+  };
+
+  const handleSignUp = () => {
+    router.push('/signup');
   };
 
   if (!user) return <p className="text-black dark:text-white">Loading...</p>;
@@ -181,16 +227,32 @@ const Profile = () => {
                 )}
               </div>
               <div className="w-full mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                {isEditing ? (
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
-                  />
+                {isAnonymous ? (
+                  <div className="flex items-center justify-between">
+                    <Button 
+                      onClick={handleSignUp}
+                      className="bg-black hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                      Sign Up
+                    </Button>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-4">
+                      Sync and save your data
+                    </span>
+                  </div>
                 ) : (
-                  <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    {isEditing ? (
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
+                      />
+                    ) : (
+                      <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -211,13 +273,15 @@ const Profile = () => {
             >
               Privacy Policy
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleDeleteAccount} 
-              className="text-red-600 dark:bg-gray-800 dark:text-red-400"
-            >
-              Delete Account
-            </Button>
+            {!isAnonymous && (
+              <Button 
+                variant="outline" 
+                onClick={handleDeleteAccount} 
+                className="text-red-600 dark:bg-gray-800 dark:text-red-400"
+              >
+                Delete Account
+              </Button>
+            )}
           </CardFooter>
         </Card>
       </div>
@@ -234,6 +298,11 @@ const Profile = () => {
               <Button onClick={handleConfirmSave} className="text-white dark:text-black">Confirm</Button>
             </div>
           </div>
+        </div>
+      )}
+      {isAnonymous && (
+        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+          You are using an anonymous account. Your data is stored locally in your browser.
         </div>
       )}
     </div>
