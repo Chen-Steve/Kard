@@ -10,6 +10,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { toast, useToast } from '../components/ui/use-toast'; 
 import { Toaster } from '../components/ui/toaster'; 
 import { getMicahAvatarSvg } from '../utils/avatar';
+import { differenceInDays } from 'date-fns';
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -46,41 +47,11 @@ const Profile = () => {
         setEmail(userData.email);
         setSelectedAvatar(userData.avatar_url);
         console.log('Fetched user data:', userData);
-
-        // Update streak if user visits today
-        const today = new Date().toISOString().split('T')[0];
-        const lastVisit = userData.last_login ? new Date(userData.last_login).toISOString().split('T')[0] : null;
-
-        if (lastVisit !== today) {
-          const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
-          const newStreak = lastVisit === yesterday ? (userData.streak || 0) + 1 : 1;
-
-          const { data, error } = await supabase
-            .from('users')
-            .update({ 
-              last_login: today,
-              streak: newStreak
-            })
-            .eq('id', userData.id)
-            .select();
-          
-          if (error) {
-            console.error('Error updating streak:', error);
-          } else {
-            setUser(data[0]);
-          }
-        }
       }
     };
 
     getSession();
   }, [router]);
-
-  const getYesterday = () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split('T')[0];
-  };
 
   const handleEdit = () => {
     setIsEditing(true);

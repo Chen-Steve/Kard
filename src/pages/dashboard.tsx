@@ -21,6 +21,7 @@ import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
 import React from 'react';
+import { differenceInDays } from 'date-fns';
 
 interface StickerWithUrl {
   id: string;
@@ -97,6 +98,29 @@ const Dashboard = () => {
             userData.avatarUrl = getMicahAvatarSvg(userData.email);
             setUser(userData);
             setUserMembership(userData.membership || 'free');
+
+            // Update streak
+            const today = new Date();
+            const lastVisit = userData.last_login ? new Date(userData.last_login) : null;
+
+            if (!lastVisit || differenceInDays(today, lastVisit) >= 1) {
+              const newStreak = calculateNewStreak(lastVisit, userData.streak || 0);
+
+              const { data, error } = await supabase
+                .from('users')
+                .update({ 
+                  last_login: today.toISOString(),
+                  streak: newStreak
+                })
+                .eq('id', userData.id)
+                .select();
+              
+              if (error) {
+                console.error('Error updating streak:', error);
+              } else {
+                setUser(data[0]);
+              }
+            }
           }
 
           const { data: decksData, error: decksError } = await supabase
@@ -286,6 +310,24 @@ const Dashboard = () => {
 
   const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
     setDashboardComponents(newComponents);
+  };
+
+  const calculateNewStreak = (lastVisit: Date | null, currentStreak: number): number => {
+    if (!lastVisit) return 1;
+    
+    const today = new Date();
+    const daysSinceLastVisit = differenceInDays(today, lastVisit);
+
+    if (daysSinceLastVisit <= 1) {
+      // User visited yesterday or today, increment streak
+      return currentStreak + 1;
+    } else if (daysSinceLastVisit === 2) {
+      // User missed one day, maintain current streak
+      return currentStreak;
+    } else {
+      // User missed more than one day, reset streak
+      return 1;
+    }
   };
 
   if (!user) return <p data-cursor="text">Loading...</p>;
