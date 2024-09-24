@@ -53,7 +53,7 @@ const SignIn = () => {
       setLoading(false);
     } else {
       console.log('Signed in successfully:', data);
-      Cookies.set('session', JSON.stringify(data.session), { expires: 7 });
+      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
       router.push('/dashboard');
     }
   };

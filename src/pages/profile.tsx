@@ -12,8 +12,17 @@ import { Toaster } from '../components/ui/toaster';
 import { getMicahAvatarSvg } from '../utils/avatar';
 import { differenceInDays } from 'date-fns';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string | null;
+  streak: number;
+  joined_at: string;
+}
+
 const Profile = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,31 +34,10 @@ const Profile = () => {
 
   useEffect(() => {
     const getSession = async () => {
-      const anonymousUserId = localStorage.getItem('anonymousUserId');
-      
-      if (anonymousUserId) {
-        setIsAnonymous(true);
-        const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
-        setUser({
-          id: anonymousUserId,
-          name: localUserData.name || 'Anonymous User',
-          email: '',
-          avatar_url: localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId),
-          streak: localUserData.streak || 0,
-          joined_at: localUserData.joined_at || new Date().toISOString(),
-        });
-        setName(localUserData.name || 'Anonymous User');
-        setEmail('');
-        setSelectedAvatar(localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId));
-      } else {
-        const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-        if (error || !session) {
-          console.error('No active session found.');
-          router.push('/signin');
-          return;
-        }
-
+      if (session && session.user) {
+        // User is authenticated
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('*')
@@ -58,13 +46,38 @@ const Profile = () => {
 
         if (userError) {
           console.error('Error fetching user data:', userError);
+          toast({
+            title: 'Error',
+            description: 'Failed to load user data. Please try again.',
+          });
         } else {
-          userData.avatar_url = getMicahAvatarSvg(userData.email);
+          setIsAnonymous(false);
           setUser(userData);
           setName(userData.name);
           setEmail(userData.email);
-          setSelectedAvatar(userData.avatar_url);
-          console.log('Fetched user data:', userData);
+          setSelectedAvatar(userData.avatar_url || getMicahAvatarSvg(userData.email));
+        }
+      } else {
+        // Check for anonymous user
+        const anonymousUserId = localStorage.getItem('anonymousUserId');
+        
+        if (anonymousUserId) {
+          setIsAnonymous(true);
+          const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+          setUser({
+            id: anonymousUserId,
+            name: localUserData.name || 'Anonymous User',
+            email: '',
+            avatar_url: localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId),
+            streak: localUserData.streak || 0,
+            joined_at: localUserData.joined_at || new Date().toISOString(),
+          });
+          setName(localUserData.name || 'Anonymous User');
+          setEmail('');
+          setSelectedAvatar(localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId));
+        } else {
+          // No authenticated session or anonymous user, redirect to sign in
+          router.push('/signin');
         }
       }
     };
@@ -78,22 +91,47 @@ const Profile = () => {
 
   const handleSave = async () => {
     if (isAnonymous) {
-      const updatedUserData = {
+      const updatedUserData: User = {
+        id: user!.id,
         name: name.trim(),
-        email: email.trim(),
+        email: '',
         avatar_url: selectedAvatar,
-        streak: user.streak,
-        joined_at: user.joined_at,
+        streak: user!.streak,
+        joined_at: user!.joined_at,
       };
       localStorage.setItem('anonymousUserData', JSON.stringify(updatedUserData));
-      setUser({ ...user, ...updatedUserData });
+      setUser(updatedUserData);
       setIsEditing(false);
       toast({
         title: 'Profile Updated',
         description: 'Your profile has been updated locally.',
       });
     } else {
-      setIsModalOpen(true);
+      // For authenticated users
+      const { data, error } = await supabase
+        .from('users')
+        .update({ 
+          name: name.trim(), 
+          email: email.trim(), 
+          avatar_url: selectedAvatar 
+        })
+        .eq('id', user!.id)
+        .select();
+
+      if (error) {
+        console.error('Error updating user data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to update profile. Please try again.',
+        });
+      } else {
+        setUser(data[0]);
+        setIsEditing(false);
+        toast({
+          title: 'Profile Updated',
+          description: 'Your profile has been updated successfully.',
+        });
+      }
     }
   };
 
@@ -108,7 +146,7 @@ const Profile = () => {
     }); // Debugging data to be saved
 
     // Check if there are any changes
-    if (trimmedName === user.name && trimmedEmail === user.email && selectedAvatar === user.avatar_url) {
+    if (trimmedName === user!.name && trimmedEmail === user!.email && selectedAvatar === user!.avatar_url) {
       setIsEditing(false);
       setIsModalOpen(false);
       return;
@@ -118,14 +156,14 @@ const Profile = () => {
     const { data, error } = await supabase
       .from('users')
       .update({ name: trimmedName, email: trimmedEmail, avatar_url: selectedAvatar })
-      .eq('id', user.id)
+      .eq('id', user!.id)
       .select();
 
     if (error) {
       console.error('Error updating user data:', error);
     } else {
       console.log('User data updated successfully:', data); // Debugging successful update
-      setUser({ ...user, name: trimmedName, email: trimmedEmail, avatar_url: selectedAvatar });
+      setUser({ ...user!, name: trimmedName, email: trimmedEmail, avatar_url: selectedAvatar });
       setIsEditing(false);
       setIsModalOpen(false);
     }
@@ -146,9 +184,11 @@ const Profile = () => {
               if (isAnonymous) {
                 localStorage.removeItem('anonymousUserId');
                 localStorage.removeItem('anonymousUserData');
+                // Also remove any other related data (e.g., decks)
+                localStorage.removeItem('decks_' + user!.id);
                 router.push('/');
               } else {
-                const { error } = await supabase.auth.admin.deleteUser(user.id);
+                const { error } = await supabase.auth.admin.deleteUser(user!.id);
                 if (error) {
                   console.error('Error deleting account:', error);
                   toast({
@@ -178,6 +218,43 @@ const Profile = () => {
   const handleSignUp = () => {
     router.push('/signup');
   };
+
+  const handleAvatarChange = () => {
+    if (isAnonymous) {
+      const newAvatar = getMicahAvatarSvg(Math.random().toString());
+      setSelectedAvatar(newAvatar);
+    } else {
+      // Existing avatar change logic for authenticated users
+    }
+  };
+
+  const updateAnonymousStreak = () => {
+    const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+    const lastLogin = new Date(localUserData.last_login);
+    const today = new Date();
+    const daysSinceLastLogin = differenceInDays(today, lastLogin);
+
+    let newStreak = localUserData.streak || 0;
+    if (daysSinceLastLogin === 1) {
+      newStreak += 1;
+    } else if (daysSinceLastLogin > 1) {
+      newStreak = 1;
+    }
+
+    const updatedUserData = {
+      ...localUserData,
+      streak: newStreak,
+      last_login: today.toISOString(),
+    };
+    localStorage.setItem('anonymousUserData', JSON.stringify(updatedUserData));
+    setUser((prevUser: User | null) => prevUser ? { ...prevUser, streak: newStreak } : null);
+  };
+
+  useEffect(() => {
+    if (isAnonymous) {
+      updateAnonymousStreak();
+    }
+  }, [isAnonymous]);
 
   if (!user) return <p className="text-black dark:text-white">Loading...</p>;
 
@@ -211,7 +288,7 @@ const Profile = () => {
               <UserAvatar 
                 avatarSvg={selectedAvatar || user.avatar_url} 
                 alt="User Avatar" 
-                onClick={() => {}}
+                onClick={handleAvatarChange}
               />
               <div className="w-full mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>

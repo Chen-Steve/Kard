@@ -34,8 +34,16 @@ interface StickerWithUrl {
   height: number;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  // Add other properties as needed
+}
+
 const Dashboard = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [decks, setDecks] = useState<any[]>([]);
@@ -79,139 +87,44 @@ const Dashboard = () => {
     }
 
     const getSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
       const anonymousUserId = localStorage.getItem('anonymousUserId');
-      
-      if (anonymousUserId) {
-        setIsAnonymous(true);
-        const anonymousUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
-        setUser(anonymousUserData);
-        setUserMembership(anonymousUserData.membership || 'free');
 
-        // Generate avatar for anonymous user
-        anonymousUserData.avatarUrl = getMicahAvatarSvg(anonymousUserData.id);
+      if (session && session.user) {
+        // User is authenticated
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-        // Fetch or create decks for anonymous user
-        const localDecks = JSON.parse(localStorage.getItem(`decks_${anonymousUserId}`) || '[]');
-        setDecks(localDecks);
-        if (localDecks.length > 0) {
-          setSelectedDeckId(localDecks[0].id);
-          setSelectedDeckName(localDecks[0].name);
-        }
-      } else {
-        const sessionData = Cookies.get('session');
-        if (sessionData) {
-          const session = JSON.parse(sessionData);
-          if (session && session.user) {  // Add this check
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-
-            if (userError) {
-              if (userError.code === 'PGRST116') {
-                console.error('No user data found for this ID');
-              } else {
-                console.error('Error fetching user data:', userError);
-              }
-            } else {
-              userData.avatarUrl = getMicahAvatarSvg(userData.email);
-              setUser(userData);
-              setUserMembership(userData.membership || 'free');
-
-              // Update streak
-              const today = new Date();
-              const lastVisit = userData.last_login ? new Date(userData.last_login) : null;
-
-              if (!lastVisit || differenceInDays(today, lastVisit) >= 1) {
-                const newStreak = calculateNewStreak(lastVisit, userData.streak || 0);
-
-                const { data, error } = await supabase
-                  .from('users')
-                  .update({ 
-                    last_login: today.toISOString(),
-                    streak: newStreak
-                  })
-                  .eq('id', userData.id)
-                  .select();
-                
-                if (error) {
-                  console.error('Error updating streak:', error);
-                } else {
-                  setUser(data[0]);
-                }
-              }
-            }
-
-            const { data: decksData, error: decksError } = await supabase
-              .from('decks')
-              .select('*')
-              .eq('userId', session.user.id);
-
-            if (decksError) {
-              console.error('Error fetching decks:', decksError);
-            } else {
-              setDecks(decksData);
-              const savedDeckId = localStorage.getItem('selectedDeckId');
-              if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-                setSelectedDeckId(savedDeckId);
-                const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-                setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-              } else if (decksData.length > 0) {
-                setSelectedDeckId(decksData[0].id);
-                setSelectedDeckName(decksData[0].name);
-              }
-            }
-          }
+        if (userError) {
+          console.error('Error fetching user data:', userError);
         } else {
-          const { data: { session }, error } = await supabase.auth.getSession();
-
-          if (error || !session) {
-            console.error('No active session found.');
-            router.push('/signin');
-            return;
-          }
-
-          if (session && session.user) {  // Add this check
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-
-            if (userError) {
-              if (userError.code === 'PGRST116') {
-                console.error('No user data found for this ID');
-              } else {
-                console.error('Error fetching user data:', userError);
-              }
-            } else {
-              userData.avatarUrl = getMicahAvatarSvg(userData.email);
-              setUser(userData);
-              setUserMembership(userData.membership || 'free');
-            }
-
-            const { data: decksData, error: decksError } = await supabase
-              .from('decks')
-              .select('*')
-              .eq('userId', session.user.id);
-
-            if (decksError) {
-              console.error('Error fetching decks:', decksError);
-            } else {
-              setDecks(decksData);
-              const savedDeckId = localStorage.getItem('selectedDeckId');
-              if (savedDeckId && decksData.some(deck => deck.id === savedDeckId)) {
-                setSelectedDeckId(savedDeckId);
-                const selectedDeck = decksData.find(deck => deck.id === savedDeckId);
-                setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-              } else if (decksData.length > 0) {
-                setSelectedDeckId(decksData[0].id);
-                setSelectedDeckName(decksData[0].name);
-              }
-            }
-          }
+          setUser({
+            ...userData,
+            avatarUrl: userData.avatar_url || getMicahAvatarSvg(userData.email)
+          });
+          setUserMembership(userData.membership || 'free');
+          setIsAnonymous(false);
+          fetchUserDecks(session.user.id);
         }
+      } else if (anonymousUserId) {
+        // Anonymous user
+        setIsAnonymous(true);
+        const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+        setUser({
+          id: anonymousUserId,
+          name: localUserData.name || 'Anonymous User',
+          email: '',
+          avatarUrl: localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId),
+          // Add other properties as needed
+        });
+        setUserMembership('free');
+        fetchAnonymousDecks(anonymousUserId);
+      } else {
+        // No session or anonymous user, redirect to sign in
+        router.push('/signin');
       }
     };
 
@@ -232,8 +145,10 @@ const Dashboard = () => {
           if (error) {
             console.error('Error fetching user data:', error);
           } else {
-            userData.avatarUrl = getMicahAvatarSvg(userData.email);
-            setUser(userData);
+            setUser({
+              ...userData,
+              avatarUrl: userData.avatar_url || getMicahAvatarSvg(userData.email)
+            });
             setUserMembership(userData.membership || 'free');
           }
         };
@@ -246,6 +161,38 @@ const Dashboard = () => {
       authListener?.subscription.unsubscribe();
     };
   }, [router]);
+
+  const fetchUserDecks = async (userId: string) => {
+    const { data: decksData, error: decksError } = await supabase
+      .from('decks')
+      .select('*')
+      .eq('userId', userId);
+
+    if (decksError) {
+      console.error('Error fetching decks:', decksError);
+    } else {
+      setDecks(decksData);
+      setSelectedDeckFromLocalStorage(decksData);
+    }
+  };
+
+  const fetchAnonymousDecks = (anonymousUserId: string) => {
+    const localDecks = JSON.parse(localStorage.getItem(`decks_${anonymousUserId}`) || '[]');
+    setDecks(localDecks);
+    setSelectedDeckFromLocalStorage(localDecks);
+  };
+
+  const setSelectedDeckFromLocalStorage = (availableDecks: any[]) => {
+    const savedDeckId = localStorage.getItem('selectedDeckId');
+    if (savedDeckId && availableDecks.some(deck => deck.id === savedDeckId)) {
+      setSelectedDeckId(savedDeckId);
+      const selectedDeck = availableDecks.find(deck => deck.id === savedDeckId);
+      setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+    } else if (availableDecks.length > 0) {
+      setSelectedDeckId(availableDecks[0].id);
+      setSelectedDeckName(availableDecks[0].name);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -300,8 +247,13 @@ const Dashboard = () => {
   };
 
   const handleLearnClick = () => {
-    if (selectedDeckId) {
+    if (user && selectedDeckId) {
       router.push(`/learning-mode/${user.id}/${selectedDeckId}`);
+    } else if (!user) {
+      toast({
+        title: 'User Not Found',
+        description: 'Please sign in to access learning mode.',
+      });
     } else {
       toast({
         title: 'No Deck Selected',
@@ -318,8 +270,13 @@ const Dashboard = () => {
   };
 
   const handleMatchClick = () => {
-    if (selectedDeckId) {
+    if (user && selectedDeckId) {
       router.push(`/matching-game/${user.id}/${selectedDeckId}`);
+    } else if (!user) {
+      toast({
+        title: 'User Not Found',
+        description: 'Please sign in to access the matching game.',
+      });
     } else {
       toast({
         title: 'No Deck Selected',
@@ -332,9 +289,7 @@ const Dashboard = () => {
     setSelectedDeckId(deckId);
     const selectedDeck = decks.find(deck => deck.id === deckId);
     setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-    if (isAnonymous) {
-      localStorage.setItem('selectedDeckId', deckId);
-    }
+    localStorage.setItem('selectedDeckId', deckId);
   };
 
   const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
@@ -360,8 +315,17 @@ const Dashboard = () => {
   };
 
   const saveAnonymousDecks = (updatedDecks: any[]) => {
-    localStorage.setItem(`decks_${user.id}`, JSON.stringify(updatedDecks));
-    setDecks(updatedDecks);
+    if (user) {
+      localStorage.setItem(`decks_${user.id}`, JSON.stringify(updatedDecks));
+      setDecks(updatedDecks);
+    } else {
+      console.error('Attempted to save decks for null user');
+      // Optionally, you can show a toast message to the user
+      toast({
+        title: 'Error',
+        description: 'Unable to save decks. Please try signing in again.',
+      });
+    }
   };
 
   if (!user) return <p data-cursor="text">Loading...</p>;
@@ -377,7 +341,7 @@ const Dashboard = () => {
           <NavMenu onDeckSelect={handleDeckSelect} />
         </div>
         <div className="flex items-center">
-          {user.avatarUrl && (
+          {user && user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
               <UserAvatar
                 avatarSvg={user.avatarUrl}
