@@ -1,7 +1,7 @@
 "use client";
 
 import '../app/globals.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import { useMediaQuery } from 'react-responsive';
@@ -18,6 +18,7 @@ import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
 import { useRouter } from 'next/router';
+import debounce from 'lodash/debounce';
 
 // Dynamically import the DragAndDropDemo component
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
@@ -89,31 +90,41 @@ const HomePage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAnonymousSignIn = () => {
-    // Generate a unique ID for the anonymous user
-    const anonymousId = 'anon_' + Math.random().toString(36).substr(2, 9);
+  const handleAnonymousSignIn = useCallback(debounce(() => {
+    // Check if an anonymous user ID already exists
+    let anonymousId = localStorage.getItem('anonymousUserId');
     
-    // Generate a random name
-    const adjectives = ['Happy', 'Clever', 'Brave', 'Kind', 'Witty'];
-    const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox'];
-    const randomName = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
+    if (!anonymousId) {
+      // If no existing anonymous ID, generate a new one
+      anonymousId = 'anon_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('anonymousUserId', anonymousId);
+      
+      // Generate a random name
+      const adjectives = ['Happy', 'Clever', 'Brave', 'Kind', 'Witty'];
+      const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox'];
+      const randomName = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
+      
+      // Save anonymous user data
+      const anonymousUserData = {
+        id: anonymousId,
+        name: randomName,
+        email: '',
+        avatarUrl: '',
+        membership: 'free',
+        streak: 0,
+        last_login: new Date().toISOString()
+      };
+      
+      localStorage.setItem('anonymousUserData', JSON.stringify(anonymousUserData));
+    } else {
+      // If an anonymous ID exists, retrieve the existing user data
+      const existingUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
+      existingUserData.last_login = new Date().toISOString();
+      localStorage.setItem('anonymousUserData', JSON.stringify(existingUserData));
+    }
     
-    // Save anonymous user data
-    const anonymousUserData = {
-      id: anonymousId,
-      name: randomName,
-      email: '',
-      avatarUrl: '',
-      membership: 'free',
-      streak: 0,
-      last_login: new Date().toISOString()
-    };
-    
-    localStorage.setItem('anonymousUserId', anonymousId);
-    localStorage.setItem('anonymousUserData', JSON.stringify(anonymousUserData));
-    
-    router.push('/dashboard');
-  };
+    router.push('/dashboard', undefined, { shallow: true });
+  }, 300), [router]);
 
   return (
     <>

@@ -291,13 +291,12 @@ const Dashboard = () => {
 
   const handleSignOut = async () => {
     if (isAnonymous) {
-      localStorage.removeItem('anonymousUserId');
-      localStorage.removeItem('anonymousUserData');
-      localStorage.removeItem(`decks_${user.id}`);
+      localStorage.removeItem('session');
     } else {
       await supabase.auth.signOut();
+      Cookies.remove('session');
     }
-    router.push('/signin');
+    router.push('/');
   };
 
   const handleLearnClick = () => {
