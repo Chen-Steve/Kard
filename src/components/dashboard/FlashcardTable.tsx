@@ -33,10 +33,6 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
     setEditingId(null);
   };
 
-  const handleCancel = () => {
-    setEditingId(null);
-  };
-
   return (
     <DragDropContext onDragEnd={onReorder}>
       <Droppable droppableId="flashcards" direction="vertical">
@@ -110,13 +106,6 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                               aria-label="Save changes"
                             >
                               <MdOutlineSave size={20} />
-                            </button>
-                            <button 
-                              onClick={handleCancel} 
-                              className="text-gray-500 hover:text-gray-700 text-sm"
-                              aria-label="Cancel editing"
-                            >
-                              Cancel
                             </button>
                           </div>
                         ) : (

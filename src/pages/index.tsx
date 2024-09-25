@@ -181,7 +181,7 @@ const HomePage: React.FC = () => {
                 className="px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-white hover:bg-gray-100 text-black border-2 border-black"
                 data-cursor={!isMobile ? "block" : undefined}
               >
-                <span className="text-lg">Login/Signup</span>
+                <span className="text-lg">Get Started</span>
               </Button>
             </Link>
             {/* Commented out Create Now button

@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Delaunay } from 'd3-delaunay';
 
-interface Bubble {
+interface VoronoiCell {
   id: number;
-  size: number;
   position: { x: number; y: number };
   color: string;
 }
 
-const generateBubble = (id: number, maxWidth: number, maxHeight: number): Bubble => {
-  const screenSize = Math.min(maxWidth, maxHeight);
-  const minSize = screenSize * 0.05; // 5% of screen size
-  const maxSize = screenSize * 0.15; // 15% of screen size
-  return {
-    id,
-    size: Math.random() * (maxSize - minSize) + minSize,
-    position: {
-      x: Math.random() * maxWidth,
-      y: Math.random() * maxHeight,
-    },
-    color: `hsl(${Math.random() * 360}, 70%, 70%)`,
-  };
-};
+const generatePoint = (maxWidth: number, maxHeight: number): [number, number] => [
+  Math.random() * maxWidth,
+  Math.random() * maxHeight,
+];
+
+const generateColor = () => `hsl(${Math.random() * 360}, 70%, 70%)`;
 
 const Bubbles: React.FC = () => {
-  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [cells, setCells] = useState<VoronoiCell[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -42,31 +34,34 @@ const Bubbles: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (dimensions.width > 0 && dimensions.height > 0) {
-      setBubbles(Array.from({ length: 8 }, (_, i) => 
-        generateBubble(i, dimensions.width, dimensions.height)
-      ));
-    }
+  const voronoiCells = useMemo(() => {
+    if (dimensions.width === 0 || dimensions.height === 0) return null;
+
+    const points = Array.from({ length: 20 }, () => generatePoint(dimensions.width, dimensions.height));
+    const delaunay = Delaunay.from(points);
+    const voronoi = delaunay.voronoi([0, 0, dimensions.width, dimensions.height]);
+
+    return Array.from(voronoi.cellPolygons()).map((cell, index) => ({
+      id: index,
+      path: `M${cell.join('L')}Z`,
+      color: generateColor(),
+    }));
   }, [dimensions]);
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {bubbles.map((bubble) => (
-        <div
-          key={bubble.id}
-          className="bubble absolute rounded-full"
-          style={{
-            width: `${bubble.size}px`,
-            height: `${bubble.size}px`,
-            left: `${bubble.position.x}px`,
-            top: `${bubble.position.y}px`,
-            background: `radial-gradient(circle at 30% 30%, ${bubble.color}, transparent)`,
-            filter: 'blur(10px)',
-            opacity: 0.3,
-          }}
-        />
-      ))}
+      <svg width={dimensions.width} height={dimensions.height}>
+        {voronoiCells && voronoiCells.map((cell) => (
+          <path
+            key={cell.id}
+            d={cell.path}
+            fill={cell.color}
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.3"
+          />
+        ))}
+      </svg>
     </div>
   );
 };
