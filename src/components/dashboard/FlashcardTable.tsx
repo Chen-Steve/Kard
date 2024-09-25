@@ -102,7 +102,7 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                           <div className="flex space-x-2">
                             <button 
                               onClick={() => handleSave(card.id)} 
-                              className="text-green-500 hover:text-green-700 text-sm"
+                              className="text-green-700 hover:text-green-800 text-sm"
                               aria-label="Save changes"
                             >
                               <MdOutlineSave size={20} />

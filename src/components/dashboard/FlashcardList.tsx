@@ -132,7 +132,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               {isEditing ? (
                 <button
                   onClick={handleSave}
-                  className="bg-green-500 text-white p-1 rounded-full hover:bg-green-600 transition-colors"
+                  className="bg-green-700 text-white p-1 rounded-full hover:bg-green-800 transition-colors"
                   title="Save"
                 >
                   <MdOutlineSave size={16} />
