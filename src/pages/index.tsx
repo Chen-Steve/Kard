@@ -34,7 +34,7 @@ interface DynamicTitleProps {
 const DynamicTitle = dynamic<DynamicTitleProps>(() => Promise.resolve(({ isMobile, text }) => (
   <h1 className="font-bold mb-2 mt-20 text-black text-4xl md:text-5xl lg:text-6xl">
     {isMobile ? (
-      "Kard is a Better Quizlet Alternative"
+      "Kard is an Uncomplicated learning platform"
     ) : (
       <>
         {text}
@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const [text] = useTypewriter({
-    words: ['Kard is a Quizlet Alternative', 'But better', ''],
+    words: ['Uncomplicated & Fast', 'For Everyone', 'Better than Quizlet'],
     loop: true,
     delaySpeed: 2000,
   });
@@ -221,7 +221,7 @@ const HomePage: React.FC = () => {
         <footer className="w-full p-6 flex flex-col items-center text-black" data-cursor={!isMobile ? "text" : undefined}>
           <div className="flex flex-col items-center">
             <div className="flex flex-row items-center mt-2">
-              <div className="relative w-12 h-12 sm:w-40 sm:h-40 md:w-60 md:h-60 lg:w-80 lg:h-80 mr-2 sm:mr-4">
+              <div className="relative w-24 h-24 sm:w-40 sm:h-40 md:w-55 md:h-55 lg:w-80 lg:h-80 mr-2 sm:mr-4">
                 <Image
                   src="/blob.svg"
                   alt="Blob"
@@ -229,11 +229,11 @@ const HomePage: React.FC = () => {
                   style={{ objectFit: 'contain' }}
                 />
               </div>
-              <p className="text-3xl sm:text-4xl md:text-5xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
+              <p className="text-7xl sm:text-8xl md:text-8xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
             </div>
             
-            <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-end items-center mt-4 sm:mt-0 sm:mr-44">
-              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30 mb-2 sm:mb-0 sm:mr-2">
+            <div className="w-full flex flex-row justify-center sm:justify-end items-center mt-4 sm:mt-0 sm:mr-44">
+              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30 mr-2">
                 <Link href="/privacy">Privacy Policy</Link>
               </p>
               <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">
@@ -243,14 +243,18 @@ const HomePage: React.FC = () => {
           </div>
         </footer>
 
-        <button
-          className="fixed bottom-4 right-4 text-md font-bold px-4 py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
-          onClick={handleSupportClick}
-          data-cursor={isMounted && !isMobile ? "block" : undefined}
-        >
-          <RiFeedbackFill className="mr-2" />
-          Feedback
-        </button>
+        {/* Move the feedback button inside the footer */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-between items-center bg-transparent">
+          <div className="flex-grow"></div> {/* This empty div pushes the button to the right */}
+          <button
+            className="text-md font-bold px-3 py-3 sm:px-4 sm:py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
+            onClick={handleSupportClick}
+            data-cursor={isMounted && !isMobile ? "block" : undefined}
+          >
+            <RiFeedbackFill className="text-xl sm:text-base sm:mr-2" />
+            <span className="hidden sm:inline">Feedback</span>
+          </button>
+        </div>
 
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <EmailForm />
