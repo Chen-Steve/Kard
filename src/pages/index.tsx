@@ -123,7 +123,7 @@ const HomePage: React.FC = () => {
       localStorage.setItem('anonymousUserData', JSON.stringify(existingUserData));
     }
     
-    router.push('/dashboard', undefined, { shallow: true });
+    router.push('/anonDashboard', undefined, { shallow: true });
   }, 300), [router]);
 
   return (
@@ -184,6 +184,7 @@ const HomePage: React.FC = () => {
                 <span className="text-lg">Login</span>
               </Button>
             </Link>
+            {/* Commented out Create Now button
             <Link href="#" onClick={handleAnonymousSignIn}>
               <Button
                 className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
@@ -192,6 +193,7 @@ const HomePage: React.FC = () => {
                 <span className="text-lg">Create Now</span>
               </Button>
             </Link>
+            */}
           </div>
         </main>
 
@@ -230,8 +232,8 @@ const HomePage: React.FC = () => {
               <p className="text-3xl sm:text-4xl md:text-5xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
             </div>
             
-            <div className="w-full flex justify-end mr-44">
-              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">
+            <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-end items-center mt-4 sm:mt-0 sm:mr-44">
+              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30 mb-2 sm:mb-0 sm:mr-2">
                 <Link href="/privacy">Privacy Policy</Link>
               </p>
               <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { FaCircleNotch, FaFolder, FaRegFolder, FaPenNib, FaEllipsisH, FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
+import { useToast } from "../components/ui/use-toast";
 
 interface Deck {
   id: string;
@@ -22,6 +23,18 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   const [startX, setStartX] = useState(0);
   const [left, setLeft] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  const [isAnonymous, setIsAnonymous] = useState(false);
+
+  useEffect(() => {
+    const checkAnonymousUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const anonymousUserId = localStorage.getItem('anonymousUserId');
+      setIsAnonymous(!session && !!anonymousUserId);
+    };
+
+    checkAnonymousUser();
+  }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isVertical) {
@@ -104,6 +117,26 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
     setLeft(window.innerWidth / 2);
   }, []);
 
+  const handlePublicDecksClick = () => {
+    if (isAnonymous) {
+      toast({
+        title: "Create an Account",
+        description: "Please create an account to access public decks!",
+        action: (
+          <button
+            onClick={() => window.location.href = '/signin'}
+            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+          >
+            Sign Up
+          </button>
+        ),
+      });
+    } else {
+      // Navigate to public decks page
+      window.location.href = '/public-decks';
+    }
+  };
+
   return (
     <div 
       ref={navRef}
@@ -141,7 +174,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         )}
         <NavIcon href="/dashboard" icon={FaCircleNotch} label="Home" index={0} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/decks" icon={FaFolder} label="Your Library" index={1} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        <NavIcon href="/public-decks" icon={FaRegFolder} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
+        <NavIcon onClick={handlePublicDecksClick} icon={FaRegFolder} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/DrawingBoardPage" icon={FaPenNib} label="Drawing Board" index={3} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         
         {isVertical ? <div className="w-6 sm:w-8 h-px bg-gray-300 my-1 sm:my-2"></div> : <div className="h-6 sm:h-8 w-px bg-gray-300 mx-1 sm:mx-2"></div>}
