@@ -8,6 +8,7 @@ import Spinner from '../components/Spinner';
 import Cookies from 'js-cookie';
 import { signIn } from 'next-auth/react';
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
+import ForgotPassword from '../components/forgotPassword';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -132,6 +134,26 @@ const SignIn = () => {
                   </div>
                 </div>
               </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsForgotPasswordOpen(true);
+                    }}
+                    className="font-medium text-black underline hover:text-gray-800"
+                    data-cursor="block"
+                    data-cursor-style={customCursorStyle({ 
+                      background: 'rgba(0, 0, 0, 0.1)',
+                      radius: '20px',
+                      padding: '8px 10px'
+                    })}
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+              </div>
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -160,6 +182,10 @@ const SignIn = () => {
           </p>
         </>
       )}
+      <ForgotPassword
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+      />
     </div>
   );
 };
