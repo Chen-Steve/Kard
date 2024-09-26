@@ -1,6 +1,12 @@
+import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
-import supabase from '../../lib/supabaseClient';
+
+// Move this outside of the handler function
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -15,16 +21,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    console.log('Initiating password reset for email:', email);
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${baseUrl}/reset-password`,
+    // Generate a password reset token using Supabase
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: `${baseUrl}/reset-password`,
+      },
     });
 
-    if (error) throw error;
+    console.log('Supabase generateLink response:', { data, error });
 
-    // The reset link is now handled by Supabase, so we don't need to create it ourselves
-    const resetLink = `${baseUrl}/reset-password`;
+    if (error) {
+      console.error('Error generating reset link:', error);
+      throw error;
+    }
 
+    if (!data || !data.properties || !data.properties.action_link) {
+      throw new Error('Failed to generate reset link');
+    }
+
+    const resetLink = data.properties.action_link;
+
+    // Create Nodemailer transporter using Zoho SMTP
     const transporter = nodemailer.createTransport({
       host: 'smtp.zoho.com',
       port: 465,
@@ -35,17 +56,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    await transporter.sendMail({
+    // Send the password reset email
+    const info = await transporter.sendMail({
       from: process.env.ZOHO_EMAIL,
       to: email,
-      subject: 'Password Reset for Your Account',
-      text: `Click the following link to reset your password: ${resetLink}`,
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+      subject: 'Reset Your Password',
+      text: `Please click on the following link to reset your password: ${resetLink}`,
+      html: `<p>Please click on the following link to reset your password:</p><p><a href="${resetLink}">${resetLink}</a></p>`,
     });
 
+    console.log('Password reset email sent successfully. Message ID:', info.messageId);
     res.status(200).json({ message: 'Password reset email sent successfully' });
   } catch (error) {
     console.error('Password reset error:', error);
-    res.status(500).json({ message: 'Failed to send password reset email', error: (error as Error).message });
+    res.status(500).json({ message: 'Failed to send password reset email', error: error instanceof Error ? error.message : String(error) });
   }
 }
