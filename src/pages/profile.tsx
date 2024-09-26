@@ -6,7 +6,7 @@ import StatsContainer from '../components/stats-container';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { FaArrowLeft } from 'react-icons/fa'; 
+import { FaArrowLeft, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import { toast, useToast } from '../components/ui/use-toast'; 
 import { Toaster } from '../components/ui/toaster'; 
 import { getMicahAvatarSvg } from '../utils/avatar';
@@ -29,6 +29,11 @@ const Profile = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const router = useRouter();
   const { dismiss } = useToast();
 
@@ -256,6 +261,42 @@ const Profile = () => {
     }
   }, [isAnonymous]);
 
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      toast({
+        title: 'Error',
+        description: 'Password must be at least 6 characters long.',
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: 'Error',
+        description: 'Passwords do not match.',
+      });
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      console.error('Error changing password:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to change password. Please try again.',
+      });
+    } else {
+      setNewPassword('');
+      setConfirmPassword('');
+      setIsChangingPassword(false);
+      toast({
+        title: 'Success',
+        description: 'Your password has been changed successfully.',
+      });
+    }
+  };
+
   if (!user) return <p className="text-black dark:text-white">Loading...</p>;
 
   return (
@@ -332,6 +373,78 @@ const Profile = () => {
                   </>
                 )}
               </div>
+              {!isAnonymous && (
+                <div className="w-full mt-4">
+                  {isChangingPassword ? (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="New password"
+                          className="pr-10 bg-white dark:bg-gray-600 text-black dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPassword ? (
+                            <FaEyeSlash className="text-gray-400" />
+                          ) : (
+                            <FaEye className="text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm new password"
+                          className="pr-10 bg-white dark:bg-gray-600 text-black dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showConfirmPassword ? (
+                            <FaEyeSlash className="text-gray-400" />
+                          ) : (
+                            <FaEye className="text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button onClick={handleChangePassword} className="flex-1">
+                          Change Password
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setIsChangingPassword(false);
+                            setNewPassword('');
+                            setConfirmPassword('');
+                          }} 
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsChangingPassword(true)}
+                      className="w-full flex items-center justify-center text-black dark:bg-gray-800 dark:text-white"
+                    >
+                      <FaKey className="mr-2" /> Change Password
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
           {isEditing && (
