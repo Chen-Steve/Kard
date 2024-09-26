@@ -19,6 +19,16 @@ const SignUp = () => {
   const router = useRouter();
 
   useEffect(() => {
+    initializeCursor();
+  }, []);
+
+  useEffect(() => {
+    if (errorMessage) {
+      initializeCursor();
+    }
+  }, [errorMessage]);
+
+  const initializeCursor = () => {
     if (typeof window !== 'undefined') {
       initCursor({
         normalStyle: { 
@@ -37,7 +47,7 @@ const SignUp = () => {
       });
       updateCursor();
     }
-  }, []);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

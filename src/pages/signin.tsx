@@ -20,6 +20,16 @@ const SignIn = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   useEffect(() => {
+    initializeCursor();
+  }, []);
+
+  useEffect(() => {
+    if (errorMessage) {
+      initializeCursor();
+    }
+  }, [errorMessage]);
+
+  const initializeCursor = () => {
     if (typeof window !== 'undefined') {
       initCursor({
         normalStyle: { 
@@ -38,7 +48,7 @@ const SignIn = () => {
       });
       updateCursor();
     }
-  }, []);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
