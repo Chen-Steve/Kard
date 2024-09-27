@@ -24,7 +24,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
   isScrollable,
   isTableViewActive,
   readOnly,
-  children,  // Add this line
+  children,
 }) => {
   return (
     <div className="flex justify-between space-x-4 flex-wrap">

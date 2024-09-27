@@ -1,21 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { FaCircleNotch, FaFolder, FaRegFolder, FaPenNib, FaEllipsisH, FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
-import supabase from '../lib/supabaseClient';
-import { useToast } from "../components/ui/use-toast";
-
-interface Deck {
-  id: string;
-  name: string;
-  description?: string;
-}
+import supabase from '../../lib/supabaseClient';
+import { useToast } from "../../components/ui/use-toast";
 
 interface NavMenuProps {
-  onDeckSelect: (deckId: string) => void;
 }
 
-const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
-  const [decks, setDecks] = useState<Deck[]>([]);
+const NavMenu: React.FC<NavMenuProps> = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showDecks, setShowDecks] = useState(false);
   const [isVertical, setIsVertical] = useState(false);
@@ -73,22 +65,6 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   };
 
   useEffect(() => {
-    const fetchDecks = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data, error } = await supabase.from('decks').select('*').eq('userId', session.user.id);
-        if (error) {
-          console.error('Error fetching decks:', error);
-        } else {
-          setDecks(data);
-        }
-      }
-    };
-
-    fetchDecks();
-  }, []);
-
-  useEffect(() => {
     const handleResize = () => {
       if (!isVertical) {
         const navWidth = navRef.current?.offsetWidth || 0;
@@ -116,26 +92,6 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
   useEffect(() => {
     setLeft(window.innerWidth / 2);
   }, []);
-
-  const handlePublicDecksClick = () => {
-    if (isAnonymous) {
-      toast({
-        title: "Create an Account",
-        description: "Please create an account to access public decks!",
-        action: (
-          <button
-            onClick={() => window.location.href = '/signin'}
-            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-          >
-            Sign Up
-          </button>
-        ),
-      });
-    } else {
-      // Navigate to public decks page
-      window.location.href = '/public-decks';
-    }
-  };
 
   return (
     <div 
@@ -174,33 +130,8 @@ const NavMenu: React.FC<NavMenuProps> = ({ onDeckSelect }) => {
         )}
         <NavIcon href="/dashboard" icon={FaCircleNotch} label="Home" index={0} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/decks" icon={FaFolder} label="Your Library" index={1} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        <NavIcon onClick={handlePublicDecksClick} icon={FaRegFolder} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
+        <NavIcon href="/public-decks" icon={FaRegFolder} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/DrawingBoardPage" icon={FaPenNib} label="Drawing Board" index={3} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        
-        {isVertical ? <div className="w-6 sm:w-8 h-px bg-gray-300 my-1 sm:my-2"></div> : <div className="h-6 sm:h-8 w-px bg-gray-300 mx-1 sm:mx-2"></div>}
-        
-        <NavIcon
-          onClick={() => setShowDecks(!showDecks)}
-          icon={FaEllipsisH}
-          label={showDecks ? "Hide Decks" : "Load Decks"}
-          index={4}
-          hoveredIndex={hoveredIndex}
-          setHoveredIndex={setHoveredIndex}
-          isVertical={isVertical}
-        />
-        
-        {showDecks && decks.map((deck, index) => (
-          <NavIcon
-            key={deck.id}
-            onClick={() => onDeckSelect(deck.id)}
-            icon={FaFolder}
-            label={deck.name}
-            index={index + 5}
-            hoveredIndex={hoveredIndex}
-            setHoveredIndex={setHoveredIndex}
-            isVertical={isVertical}
-          />
-        ))}
       </div>
     </div>
   );

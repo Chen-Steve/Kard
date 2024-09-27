@@ -10,7 +10,7 @@ import { PiCardsFill } from "react-icons/pi";
 import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { MdDarkMode } from "react-icons/md"; 
 import { FaSun } from "react-icons/fa";
-import NavMenu from '../components/NavMenu';
+import NavMenu from '../components/dashboard/NavMenu';
 import FlashcardComponent from '../components/dashboard/Flashcard';
 import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
@@ -22,6 +22,7 @@ import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
 import React from 'react';
 import { differenceInDays } from 'date-fns';
+import DeckSelector from '../components/dashboard/DeckSelector';
 
 interface StickerWithUrl {
   id: string;
@@ -216,14 +217,28 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col" data-cursor="normal">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50" data-cursor="normal">
-        <div className="flex items-center">
+        {/* Left section */}
+        <div className="flex items-center space-x-4 w-1/3">
           <DashSettings
             components={dashboardComponents}
             onUpdateComponents={updateDashboardComponents}
           />
-          <NavMenu onDeckSelect={handleDeckSelect} />
+          <NavMenu />
         </div>
-        <div className="flex items-center">
+        
+        {/* Center section */}
+        <div className="flex-grow flex justify-center w-1/3">
+          {decks.length > 0 && (
+            <DeckSelector
+              decks={decks}
+              selectedDeckId={selectedDeckId}
+              onDeckSelect={handleDeckSelect}
+            />
+          )}
+        </div>
+        
+        {/* Right section */}
+        <div className="flex items-center justify-end w-1/3">
           {user && user.avatarUrl && (
             <div className="relative" ref={dropdownRef}>
               <UserAvatar
@@ -283,7 +298,6 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        
       </header>
       
       <main className="flex-grow p-4 relative" data-cursor="normal">
