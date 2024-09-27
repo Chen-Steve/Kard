@@ -60,11 +60,11 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => 
   return (
     <div
       ref={cardRef}
-      className="w-full md:w-1/3 bg-card dark:bg-gray-800 rounded-t-[2rem] rounded-b-lg flex flex-col items-center justify-center text-card-foreground dark:text-gray-200 transition-all duration-300 ease-out relative overflow-hidden"
+      className="w-full md:w-1/3 bg-card dark:bg-gray-800 rounded-[2rem] flex flex-col items-center justify-center text-card-foreground dark:text-gray-200 transition-all duration-300 ease-out relative overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="absolute inset-0 border-4 border-black dark:border-gray-700 rounded-t-[2rem] rounded-b-lg pointer-events-none" />
+      <div className="absolute inset-0 border-4 border-black dark:border-gray-700 rounded-[2rem] pointer-events-none" />
       <div className="absolute top-0 left-0 w-24 h-24 transition-all duration-300 ease-out">
         <Image
           src="/blob.svg"
