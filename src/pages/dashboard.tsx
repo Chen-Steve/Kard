@@ -55,6 +55,7 @@ const Dashboard = () => {
     { id: 'stickers', name: 'Stickers', visible: false, order: 2 },
   ]);
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
+  const [showFlashcardList, setShowFlashcardList] = useState(true);
 
   const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
     const { data: decksData, error: decksError } = await supabase
@@ -105,7 +106,7 @@ const Dashboard = () => {
         } else {
           setUser({
             ...userData,
-            avatarUrl: userData.avatar_url || getMicahAvatarSvg(userData.email)
+            avatarUrl: userData.avatarUrl || getMicahAvatarSvg(userData.email)
           });
           fetchUserDecksAndSetSelected(session.user.id);
         }
@@ -145,6 +146,10 @@ const Dashboard = () => {
     setDashboardComponents(newComponents);
   };
 
+  const handleToggleFlashcardList = () => {
+    setShowFlashcardList(!showFlashcardList);
+  };
+
   if (!user) return <p data-cursor="text">Loading...</p>;
 
   return (
@@ -155,6 +160,8 @@ const Dashboard = () => {
           <DashSettings
             components={dashboardComponents}
             onUpdateComponents={updateDashboardComponents}
+            showFlashcardList={showFlashcardList}
+            onToggleFlashcardList={handleToggleFlashcardList}
           />
           <NavMenu />
         </div>
@@ -280,6 +287,7 @@ const Dashboard = () => {
                             deckId={selectedDeckId}
                             decks={decks}
                             onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
+                            showFlashcardList={showFlashcardList}
                           />
                         </div>
                       ) : null;

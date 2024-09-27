@@ -18,6 +18,7 @@ interface FlashcardProps {
   onDeckChange?: (newDeckId: string) => void;
   readOnly?: boolean;
   isTableView?: boolean;
+  showFlashcardList: boolean;
 }
 
 interface Flashcard {
@@ -34,7 +35,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -286,6 +287,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     );
   };
 
+  const handleToggleImport = () => {
+    setIsImportVisible(!isImportVisible);
+  };
+
+  const handleToggleGenerate = () => {
+    setIsGenerateVisible(!isGenerateVisible);
+  };
+
   return (
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
@@ -302,69 +311,67 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           onNext={handleNext}
         />
 
-        <div className="flex justify-between items-center mt-4">
-          <FlashcardToolbar
-            onAddCard={handleAddCard}
-            onToggleList={() => setShowList(!showList)}
-            onToggleScroll={() => setIsScrollable(!isScrollable)}
-            onToggleView={() => setIsTableViewActive(!isTableViewActive)}
-            showList={showList}
-            isScrollable={isScrollable}
-            isTableViewActive={isTableViewActive}
-            readOnly={readOnly}
-          />
-          
-          <FlashcardImportGenerate
-            userId={userId}
-            deckId={deckId}
-            onFlashcardsAdded={handleFlashcardsAdded}
-            currentFlashcardsCount={flashcards.length}
-            onToggleImport={() => setIsImportVisible(!isImportVisible)}
-            onToggleGenerate={() => setIsGenerateVisible(!isGenerateVisible)}
-            isImportVisible={isImportVisible}
-            isGenerateVisible={isGenerateVisible}
-          />
-        </div>
-
-        <hr className="border-t-2 border-black dark:border-gray-600 w-full mx-auto mt-4" />
-
-        {showList && (
-          <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
-            {isTableViewActive ? (
-              <FlashcardTable 
-                flashcards={flashcards}
-                onDelete={handleDeleteCard}
-                onSave={handleSaveCard}
-                onReorder={handleReorder}
+        {showFlashcardList && (
+          <>
+            <div className="flex justify-between items-center mt-4">
+              <FlashcardToolbar
+                onAddCard={handleAddCard}
+                onToggleScroll={() => setIsScrollable(!isScrollable)}
+                onToggleView={() => setIsTableViewActive(!isTableViewActive)}
+                isScrollable={isScrollable}
+                isTableViewActive={isTableViewActive}
                 readOnly={readOnly}
               />
-            ) : (
-              <DragDropContext onDragEnd={handleReorder}>
-                <Droppable droppableId="flashcards">
-                  {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                      {flashcards.map((card, index) => (
-                        <EditFlashcard
-                          key={card.id}
-                          id={card.id}
-                          question={card.question}
-                          answer={card.answer}
-                          showDefinitions={showDefinitions}
-                          onSave={(id, updatedQuestion, updatedAnswer) => {
-                            debouncedSaveCard(id, updatedQuestion, updatedAnswer);
-                          }}
-                          onDelete={handleDeleteCard}
-                          readOnly={readOnly}
-                          index={index}
-                        />
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            )}
-          </div>
+
+              <FlashcardImportGenerate
+                userId={userId}
+                deckId={deckId}
+                onFlashcardsAdded={handleFlashcardsAdded}
+                currentFlashcardsCount={flashcards.length}
+                onToggleImport={handleToggleImport}
+                onToggleGenerate={handleToggleGenerate}
+                isImportVisible={isImportVisible}
+                isGenerateVisible={isGenerateVisible}
+              />
+            </div>
+
+            <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
+              {isTableViewActive ? (
+                <FlashcardTable 
+                  flashcards={flashcards}
+                  onDelete={handleDeleteCard}
+                  onSave={handleSaveCard}
+                  onReorder={handleReorder}
+                  readOnly={readOnly}
+                />
+              ) : (
+                <DragDropContext onDragEnd={handleReorder}>
+                  <Droppable droppableId="flashcards">
+                    {(provided) => (
+                      <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+                        {flashcards.map((card, index) => (
+                          <EditFlashcard
+                            key={card.id}
+                            id={card.id}
+                            question={card.question}
+                            answer={card.answer}
+                            showDefinitions={showDefinitions}
+                            onSave={(id, updatedQuestion, updatedAnswer) => {
+                              debouncedSaveCard(id, updatedQuestion, updatedAnswer);
+                            }}
+                            onDelete={handleDeleteCard}
+                            readOnly={readOnly}
+                            index={index}
+                          />
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
+            </div>
+          </>
         )}
 
         {flashcards.length > 0 && (

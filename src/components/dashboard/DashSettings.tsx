@@ -3,12 +3,18 @@ import { LuSettings2 } from "react-icons/lu";
 import { DashboardComponent } from '../../types/dashboard';
 
 interface DashSettingsProps {
-
   components: DashboardComponent[];
   onUpdateComponents: (components: DashboardComponent[]) => void;
+  showFlashcardList: boolean;
+  onToggleFlashcardList: () => void;
 }
 
-const DashSettings: React.FC<DashSettingsProps> = ({ components, onUpdateComponents }) => {
+const DashSettings: React.FC<DashSettingsProps> = ({ 
+  components, 
+  onUpdateComponents, 
+  showFlashcardList, 
+  onToggleFlashcardList 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleVisibility = (id: string) => {
@@ -52,6 +58,19 @@ const DashSettings: React.FC<DashSettingsProps> = ({ components, onUpdateCompone
                 </label>
               </div>
             ))}
+            <div className="flex items-center justify-between my-2">
+              <span className="text-gray-700 dark:text-gray-300 text-sm">Show Flashcards</span>
+              <label className="inline-flex items-center cursor-pointer ml-2">
+                <input
+                  title="Toggle Flashcard List"
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={showFlashcardList}
+                  onChange={onToggleFlashcardList}
+                />
+                <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
             <div className="mt-4 pt-2 border-t border-gray-200 dark:border-gray-600">
               <div className="flex items-center justify-between my-2">
                 <span className="text-gray-700 dark:text-gray-300 text-sm relative group">
