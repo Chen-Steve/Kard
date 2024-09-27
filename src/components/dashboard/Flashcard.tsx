@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaEye, FaEyeSlash, FaQuestionCircle } from 'react-icons/fa';
+import { GrFormViewHide, GrFormView } from "react-icons/gr";
 import KeyboardShortcuts from '../KeyboardShortcuts';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './FlashcardList';
@@ -369,9 +370,9 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         {flashcards.length > 0 && (
           <button
             onClick={() => setShowDefinitions(!showDefinitions)}
-            className="fixed border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-2 sm:px-4 py-2 rounded-full shadow-lg flex items-center"
+            className="fixed text-md border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-1 sm:px-2 py-1 rounded-full shadow-lg flex items-center"
           >
-            {showDefinitions ? <FaEyeSlash className="text-lg sm:mr-2" /> : <FaEye className="text-lg sm:mr-2" />}
+            {showDefinitions ? <GrFormViewHide className="text-xl sm:mr-2" /> : <GrFormView className="text-xl sm:mr-2" />}
             <span className="hidden sm:inline">
               {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
             </span>

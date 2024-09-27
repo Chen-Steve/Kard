@@ -59,7 +59,7 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
       <div className="relative flex items-center">
         <input
           type="text"
-          placeholder="Search for a deck..."
+          placeholder="Your decks..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-2 pl-10 pr-10 appearance-none text-sm md:text-base"

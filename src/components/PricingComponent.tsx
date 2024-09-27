@@ -74,15 +74,23 @@ const PricingComponent: React.FC = () => {
           <ul className="mb-6 text-gray-700 dark:text-gray-300">
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 1
+              Unlimited Flashcards
             </li>
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 2
+              Unlimited Decks
             </li>
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 3
+              Learning Mode
+            </li>
+            <li className="mb-2 flex items-center">
+              <FaCheck className="text-green-500 mr-2" />
+              Test Mode
+            </li>
+            <li className="mb-2 flex items-center">
+              <FaCheck className="text-green-500 mr-2" />
+              Matching Mode
             </li>
           </ul>
           <button className="comic-button">Choose Plan</button>
@@ -96,19 +104,19 @@ const PricingComponent: React.FC = () => {
           <ul className="mb-6 text-gray-700 dark:text-gray-300">
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 1
+              Everything in Free plan
             </li>
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 2
+              AI Flashcard Generation
             </li>
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 3
+              AI Chat Mode
             </li>
             <li className="mb-2 flex items-center">
               <FaCheck className="text-green-500 mr-2" />
-              Feature 4
+              Import from Quizlet
             </li>
           </ul>
           <button
