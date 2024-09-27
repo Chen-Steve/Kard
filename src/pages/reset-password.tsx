@@ -15,20 +15,31 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isValidToken, setIsValidToken] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log('Password recovery event detected');
-        // The password recovery event has been triggered, you can now update the password
-      }
-    });
+    const { token } = router.query;
+    
+    if (!token) {
+      setError('Invalid or missing reset token');
+      return;
+    }
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+    setIsValidToken(true); // We'll assume the token is valid if it exists
+  }, [router]);
+
+  if (!isValidToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            {error || 'Invalid reset token'}
+          </h2>
+        </div>
+      </div>
+    );
+  }
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
