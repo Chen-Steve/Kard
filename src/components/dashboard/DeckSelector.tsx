@@ -55,7 +55,7 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
   };
 
   return (
-    <div className="relative w-full mb-2 max-w-full sm:max-w-md mx-auto">
+    <div className="relative w-full mb-1 max-w-full sm:max-w-md mx-auto">
       <div className="relative flex items-center">
         <input
           type="text"

@@ -1,13 +1,9 @@
 import '../app/globals.css';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import UserAvatar from '../components/UserAvatar';
 import { getMicahAvatarSvg } from '../utils/avatar';
-import { SiStagetimer } from "react-icons/si";
-import { RiTimerFill } from "react-icons/ri";
-import { PiCardsFill } from "react-icons/pi";
-import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { MdDarkMode } from "react-icons/md"; 
 import { FaSun } from "react-icons/fa";
 import NavMenu from '../components/dashboard/NavMenu';
@@ -16,13 +12,12 @@ import { toast, useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
 import { HiLightningBolt } from "react-icons/hi";
-import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
+import { initCursor } from 'ipad-cursor';
 import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
-import React from 'react';
-import { differenceInDays } from 'date-fns';
 import DeckSelector from '../components/dashboard/DeckSelector';
+import ModesButtons from '../components/modes/ModesButtons';
 
 interface StickerWithUrl {
   id: string;
@@ -58,33 +53,42 @@ const Dashboard = () => {
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
     { id: 'stickers', name: 'Stickers', visible: false, order: 2 },
-    // Add more components as needed
   ]);
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
 
-  const getStickersVisibility = () => {
-    const stickersComponent = dashboardComponents.find(comp => comp.id === 'stickers');
-    return stickersComponent ? stickersComponent.visible : false;
-  };
+  const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
+    const { data: decksData, error: decksError } = await supabase
+      .from('decks')
+      .select('*')
+      .eq('userId', userId);
+
+    if (decksError) {
+      console.error('Error fetching decks:', decksError);
+    } else {
+      setDecks(decksData);
+      if (decksData.length > 0) {
+        setSelectedDeckId(decksData[0].id);
+        setSelectedDeckName(decksData[0].name);
+      }
+    }
+  }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      initCursor({
-        normalStyle: { 
-          background: 'rgba(255, 255, 255, 0.3)',
-          border: '2px solid black'
-        },
-        textStyle: { 
-          background: 'rgba(255, 255, 255, 0.5)',
-          border: '2px solid black'
-        },
-        blockStyle: { 
-          background: 'rgba(255, 255, 255, 0.2)',
-          radius: 'auto',
-          border: '2px solid black'
-        },
-      });
-    }
+    initCursor({
+      normalStyle: { 
+        background: 'rgba(255, 255, 255, 0.3)',
+        border: '2px solid black'
+      },
+      textStyle: { 
+        background: 'rgba(255, 255, 255, 0.5)',
+        border: '2px solid black'
+      },
+      blockStyle: { 
+        background: 'rgba(255, 255, 255, 0.2)',
+        radius: 'auto',
+        border: '2px solid black'
+      },
+    });
 
     const getSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -103,7 +107,7 @@ const Dashboard = () => {
             ...userData,
             avatarUrl: userData.avatar_url || getMicahAvatarSvg(userData.email)
           });
-          fetchUserDecks(session.user.id);
+          fetchUserDecksAndSetSelected(session.user.id);
         }
       } else {
         router.push('/signin');
@@ -112,38 +116,12 @@ const Dashboard = () => {
 
     getSession();
 
-    const darkMode = localStorage.getItem('darkMode') === 'true';
+    const darkMode = document.documentElement.classList.contains('dark');
     setIsDarkMode(darkMode);
     if (darkMode) {
       document.documentElement.classList.add('dark');
     }
-  }, [router]);
-
-  const fetchUserDecks = async (userId: string) => {
-    const { data: decksData, error: decksError } = await supabase
-      .from('decks')
-      .select('*')
-      .eq('userId', userId);
-
-    if (decksError) {
-      console.error('Error fetching decks:', decksError);
-    } else {
-      setDecks(decksData);
-      setSelectedDeckFromLocalStorage(decksData);
-    }
-  };
-
-  const setSelectedDeckFromLocalStorage = (availableDecks: any[]) => {
-    const savedDeckId = localStorage.getItem('selectedDeckId');
-    if (savedDeckId && availableDecks.some(deck => deck.id === savedDeckId)) {
-      setSelectedDeckId(savedDeckId);
-      const selectedDeck = availableDecks.find(deck => deck.id === savedDeckId);
-      setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-    } else if (availableDecks.length > 0) {
-      setSelectedDeckId(availableDecks[0].id);
-      setSelectedDeckName(availableDecks[0].name);
-    }
-  };
+  }, [router, fetchUserDecksAndSetSelected]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -154,59 +132,14 @@ const Dashboard = () => {
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', newDarkMode.toString());
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', newDarkMode);
   };
 
-  const handleLearnClick = () => {
-    if (user && selectedDeckId) {
-      router.push(`/learning-mode/${user.id}/${selectedDeckId}`);
-    } else if (!user) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access learning mode.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to start learning.',
-      });
-    }
-  };
-
-  const handleTestClick = () => {
-    toast({
-      title: 'Coming Soon!',
-      description: 'The Test feature is coming soon.',
-    });
-  };
-
-  const handleMatchClick = () => {
-    if (user && selectedDeckId) {
-      router.push(`/matching-game/${user.id}/${selectedDeckId}`);
-    } else if (!user) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access the matching game.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to play the matching game.',
-      });
-    }
-  };
-
-  const handleDeckSelect = (deckId: string) => {
+  const handleDeckSelect = useCallback((deckId: string) => {
     setSelectedDeckId(deckId);
     const selectedDeck = decks.find(deck => deck.id === deckId);
     setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-    localStorage.setItem('selectedDeckId', deckId);
-  };
+  }, [decks]);
 
   const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
     setDashboardComponents(newComponents);
@@ -271,7 +204,7 @@ const Dashboard = () => {
                   <div className="border-t border-gray-200 dark:border-gray-600">
                     <button
                       onClick={toggleDarkMode}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
                     >
                       {isDarkMode ? <FaSun className="mr-2" /> : <MdDarkMode className="mr-2" />}
                       {isDarkMode ? 'Light Mode' : 'Dark Mode'}
@@ -279,14 +212,14 @@ const Dashboard = () => {
                   </div>
                   <div className="border-t border-gray-200 dark:border-gray-600">
                     {user.membership === 'pro' ? (
-                      <div className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 flex items-center">
+                      <div className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 flex items-center">
                         <HiLightningBolt className="mr-2" />
                         Pro
                       </div>
                     ) : (
                       <button
                         onClick={() => router.push('/pricing')}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
                       >
                         <HiLightningBolt className="mr-2" />
                         Upgrade
@@ -301,9 +234,8 @@ const Dashboard = () => {
       </header>
       
       <main className="flex-grow p-4 relative" data-cursor="normal">
-
         <div className="absolute inset-0">
-          {getStickersVisibility() && (
+          {dashboardComponents.find(comp => comp.id === 'stickers')?.visible && (
             <StickerSelector
               stickers={stickers}
               setStickers={setStickers}
@@ -323,96 +255,13 @@ const Dashboard = () => {
                   {dashboardComponents
                     .filter(comp => comp.visible && comp.id === 'buttons')
                     .map(comp => (
-                      <div key={comp.id} className="flex flex-wrap justify-center gap-2">
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleLearnClick}
-                            data-cursor="block"
-                          >
-                            <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-                            <span className="font-semibold">Learn</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleTestClick}
-                            data-cursor="block"
-                          >
-                            <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">Test</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-                            onClick={handleMatchClick}
-                            data-cursor="block"
-                          >
-                            <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">Match</span>
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <button
-                            title="K-Chat"
-                            className={`
-                              flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12
-                              hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base
-                              focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700
-                            `}
-                            onClick={async () => {
-                              if (user.membership === 'pro') {
-                                if (selectedDeckId) {
-                                  router.push(`/ai-chat/${user.id}/${selectedDeckId}`);
-                                } else {
-                                  toast({
-                                    title: 'No Deck Selected',
-                                    description: 'Please select a deck to start the AI chat.',
-                                  });
-                                }
-                              } else {
-                                toast({
-                                  title: 'Upgrade to Pro',
-                                  description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-                                  action: (
-                                    <button
-                                      onClick={() => router.push('/pricing')}
-                                      className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
-                                    >
-                                      Upgrade
-                                    </button>
-                                  ),
-                                });
-                              }
-                            }}
-                            data-cursor="block"
-                          >
-                            <BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />
-                            <span className="font-semibold">K-Chat</span>
-                          </button>
-                          {user.membership !== 'pro' && (
-                            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none"
-                                 style={{
-                                   backgroundImage: `repeating-linear-gradient(
-                                   45deg,
-                                  transparent,
-                                  transparent 10px,
-                                  rgba(0,0,0,0.1) 10px,
-                                  rgba(0,0,0,0.1) 20px
-                                )`
-                                 }}
-                            />
-                          )}
-                          {user.membership !== 'pro' && (
-                            <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
-                              <HiLightningBolt className="inline-block mr-1" />
-                              PRO
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <ModesButtons
+                        key={comp.id}
+                        userId={user.id}
+                        selectedDeckId={selectedDeckId}
+                        selectedDeckName={selectedDeckName}
+                        userMembership={user.membership}
+                      />
                     ))}
                 </div>
               </div>
@@ -434,7 +283,6 @@ const Dashboard = () => {
                           />
                         </div>
                       ) : null;
-                    // Add more cases for other components
                     default:
                       return null;
                   }
