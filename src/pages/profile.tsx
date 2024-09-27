@@ -262,18 +262,18 @@ const Profile = () => {
   }, [isAnonymous]);
 
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       toast({
-        title: 'Error',
-        description: 'Password must be at least 6 characters long.',
+        title: 'Password Too Short',
+        description: 'Password must be at least 8 characters long.',
       });
       return;
     }
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: 'Error',
-        description: 'Passwords do not match.',
+        title: 'Passwords Do Not Match',
+        description: 'Please ensure both password fields are identical.',
       });
       return;
     }
@@ -283,16 +283,16 @@ const Profile = () => {
     if (error) {
       console.error('Error changing password:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to change password. Please try again.',
+        title: 'Password Change Failed',
+        description: 'Your password must include at least one uppercase letter, one lowercase letter, one number, and one special character. Please try again.',
       });
     } else {
       setNewPassword('');
       setConfirmPassword('');
       setIsChangingPassword(false);
       toast({
-        title: 'Success',
-        description: 'Your password has been changed successfully.',
+        title: 'Password Changed Successfully',
+        description: 'Your new password has been set.',
       });
     }
   };
