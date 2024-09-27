@@ -34,7 +34,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
           className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-1 sm:px-4 sm:py-2 rounded flex items-center text-sm sm:text-base"
           aria-label="Add flashcard"
         >
-          <FaPlus className="mr-1 sm:mr-2" /> <span className="hidden sm:inline">Add Flashcard</span>
+          <FaPlus className="sm:mr-2" /> <span className="hidden sm:inline">Add Flashcard</span>
         </button>
       )}
       <div className="flex space-x-2">

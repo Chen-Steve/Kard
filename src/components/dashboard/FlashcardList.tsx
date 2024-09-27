@@ -85,7 +85,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                 className="text-red-500 hover:text-red-700 text-xs"
                 aria-label="Delete card"
               >
-                <MdDeleteOutline size={16} />
+                <MdDeleteOutline size={20} />
               </button>
             )}
           </div>

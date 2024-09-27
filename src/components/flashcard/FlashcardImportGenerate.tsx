@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import Papa from 'papaparse';
 import { toast } from 'react-toastify';
@@ -37,6 +37,26 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
   isGenerateVisible
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importModalRef = useRef<HTMLDivElement>(null);
+  const importButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isImportVisible &&
+        importModalRef.current &&
+        !importModalRef.current.contains(event.target as Node) &&
+        !importButtonRef.current?.contains(event.target as Node)
+      ) {
+        onToggleImport();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isImportVisible, onToggleImport]);
 
   const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -122,15 +142,16 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 relative">
       <button
         onClick={onToggleGenerate}
-        className="text-green-600 hover:text-green-700 transition-colors duration-200"
+        className="text-green-500 hover:text-green-600 transition-colors duration-200"
         title="Generate Flashcards"
       >
         <FaWandMagicSparkles className="text-2xl" />
       </button>
       <button
+        ref={importButtonRef}
         onClick={onToggleImport}
         className="text-blue-500 hover:text-blue-600 transition-colors duration-200"
         title="Import Flashcards"
@@ -139,7 +160,7 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
       </button>
 
       {isImportVisible && (
-        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
+        <div ref={importModalRef} className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
           <input
             type="file"
             accept=".csv"
@@ -155,8 +176,9 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
           >
             Choose csv file
           </button>
-          <div className="flex items-center mt-2">
-            <FaQuestionCircle className="text-xl text-muted-foreground dark:text-gray-400 cursor-pointer" title="CSV Format: 'question', 'answer'" />
+          <div className="flex items-center mt-2 text-xs text-muted-foreground dark:text-gray-400">
+            <FaQuestionCircle className="mr-2" />
+            <span>Format: question, answer</span>
           </div>
         </div>
       )}
