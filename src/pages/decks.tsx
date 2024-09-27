@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import useDOMNodeInserted from '../hooks/useDOMNodeInserted';
-import NavMenu from '../components/NavMenu';
+import NavMenu from '../components/dashboard/NavMenu';
 import { useToast } from "@/components/ui/use-toast";
 import DeckFormDialog from '../components/deck/DeckFormDialog';
 import DeckSearchAndFilter from '../components/deck/DeckSearchAndFilter';
@@ -337,7 +337,7 @@ const DecksPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex">
-      <NavMenu onDeckSelect={handleDeckSelect} />
+      <NavMenu/>
       <div className="flex-1 pl-0 sm:pl-64">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 mt-16">
           <div className="mb-6 flex flex-wrap gap-4 justify-between items-center">

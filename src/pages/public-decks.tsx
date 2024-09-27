@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import NavMenu from '../components/NavMenu';
+import NavMenu from '../components/dashboard/NavMenu';
 import { FaCopy } from 'react-icons/fa';
 import { IoMdStar, IoMdStarOutline } from "react-icons/io";
 import { useToast } from "@/components/ui/use-toast";

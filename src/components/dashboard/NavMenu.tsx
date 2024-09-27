@@ -5,6 +5,7 @@ import supabase from '../../lib/supabaseClient';
 import { useToast } from "../../components/ui/use-toast";
 
 interface NavMenuProps {
+  onDeckSelect?: (deckId: string) => void;
 }
 
 const NavMenu: React.FC<NavMenuProps> = () => {
