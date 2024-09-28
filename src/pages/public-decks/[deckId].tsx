@@ -123,6 +123,7 @@ const PublicDeckPage = () => {
           deckId={deck.id} 
           decks={[deck]} 
           readOnly={true} 
+          showFlashcardList={true}
         />
 
         <button
