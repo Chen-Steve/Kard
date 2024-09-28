@@ -1,7 +1,7 @@
 "use client";
 
 import '../app/globals.css';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import { useMediaQuery } from 'react-responsive';
@@ -83,14 +83,14 @@ const HomePage: React.FC = () => {
     window.open('https://forms.gle/bP14r8vtGhmj8s7S7', '_blank');
   };
 
-  const handleLearnMoreClick = (e: React.MouseEvent) => {
+  const handleLearnMoreClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsModalOpen(true);
-  };
+  }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAnonymousSignIn = useCallback(debounce(() => {
+  const handleAnonymousSignIn = useCallback(() => {
     // Check if an anonymous user ID already exists
     let anonymousId = localStorage.getItem('anonymousUserId');
     
@@ -124,7 +124,12 @@ const HomePage: React.FC = () => {
     }
     
     router.push('/anonDashboard', undefined, { shallow: true });
-  }, 300), [router]);
+  }, [router]);
+
+  const debouncedHandleAnonymousSignIn = useMemo(
+    () => debounce(handleAnonymousSignIn, 300),
+    [handleAnonymousSignIn]
+  );
 
   return (
     <>
@@ -156,7 +161,6 @@ const HomePage: React.FC = () => {
           </nav>
         </header>
 
-        {/* Add a placeholder div to prevent content from being hidden behind the fixed header */}
         <div style={{ height: `${navHeight}px` }} />
 
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
@@ -184,8 +188,9 @@ const HomePage: React.FC = () => {
                 <span className="text-lg">Get Started</span>
               </Button>
             </Link>
-            {/* Commented out Create Now button
-            <Link href="#" onClick={handleAnonymousSignIn}>
+            {/*   
+            
+            <Link href="#" onClick={debouncedHandleAnonymousSignIn}>
               <Button
                 className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
                 data-cursor={!isMobile ? "block" : undefined}
@@ -193,7 +198,9 @@ const HomePage: React.FC = () => {
                 <span className="text-lg">Create Now</span>
               </Button>
             </Link>
+            
             */}
+            
           </div>
         </main>
 
