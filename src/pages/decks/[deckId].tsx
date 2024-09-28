@@ -49,8 +49,13 @@ const DeckPage = () => {
         </Link>
       </header>
       <main className="flex-grow w-full max-w-3xl">
-      <h1 className="text-3xl font-bold text-center my-4">Edit Flashcards</h1>
-        <FlashcardComponent userId={userId} deckId={deckId as string} decks={decks} />
+        <h1 className="text-3xl font-bold text-center my-4">Edit Flashcards</h1>
+        <FlashcardComponent 
+          userId={userId} 
+          deckId={deckId as string} 
+          decks={decks} 
+          showFlashcardList={true}
+        />
       </main>
     </div>
   );
