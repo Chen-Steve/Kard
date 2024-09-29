@@ -295,6 +295,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     setIsGenerateVisible(!isGenerateVisible);
   };
 
+  const handleShuffleComplete = (shuffledCards: Flashcard[]) => {
+    setFlashcards(shuffledCards);
+    setCurrentCardIndex(0);
+    setIsFlipped(false);
+  };
+
   return (
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
@@ -313,16 +319,16 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
         {showFlashcardList && (
           <>
-            <div className="flex justify-between items-center mt-4">
-              <FlashcardToolbar
-                onAddCard={handleAddCard}
-                onToggleScroll={() => setIsScrollable(!isScrollable)}
-                onToggleView={() => setIsTableViewActive(!isTableViewActive)}
-                isScrollable={isScrollable}
-                isTableViewActive={isTableViewActive}
-                readOnly={readOnly}
-              />
-
+            <FlashcardToolbar
+              onAddCard={handleAddCard}
+              onToggleScroll={() => setIsScrollable(!isScrollable)}
+              onToggleView={() => setIsTableViewActive(!isTableViewActive)}
+              isScrollable={isScrollable}
+              isTableViewActive={isTableViewActive}
+              readOnly={readOnly}
+              flashcards={flashcards}
+              onShuffleComplete={handleShuffleComplete}
+            >
               <FlashcardImportGenerate
                 userId={userId}
                 deckId={deckId}
@@ -333,7 +339,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                 isImportVisible={isImportVisible}
                 isGenerateVisible={isGenerateVisible}
               />
-            </div>
+            </FlashcardToolbar>
 
             <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
               {isTableViewActive ? (

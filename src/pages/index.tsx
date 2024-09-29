@@ -250,9 +250,8 @@ const HomePage: React.FC = () => {
           </div>
         </footer>
 
-        {/* Move the feedback button inside the footer */}
         <div className="fixed bottom-0 left-0 right-0 p-4 flex justify-between items-center bg-transparent">
-          <div className="flex-grow"></div> {/* This empty div pushes the button to the right */}
+          <div className="flex-grow"></div>
           <button
             className="text-md font-bold px-3 py-3 sm:px-4 sm:py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
             onClick={handleSupportClick}

@@ -125,16 +125,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       const updatePromises = flashcards.map(card =>
-        retry(() => prisma.flashcard.update({
+        prisma.flashcard.update({
           where: { id: card.id },
           data: { order: card.order },
-        }))
+        })
       );
       await Promise.all(updatePromises);
       res.status(200).json({ message: 'Flashcards updated successfully' });
     } catch (error) {
       console.error('PATCH flashcards error:', error);
-      toast.error('Internal Server Error: ' + (error as Error).message);
+      res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+    }
+  } else if (req.method === 'PUT' && req.query.action === 'shuffle') {
+    console.log('Received shuffle request:', req.body); // Add this line
+    const { deckId, newOrder } = req.body;
+
+    if (!deckId || !newOrder || !Array.isArray(newOrder)) {
+      console.log('Invalid request body:', { deckId, newOrder }); // Add this line
+      res.status(400).json({ error: 'Missing required fields', details: 'deckId and newOrder array are required' });
+      return;
+    }
+
+    try {
+      console.log('Shuffling flashcards with data:', { deckId, newOrder }); // Log incoming data
+
+      const updatePromises = newOrder.map((id, index) =>
+        prisma.flashcard.update({
+          where: { id },
+          data: { order: index + 1 },
+        })
+      );
+
+      await Promise.all(updatePromises);
+
+      res.status(200).json({ message: 'Flashcards shuffled successfully' });
+    } catch (error) {
+      console.error('Shuffle flashcards error:', error);
       res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
     }
   } else {
