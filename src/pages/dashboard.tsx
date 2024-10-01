@@ -194,14 +194,6 @@ const Dashboard = () => {
                   </div>
                   <div className="border-t border-gray-200 dark:border-gray-600">
                     <button
-                      onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    >
-                      Log Out
-                    </button>
-                  </div>
-                  <div className="border-t border-gray-200 dark:border-gray-600">
-                    <button
                       onClick={() => router.push('/profile')}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
@@ -232,6 +224,14 @@ const Dashboard = () => {
                         Upgrade
                       </button>
                     )}
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-600">
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 text-sm border border-red-600 text-red-700 dark:text-red-400 bg-red-100 hover:bg-red-200 hover:text-red-800"
+                    >
+                      Log Out
+                    </button>
                   </div>
                 </div>
               )}

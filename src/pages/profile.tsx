@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import UserAvatar from '../components/UserAvatar';
