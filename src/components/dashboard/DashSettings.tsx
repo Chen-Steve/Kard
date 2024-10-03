@@ -81,12 +81,7 @@ const DashSettings: React.FC<DashSettingsProps> = ({
                     Coming Soon
                   </span>
                 </span>
-                <button 
-                  className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded cursor-not-allowed"
-                  disabled
-                >
-                  Coming Soon
-                </button>
+                
               </div>
             </div>
           </div>

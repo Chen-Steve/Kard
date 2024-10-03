@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const [text] = useTypewriter({
-    words: ['Uncomplicated & Fast', 'For Everyone', 'Better than Quizlet'],
+    words: ['Uncomplicated & Fast', 'For Everyone'],
     loop: true,
     delaySpeed: 2000,
   });

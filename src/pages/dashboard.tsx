@@ -18,6 +18,7 @@ import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
 import DeckSelector from '../components/dashboard/DeckSelector';
 import ModesButtons from '../components/modes/ModesButtons';
+import { FaPowerOff } from "react-icons/fa6";
 
 interface StickerWithUrl {
   id: string;
@@ -228,8 +229,9 @@ const Dashboard = () => {
                   <div className="border-t border-gray-200 dark:border-gray-600">
                     <button
                       onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-2 text-sm border border-red-600 text-red-700 dark:text-red-400 bg-red-100 hover:bg-red-200 hover:text-red-800"
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150 flex items-center"
                     >
+                      <FaPowerOff className="mr-2" />
                       Log Out
                     </button>
                   </div>
