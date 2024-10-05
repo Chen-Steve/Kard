@@ -4,8 +4,6 @@ import '../app/globals.css';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
-import { useMediaQuery } from 'react-responsive';
-import trackEvent from '@vercel/analytics';
 import { RiFeedbackFill } from "react-icons/ri";
 import CookieConsent from '../components/CookieConsent';
 import { Button } from '../components/ui/Button';
@@ -20,7 +18,6 @@ import Bubbles from '../components/demo/Bubbles';
 import { useRouter } from 'next/router';
 import debounce from 'lodash/debounce';
 
-// Dynamically import the DragAndDropDemo component
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
   loading: () => <p>Loading drag and drop demo...</p>
@@ -47,7 +44,6 @@ const DynamicTitle = dynamic<DynamicTitleProps>(() => Promise.resolve(({ isMobil
 const HomePage: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isNavSticky, setIsNavSticky] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
