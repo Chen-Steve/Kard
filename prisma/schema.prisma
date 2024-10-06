@@ -1,7 +1,7 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -9,7 +9,7 @@ generator client {
 }
 
 model User {
-  id         String      @id @default(uuid()) @db.Uuid
+  id         String      @id
   email      String      @unique @db.Text
   name       String?     @unique @db.Text 
   membership String      @default("free")
@@ -28,27 +28,27 @@ model User {
 }
 
 model Flashcard {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   question  String   @db.Text
   answer    String   @db.Text
   order     Int
-  userId    String   @db.Uuid
+  userId    String   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  deckId    String   @db.Uuid
+  deckId    String
 
   @@map("flashcards")
 }
 
 model Deck {
-  id          String       @id @default(uuid()) @db.Uuid
+  id          String       @id @default(uuid())
   name        String
   description String?
-  userId      String       @db.Uuid
+  userId      String
   isPublic    Boolean      @default(false)
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-  order       Int          @default(0)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  order       Int      @default(0)
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   flashcards  Flashcard[]
   deckTags    DeckTag[]
@@ -67,7 +67,7 @@ model Tag {
 }
 
 model DeckTag {
-  deckId String @map("deck_id") @db.Uuid
+  deckId String @map("deck_id")
   tagId  Int    @map("tag_id")
   deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
@@ -77,32 +77,32 @@ model DeckTag {
 }
 
 model Generation {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   date      DateTime @default(now())
   count     Int      @default(0)
-  userId    String   @db.Uuid
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("generations")
 }
 
 model Sticker {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   imageUrl  String   @db.Text
   position  Json
-  userId    String   @db.Uuid
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("stickers")
 }
 
 model PasswordResetToken {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        Int      @id @default(autoincrement())
   email     String   @db.Text
   token     String   @unique @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   expiresAt DateTime @map("expires_at")
-  userId    String   @map("user_id") @db.Uuid
+  userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])

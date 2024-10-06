@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaEye, FaEyeSlash, FaQuestionCircle } from 'react-icons/fa';
 import { GrFormViewHide, GrFormView } from "react-icons/gr";
 import KeyboardShortcuts from '../KeyboardShortcuts';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './FlashcardList';
 import { debounce } from 'lodash';
 import { toast } from 'react-toastify';
@@ -47,11 +46,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [isTableViewActive, setIsTableViewActive] = useState(isTableView);
   const [isImportVisible, setIsImportVisible] = useState(false);
   const [isGenerateVisible, setIsGenerateVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const flashcardRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
 
   const fetchFlashcards = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/flashcard?userId=${userId}&deckId=${deckId}`);
       if (!response.ok) {
@@ -74,6 +75,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     } catch (error) {
       console.error('Error fetching flashcards:', error);
       setError('Failed to fetch flashcards. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   }, [userId, deckId]);
 
@@ -169,23 +172,20 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleAddCard = async () => {
     console.log('Adding card for userId:', userId);
-    const newCardOrder = flashcards.length + 1; // Ensure order starts from 1
+    const newCardOrder = flashcards.length + 1;
     const newCard = {
-      id: `temp-${newCardOrder}`,
       question: 'Term',
       answer: 'Definition',
       order: newCardOrder,
-      userId: userId,
-      deckId: deckId, // Include deckId
     };
 
-    // Check character limit before adding
     if (newCard.question.length > MAX_CHAR_LIMIT || newCard.answer.length > MAX_CHAR_LIMIT) {
       setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
       return;
     }
 
-    setFlashcards((prevFlashcards) => [...prevFlashcards, newCard]);
+    const tempId = `temp-${Date.now()}`;
+    setFlashcards((prevFlashcards) => [...prevFlashcards, { ...newCard, id: tempId }]);
     setCurrentCardIndex(flashcards.length);
     setError(null);
 
@@ -193,20 +193,25 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       const response = await fetch('/api/flashcard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newCard),
+        body: JSON.stringify({
+          flashcards: [{ ...newCard, id: tempId }], // Send as an array
+          userId,
+          deckId,
+        }),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
       }
-      const savedCard = await response.json();
+      const savedCards = await response.json();
+      const savedCard = savedCards[0]; // Assuming the API returns an array of saved cards
       setFlashcards((prevFlashcards) =>
-        prevFlashcards.map((card) => (card.id === newCard.id ? savedCard : card))
+        prevFlashcards.map((card) => (card.id === tempId ? savedCard : card))
       );
     } catch (error) {
       console.error('Error adding flashcard:', error);
       toast.error('Failed to add flashcard. Please try again.');
-      setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== newCard.id));
+      setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== tempId));
     }
   };
 
@@ -245,7 +250,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         const errorData = await response.json();
         throw new Error(`Failed to update flashcard: ${errorData.error}, ${errorData.details}`);
       }
-      const updatedCard = await response.json();
+      const updatedCards = await response.json();
+      const updatedCard = updatedCards[0];
       setFlashcards((prevFlashcards) =>
         prevFlashcards.map((card) => (card.id === id ? updatedCard : card))
       );
@@ -256,7 +262,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
   }, 500);
 
-  const handleReorder = useCallback((result: DropResult) => {
+  const handleReorder = useCallback(async (result: DropResult) => {
     if (!result.destination) {
       return;
     }
@@ -265,13 +271,46 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    setFlashcards(items);
+    // Update the order property for each flashcard
+    const updatedItems = items.map((item, index) => ({
+      ...item,
+      order: index + 1
+    }));
 
-    // You might want to add an API call here to update the order on the server
-  }, [flashcards]);
+    setFlashcards(updatedItems);
+
+    try {
+      // Send the updated order to the server
+      const response = await fetch('/api/flashcard', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          flashcards: updatedItems.map(({ id, order }) => ({ id, order })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update flashcard order');
+      }
+
+      // If successful, you might want to fetch the updated flashcards from the server
+      // or just keep the local state as is, assuming the server update was successful
+    } catch (error) {
+      console.error('Error updating flashcard order:', error);
+      toast.error('Failed to update flashcard order. Please try again.');
+      // Optionally, revert the changes if the server update fails
+      fetchFlashcards();
+    }
+  }, [flashcards, fetchFlashcards]);
 
   const handleDeleteCard = (id: string) => {
-    setFlashcards((prevFlashcards) => prevFlashcards.filter((card) => card.id !== id));
+    setFlashcards((prevFlashcards) => {
+      const updatedFlashcards = prevFlashcards.filter((card) => card && card.id !== id);
+      if (currentCardIndex >= updatedFlashcards.length) {
+        setCurrentCardIndex(Math.max(0, updatedFlashcards.length - 1));
+      }
+      return updatedFlashcards;
+    });
     setError(null);
   };
 
@@ -279,12 +318,41 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     setFlashcards(prevFlashcards => [...prevFlashcards, ...newFlashcards]);
   };
 
-  const handleSaveCard = (id: string, updatedQuestion: string, updatedAnswer: string) => {
+  const handleSaveCard = async (id: string, updatedQuestion: string, updatedAnswer: string) => {
+    // Immediately update the state
     setFlashcards((prevFlashcards) =>
       prevFlashcards.map((card) =>
         card.id === id ? { ...card, question: updatedQuestion, answer: updatedAnswer } : card
       )
     );
+
+    // Now update the server
+    try {
+      const response = await fetch('/api/flashcard', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id, 
+          question: updatedQuestion, 
+          answer: updatedAnswer,
+          order: flashcards.find(card => card.id === id)?.order,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update flashcard: ${errorData.error}, ${errorData.details}`);
+      }
+      const updatedCard = await response.json();
+      // Update the state again with the server response (in case of any changes)
+      setFlashcards((prevFlashcards) =>
+        prevFlashcards.map((card) => (card.id === id ? updatedCard : card))
+      );
+      setError(null);
+    } catch (error) {
+      console.error('Error updating flashcard:', error);
+      setError('Failed to update flashcard on the server. Please try again.');
+      // Optionally, you could revert the change here if you want to ensure consistency with the server
+    }
   };
 
   const handleToggleImport = () => {
@@ -355,16 +423,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                   <Droppable droppableId="flashcards">
                     {(provided) => (
                       <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                        {flashcards.map((card, index) => (
+                        {flashcards.filter(card => card !== undefined).map((card, index) => (
                           <EditFlashcard
                             key={card.id}
                             id={card.id}
                             question={card.question}
                             answer={card.answer}
                             showDefinitions={showDefinitions}
-                            onSave={(id, updatedQuestion, updatedAnswer) => {
-                              debouncedSaveCard(id, updatedQuestion, updatedAnswer);
-                            }}
+                            onSave={handleSaveCard}
                             onDelete={handleDeleteCard}
                             readOnly={readOnly}
                             index={index}

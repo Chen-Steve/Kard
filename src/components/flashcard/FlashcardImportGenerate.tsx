@@ -73,12 +73,10 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
     Papa.parse(file, {
       header: true,
       complete: async (results) => {
-        const importedFlashcards: Flashcard[] = results.data
-          .map((row: any, index: number) => ({
-            id: `imported-${index}`,
+        const importedFlashcards = results.data
+          .map((row: any) => ({
             question: row.question || '',
             answer: row.answer || '',
-            order: currentFlashcardsCount + index + 1,
           }))
           .filter(card => card.question.length <= MAX_CHAR_LIMIT && card.answer.length <= MAX_CHAR_LIMIT);
 
@@ -115,11 +113,12 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: flashcard.question,
-          answer: flashcard.answer,
+          flashcards: [{
+            question: flashcard.question,
+            answer: flashcard.answer,
+          }],
           userId: userId,
           deckId: deckId,
-          order: currentFlashcardsCount + 1,
         }),
       });
 
@@ -128,7 +127,8 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
         throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
       }
 
-      return await response.json();
+      const newFlashcards = await response.json();
+      return newFlashcards[0]; // Return the first (and only) flashcard
     } catch (error) {
       console.error('Error adding flashcard:', error);
       toast.error('Failed to add flashcard. Please try again.');
@@ -137,8 +137,28 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
   };
 
   const saveFlashcards = async (flashcards: { question: string, answer: string }[]) => {
-    const savedFlashcards = await Promise.all(flashcards.map(saveFlashcard));
-    return savedFlashcards.filter(card => card !== null);
+    try {
+      const response = await fetch('/api/flashcard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          flashcards: flashcards,
+          userId: userId,
+          deckId: deckId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to add flashcards: ${errorData.error}, ${errorData.details}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding flashcards:', error);
+      toast.error('Failed to add flashcards. Please try again.');
+      return [];
+    }
   };
 
   return (
