@@ -30,7 +30,6 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
         <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10" data-cursor="normal">
           <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
             <span className="block font-medium">{user.name}</span>
-            <span className="block">{user.email}</span>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-600">
             <button
@@ -68,7 +67,7 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
           <div className="border-t border-gray-200 dark:border-gray-600">
             <button
               onClick={handleSignOut}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150 flex items-center"
+              className="flex w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150 items-center"
             >
               <FaPowerOff className="mr-2" />
               Log Out
