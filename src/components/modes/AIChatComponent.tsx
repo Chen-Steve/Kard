@@ -2,6 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { generateAIResponse, Message } from '../../lib/openai';
 import Markdown from 'markdown-to-jsx';
+import Link from 'next/link';
+import { FaArrowLeft } from "react-icons/fa6";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 
 interface Flashcard {
   id: string;
@@ -21,7 +30,12 @@ interface AIChatComponentProps {
   onDeckChange: (deckId: string) => void;
 }
 
-const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, selectedDeckId, onDeckChange }) => {
+const AIChatComponent: React.FC<AIChatComponentProps> = ({ 
+  flashcards, 
+  decks, 
+  selectedDeckId, 
+  onDeckChange
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,53 +87,65 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({ flashcards, decks, se
     }
   };
 
+  const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
+
   return (
-    <div className="flex flex-col max-w-full h-[85vh] bg-white dark:bg-gray-800 dark:text-white">
-      <div className="mb-4">
-        <select
-          title="Select a deck"
-          value={selectedDeckId || ''}
-          onChange={(e) => onDeckChange(e.target.value)}
-          className="w-full max-w-xs p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:border-white dark:border dark:text-white"
-        >
-          <option value="">Select a deck</option>
-          {decks.map((deck) => (
-            <option key={deck.id} value={deck.id}>
-              {deck.name}
-            </option>
+    <div className="flex flex-col items-center max-w-full h-[85vh] bg-white dark:bg-gray-800 dark:text-white">
+      <div className="w-full max-w-2xl flex flex-col h-full">
+        <div className="mb-4 w-full flex justify-between items-center">
+          <Link href="/dashboard">
+            <Button className="px-4 py-2 text-sm font-medium dark:bg-gray-700 dark:text-white flex items-center">
+              <FaArrowLeft className="mr-2" /> Back to Dashboard
+            </Button>
+          </Link>
+          <Select value={selectedDeckId || ''} onValueChange={onDeckChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a deck" />
+            </SelectTrigger>
+            <SelectContent>
+              {decks.map((deck) => (
+                <SelectItem key={deck.id} value={deck.id}>
+                  {deck.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex-grow overflow-auto mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+          {messages.map((message, index) => (
+            <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
+              <span className={`inline-block p-2 rounded-lg max-w-[80%] ${
+                message.role === 'user' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 dark:bg-gray-600 text-black dark:text-white'
+              }`}>
+                {message.role === 'user' ? (
+                  message.content
+                ) : (
+                  <Markdown>{message.content}</Markdown>
+                )}
+              </span>
+            </div>
           ))}
-        </select>
+          <div ref={messagesEndRef} />
+        </div>
+        <form onSubmit={handleSubmit} className="flex space-x-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+            placeholder="Ask about your flashcards..."
+          />
+          <Button 
+            type="submit" 
+            disabled={isLoading || !selectedDeckId} 
+            className="px-4 py-6 text-lg dark:bg-gray-700 dark:text-white"
+          >
+            {isLoading ? 'Thinking...' : 'Send'}
+          </Button>
+        </form>
       </div>
-      <div className="flex-grow overflow-auto mb-4 p-4 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:border-white dark:border">
-        {messages.map((message, index) => (
-          <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <span className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-black dark:text-white'}`}>
-              {message.role === 'user' ? (
-                message.content
-              ) : (
-                <Markdown>{message.content}</Markdown>
-              )}
-            </span>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <form onSubmit={handleSubmit} className="flex space-x-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-grow p-3 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-          placeholder="Ask about your flashcards..."
-        />
-        <Button 
-          type="submit" 
-          disabled={isLoading || !selectedDeckId} 
-          className="px-6 py-6 text-base font-medium dark:bg-gray-700 dark:text-white"
-        >
-          {isLoading ? 'Thinking...' : 'Send'}
-        </Button>
-      </form>
     </div>
   );
 };
