@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../components/ui/Card';
 import CustomButton from '../../components/ui/CustomButton';
 import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
-import PerformanceSummary from './micro-components/PerformanceSummary';
+import PerformanceSummary from './mode-components/PerformanceSummary';
 import { FaPlay } from 'react-icons/fa';
 import { FaClock } from 'react-icons/fa';
 

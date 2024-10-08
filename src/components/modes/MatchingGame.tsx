@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { FaArrowLeft, FaPlay, FaInfoCircle } from 'react-icons/fa';
 import { Card, CardContent } from '../../components/ui/Card';
 import CustomButton from '../../components/ui/CustomButton';
-import PerformanceSummary from './micro-components/PerformanceSummary';
+import PerformanceSummary from './mode-components/PerformanceSummary';
 import Markdown from 'markdown-to-jsx';
 
 interface Flashcard {

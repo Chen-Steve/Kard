@@ -26,7 +26,7 @@ const ResetPassword = () => {
       return;
     }
 
-    setIsValidToken(true); // We'll assume the token is valid if it exists
+    setIsValidToken(true);
   }, [router]);
 
   if (!isValidToken) {
