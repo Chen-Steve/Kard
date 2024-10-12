@@ -1,4 +1,4 @@
-import { Flashcard } from './flashcard'; // Make sure to create this type if it doesn't exist
+import { Flashcard } from './flashcard';
 
 export interface Tag {
     id: number;
@@ -14,5 +14,5 @@ export interface Tag {
     tags: Array<{ id: number; name: string; color: string }>;
     isPublic: boolean;
     order?: number;
-    flashcards?: Flashcard[]; // Add this line
+    flashcards?: Flashcard[];
   }
