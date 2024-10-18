@@ -10,7 +10,7 @@
 
 ---
 
-## 🚧 Current Development Roadmap
+## 🚧 Current Development
 
 - [ ] **Drag-and-drop flashcards** between Decks.
 - [ ] **Customizable Dashboard** to personalize the study experience.
@@ -20,13 +20,19 @@
 - [ ] Fix **streaks system** for tracking progress.
 - [ ] Add **reward/gamification** to motivate learning.
 - [ ] **Anonymous sign-in** support.
-- [ ] Enhanced text formatting: **bold, underline, italics** in flashcards.
+- [x] Enhanced text formatting: **bold, underline, italics** in flashcards (10/18/24).
 - [ ] **Image support** in flashcards.
 - [x] Completed: **Learn Mode, Matching Mode, AI-Chat.**
 
 ---
 
-## 💻 Getting Started
+## My Learning Journey
+
+For those who like to see my journey of learning and building this project, as well as the bugs and issues I've faced and how I solved them, read here: [steven](https://steven-chen.vercel.app/)
+
+---
+
+## Run locally
 
 To run the development server:
 

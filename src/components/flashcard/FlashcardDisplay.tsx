@@ -1,6 +1,5 @@
 import React from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import Markdown from 'markdown-to-jsx';
 
 interface FlashcardDisplayProps {
   card: { question: string; answer: string } | null;
@@ -32,7 +31,7 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
         </div>
         {card ? (
           <div className="w-full sm:w-5/6 max-w-lg overflow-auto text-sm sm:text-base">
-            <Markdown>{isFlipped ? card.answer : card.question}</Markdown>
+            <div dangerouslySetInnerHTML={{ __html: isFlipped ? card.answer : card.question }} />
           </div>
         ) : (
           <p className="text-lg sm:text-xl text-muted-foreground dark:text-gray-400">No cards</p>

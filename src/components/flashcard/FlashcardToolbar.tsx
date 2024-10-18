@@ -1,6 +1,5 @@
-import React, { ReactNode } from 'react';
-import { FaPlus, FaEllipsisH, FaList, FaTable } from 'react-icons/fa';
-import { FaShuffle } from 'react-icons/fa6';
+import React, { ReactNode, useState, useRef, useEffect } from 'react';
+import { FaPlus, FaEllipsisH, FaChevronDown } from 'react-icons/fa';
 import FlashcardShuffle from './FlashcardShuffle';
 
 interface Flashcard {
@@ -52,13 +51,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
         >
           <FaEllipsisH />
         </button>
-        <button
-          onClick={onToggleView}
-          className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-2 py-1 sm:px-3 sm:py-2 rounded flex items-center"
-          aria-label={isTableViewActive ? "Switch to list view" : "Switch to table view"}
-        >
-          {isTableViewActive ? <FaList /> : <FaTable />}
-        </button>
+        <ViewSelector isTableViewActive={isTableViewActive} onToggleView={onToggleView} />
         <FlashcardShuffle 
           flashcards={flashcards}
           onShuffleComplete={onShuffleComplete}
@@ -67,6 +60,78 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
       <div className="flex space-x-2">
         {children}
       </div>
+    </div>
+  );
+};
+
+interface ViewSelectorProps {
+  isTableViewActive: boolean;
+  onToggleView: () => void;
+}
+
+const ViewSelector: React.FC<ViewSelectorProps> = ({ isTableViewActive, onToggleView }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleViewChange = (isTable: boolean) => {
+    if (isTable !== isTableViewActive) {
+      onToggleView();
+    }
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative inline-block text-left" ref={dropdownRef}>
+      <div>
+        <button
+          aria-label="Display Mode"
+          type="button"
+          className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-2 py-1 sm:px-3 sm:py-2 rounded flex items-center"
+          id="view-options-menu"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          Display Mode
+          <FaChevronDown className="ml-2" />
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
+          <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="view-options-menu">
+            <button
+              className={`${
+                isTableViewActive ? 'bg-gray-100 dark:bg-gray-600' : ''
+              } block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600`}
+              role="menuitem"
+              onClick={() => handleViewChange(true)}
+            >
+              Table View
+            </button>
+            <button
+              className={`${
+                !isTableViewActive ? 'bg-gray-100 dark:bg-gray-600' : ''
+              } block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600`}
+              role="menuitem"
+              onClick={() => handleViewChange(false)}
+            >
+              List View
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

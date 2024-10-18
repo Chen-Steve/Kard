@@ -4,6 +4,7 @@ import { TbEdit } from "react-icons/tb";
 import { MdDeleteOutline, MdOutlineSave } from "react-icons/md";
 import { Draggable } from '@hello-pangea/dnd';
 import { toast } from 'react-toastify';
+import EditableDiv from '../flashcard/EditableDiv';
 
 interface EditFlashcardProps {
   id: string;
@@ -26,9 +27,9 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
   readOnly = false,
   index
 }) => {
-  const [editedQuestion, setEditedQuestion] = useState(question);
-  const [editedAnswer, setEditedAnswer] = useState(answer);
-  const [isEditing, setIsEditing] = useState(false);
+  const [editedQuestion, setEditedQuestion] = useState<string>(question);
+  const [editedAnswer, setEditedAnswer] = useState<string>(answer);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     setEditedQuestion(question);
@@ -93,17 +94,15 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             <div className="rounded-lg">
               <h3 className="font-semibold text-base mb-1">Question:</h3>
               {isEditing ? (
-                <textarea
-                  value={editedQuestion}
-                  onChange={(e) => setEditedQuestion(e.target.value)}
-                  className="w-full p-1 border-none focus:outline-none bg-transparent resize-none text-sm"
-                  placeholder="Enter question here..."
+                <EditableDiv
+                  htmlContent={editedQuestion}
+                  onChange={setEditedQuestion}
                   disabled={readOnly}
-                  rows={2}
+                  placeholder="Enter question here..."
                 />
               ) : (
                 <div className="prose dark:prose-invert max-w-none text-sm">
-                  <Markdown>{editedQuestion}</Markdown>
+                  <div dangerouslySetInnerHTML={{ __html: editedQuestion }} />
                 </div>
               )}
             </div>
@@ -111,17 +110,15 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               <div className="rounded-lg">
                 <h3 className="font-semibold text-base mb-1">Answer:</h3>
                 {isEditing ? (
-                  <textarea
-                    value={editedAnswer}
-                    onChange={(e) => setEditedAnswer(e.target.value)}
-                    className="w-full p-1 border-none focus:outline-none bg-transparent resize-none text-sm"
-                    placeholder="Enter answer here..."
+                  <EditableDiv
+                    htmlContent={editedAnswer}
+                    onChange={setEditedAnswer}
                     disabled={readOnly}
-                    rows={2}
+                    placeholder="Enter answer here..."
                   />
                 ) : (
                   <div className="prose dark:prose-invert max-w-none text-sm">
-                    <Markdown>{editedAnswer}</Markdown>
+                    <div dangerouslySetInnerHTML={{ __html: editedAnswer }} />
                   </div>
                 )}
               </div>
