@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
 interface EditableDivProps {
   htmlContent: string;
@@ -10,6 +10,15 @@ interface EditableDivProps {
 const EditableDiv: React.FC<EditableDivProps> = ({ htmlContent, onChange, disabled = false, placeholder = '' }) => {
   const divRef = useRef<HTMLDivElement>(null);
 
+  const updateContent = useCallback(() => {
+    if (divRef.current) {
+      const content = divRef.current.innerHTML;
+      if (content !== htmlContent) {
+        onChange(content);
+      }
+    }
+  }, [htmlContent, onChange]);
+
   useEffect(() => {
     if (divRef.current && divRef.current.innerHTML !== htmlContent) {
       divRef.current.innerHTML = htmlContent;
@@ -17,16 +26,15 @@ const EditableDiv: React.FC<EditableDivProps> = ({ htmlContent, onChange, disabl
   }, [htmlContent]);
 
   const handleInput = () => {
-    if (divRef.current) {
-      onChange(divRef.current.innerHTML);
-    }
+    updateContent();
+  };
+
+  const handleBlur = () => {
+    updateContent();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Prevent space bar from propagating
-    if (e.key === ' ') {
-      e.stopPropagation();
-    }
+    e.stopPropagation();
 
     if (e.ctrlKey) {
       switch (e.key.toLowerCase()) {
@@ -53,10 +61,11 @@ const EditableDiv: React.FC<EditableDivProps> = ({ htmlContent, onChange, disabl
       ref={divRef}
       contentEditable={!disabled}
       onInput={handleInput}
+      onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className={`w-full p-1 border ${disabled ? 'bg-gray-100' : 'bg-transparent'} focus:outline-none resize-none text-sm`}
-      placeholder={placeholder}
-      suppressContentEditableWarning={true}
+      className={`w-full p-1 border ${disabled ? 'bg-gray-100' : 'bg-white'} focus:outline-none resize-none text-sm`}
+      data-placeholder={placeholder}
+      style={{ minHeight: '1.5em' }}
     />
   );
 };

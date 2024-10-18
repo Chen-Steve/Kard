@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Markdown from 'markdown-to-jsx';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TbEdit } from "react-icons/tb";
 import { MdDeleteOutline, MdOutlineSave } from "react-icons/md";
 import { Draggable } from '@hello-pangea/dnd';
@@ -35,6 +34,14 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
     setEditedQuestion(question);
     setEditedAnswer(answer);
   }, [question, answer]);
+
+  const handleQuestionChange = useCallback((content: string) => {
+    setEditedQuestion(content);
+  }, []);
+
+  const handleAnswerChange = useCallback((content: string) => {
+    setEditedAnswer(content);
+  }, []);
 
   const handleSave = () => {
     if (!readOnly) {
@@ -96,7 +103,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               {isEditing ? (
                 <EditableDiv
                   htmlContent={editedQuestion}
-                  onChange={setEditedQuestion}
+                  onChange={handleQuestionChange}
                   disabled={readOnly}
                   placeholder="Enter question here..."
                 />
@@ -112,7 +119,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                 {isEditing ? (
                   <EditableDiv
                     htmlContent={editedAnswer}
-                    onChange={setEditedAnswer}
+                    onChange={handleAnswerChange}
                     disabled={readOnly}
                     placeholder="Enter answer here..."
                   />
