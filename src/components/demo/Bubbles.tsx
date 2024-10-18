@@ -21,7 +21,17 @@ const generatePoint = (maxWidth: number, maxHeight: number): Point => ({
   amplitude: 20 + Math.random() * 40,
 });
 
-const generateColor = () => `hsl(${Math.random() * 360}, 70%, 70%)`;
+const generateColor = (index: number, total: number) => {
+  const startColor = { r: 239, g: 234, b: 206 }; // EFEACE
+  const endColor = { r: 116, g: 197, b: 149 };   // 74C595
+  
+  const t = index / (total - 1);
+  const r = Math.round(startColor.r + (endColor.r - startColor.r) * t);
+  const g = Math.round(startColor.g + (endColor.g - startColor.g) * t);
+  const b = Math.round(startColor.b + (endColor.b - startColor.b) * t);
+  
+  return `rgb(${r}, ${g}, ${b})`;
+};
 
 const Bubbles: React.FC = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -48,8 +58,9 @@ const Bubbles: React.FC = () => {
 
   useEffect(() => {
     if (dimensions.width > 0 && dimensions.height > 0) {
-      pointsRef.current = Array.from({ length: 20 }, () => generatePoint(dimensions.width, dimensions.height));
-      colorsRef.current = Array.from({ length: 20 }, generateColor);
+      const numPoints = 20;
+      pointsRef.current = Array.from({ length: numPoints }, () => generatePoint(dimensions.width, dimensions.height));
+      colorsRef.current = Array.from({ length: numPoints }, (_, i) => generateColor(i, numPoints));
     }
   }, [dimensions]);
 
