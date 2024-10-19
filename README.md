@@ -28,7 +28,7 @@
 
 ## My Learning Journey
 
-For those who like to see my journey of learning and building this project, as well as the bugs and issues I've faced and how I solved them, read here: [steven](https://steven-chen.vercel.app/)
+For those who like to see my journey of learning and building this project, as well as the bugs and issues I've faced and how I solved them, read here: [steven](https://steven-chen.vercel.app/blog)
 
 ---
 
