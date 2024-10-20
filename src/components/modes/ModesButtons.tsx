@@ -111,7 +111,6 @@ const ModeButton: React.FC<ModeButtonProps> = ({ icon, text, onClick, isPro = fa
     <button
       className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
       onClick={onClick}
-      data-cursor="block"
     >
       {icon}
       <span className="font-semibold">{text}</span>

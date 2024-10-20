@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { customCursorStyle } from 'ipad-cursor';
-import nodemailer from 'nodemailer';
 
 interface ForgotPasswordProps {
   isOpen: boolean;
@@ -52,8 +50,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ isOpen, onClose }) => {
             aria-label="Close"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            data-cursor="block"
-            data-cursor-style={customCursorStyle({ background: 'rgba(0, 0, 0, 0.2)', radius: '50%' })}
           >
             <FaTimes />
           </button>
@@ -72,15 +68,12 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ isOpen, onClose }) => {
                          focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
               placeholder="you@example.com"
               required
-              data-cursor="text"
             />
           </div>
           <button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={isLoading}
-            data-cursor="block"
-            data-cursor-style={customCursorStyle({ background: 'rgba(255, 255, 255, 0.4)' })}
           >
             {isLoading ? 'Sending...' : 'Send Reset Link'}
           </button>

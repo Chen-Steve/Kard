@@ -4,7 +4,6 @@ import { RiTimerFill } from "react-icons/ri";
 import { PiCardsFill } from "react-icons/pi";
 import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { FaEllipsisH } from 'react-icons/fa';
-import { customCursorStyle } from 'ipad-cursor';
 
 const features = [
   { icon: SiStagetimer, name: 'Learn Mode', description: 'Master your flashcards at your own pace' },
@@ -16,7 +15,7 @@ const features = [
 
 const FeaturesSection: React.FC = () => {
   return (
-    <div className="mt-40" data-cursor="text">
+    <div className="mt-40">
       <h3 className="text-3xl font-bold mb-8 text-center text-black">
         Powerful Features to Accelerate Your Learning
       </h3>
@@ -26,12 +25,6 @@ const FeaturesSection: React.FC = () => {
             <div 
               key={index} 
               className="flex-shrink-0 w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
-              data-cursor="block"
-              data-cursor-style={customCursorStyle({
-                background: 'rgba(30, 64, 175, 0.4)',
-                border: '2px solid black',
-                radius: '8px'
-              })}
             >
               <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
                    style={{

@@ -27,7 +27,7 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
         onClick={() => setDropdownOpen(!dropdownOpen)}
       />
       {dropdownOpen && (
-        <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10" data-cursor="normal">
+        <div className="absolute right-0 mt-2 sm:mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
           <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
             <span className="block font-medium">{user.name}</span>
           </div>

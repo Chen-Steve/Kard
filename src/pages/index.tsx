@@ -91,12 +91,11 @@ const HomePage: React.FC = () => {
       <div className={`min-h-screen flex flex-col relative bg-[#F8F7F6] text-black overflow-hidden ${isMounted && !isMobile ? 'cursor-none' : ''}`}>
         {isMounted && <Bubbles />}
         
-        <header className="w-full fixed top-0 left-0 right-0 z-50 px-4 py-2" data-cursor-ignore={!isMobile}>
+        <header className="w-full fixed top-0 left-0 right-0 z-50 px-4 py-2">
           <nav ref={navRef} className="flex justify-center items-center py-2 px-6 max-w-7xl mx-auto">
             <Link 
               href="/" 
               className="kard wiggle-effect text-black mr-10" 
-              data-cursor={!isMobile ? "text" : undefined}
             >
               Kard
             </Link>
@@ -104,7 +103,6 @@ const HomePage: React.FC = () => {
               <a 
                 href="#" 
                 className="nav-item text-black px-4 py-2 rounded-full" 
-                data-cursor={!isMobile ? "block" : undefined}
                 onClick={handleLearnMoreClick}
               >
                 Learn More
@@ -116,7 +114,7 @@ const HomePage: React.FC = () => {
         <div style={{ height: `${navHeight}px` }} />
 
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
-          <div className="text-center mb-12 fixed-title" data-cursor={isMounted && !isMobile ? "text" : undefined}>
+          <div className="text-center mb-12 fixed-title">
             {isMounted ? (
               <DynamicTitle isMobile={isMobile} text={text} />
             ) : (
@@ -135,7 +133,6 @@ const HomePage: React.FC = () => {
             <Link href="/signin">
               <Button
                 className="px-6 py-3 rounded-md font-semibold w-full sm:w-auto bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-200 ease-out hover:-translate-y-0.5 hover:translate-x-0.5 active:translate-y-0 active:translate-x-0 shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] active:shadow-none hover:bg-white"
-                data-cursor={!isMobile ? "block" : undefined}
               >
                 <span className="text-lg relative z-10">Get Started</span>
               </Button>
@@ -164,7 +161,7 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
-        <footer className="w-full p-6 flex flex-col items-center text-black" data-cursor={!isMobile ? "text" : undefined}>
+        <footer className="w-full p-6 flex flex-col items-center text-black">
           <div className="flex flex-col items-center">
             <div className="flex flex-row items-center mt-2">
               <div className="relative w-24 h-24 sm:w-40 sm:h-40 md:w-55 md:h-55 lg:w-80 lg:h-80 mr-2 sm:mr-4">
@@ -194,7 +191,6 @@ const HomePage: React.FC = () => {
           <button
             className="text-md font-bold px-3 py-3 sm:px-4 sm:py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
             onClick={handleSupportClick}
-            data-cursor={isMounted && !isMobile ? "block" : undefined}
           >
             <RiFeedbackFill className="text-xl sm:text-base sm:mr-2" />
             <span className="hidden sm:inline">Feedback</span>

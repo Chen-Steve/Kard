@@ -29,7 +29,6 @@ const DashSettings: React.FC<DashSettingsProps> = ({
       <LuSettings2
         onClick={() => setIsOpen(!isOpen)}
         className="ml-4 mb-4 text-black dark:text-gray-200 text-3xl cursor-pointer hover:text-gray-800 dark:hover:text-gray-100 transition-colors duration-200"
-        data-cursor="block"
         aria-label="Dashboard Settings"
         role="button"
         tabIndex={0}

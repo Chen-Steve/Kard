@@ -54,13 +54,13 @@ const EmailForm: React.FC = () => {
           placeholder="Enter your email"
           required
           className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-          data-cursor="text"
+          
         />
         <button
           type="submit"
           disabled={isLoading}
           className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-          data-cursor="block"
+          
         >
           {isLoading ? 'Subscribing...' : 'Subscribe'}
         </button>

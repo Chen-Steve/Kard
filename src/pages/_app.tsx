@@ -1,7 +1,7 @@
 import { SessionProvider, useSession } from 'next-auth/react';
 import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import Head from 'next/head';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,8 +25,6 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function MyApp({ Component, pageProps: { session: initialSession, ...pageProps } }: AppProps) {
-  const [isCursorInitialized, setIsCursorInitialized] = useState(false);
-
   const handleDragEnd = () => {
     // Handle the drag end event
   };
@@ -36,33 +34,7 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
     if (darkMode) {
       document.documentElement.classList.add('dark');
     }
-
-    // Initialize iPad cursor
-    if (typeof window !== 'undefined' && !isCursorInitialized) {
-      import('ipad-cursor').then(({ initCursor }) => {
-        initCursor();
-        setIsCursorInitialized(true);
-      });
-    }
-
-    // Clean up function
-    return () => {
-      if (isCursorInitialized && typeof window !== 'undefined') {
-        import('ipad-cursor').then(({ disposeCursor }) => {
-          disposeCursor();
-        });
-      }
-    };
-  }, [isCursorInitialized]);
-
-  useEffect(() => {
-    // Update cursor when the component re-renders
-    if (typeof window !== 'undefined' && isCursorInitialized) {
-      import('ipad-cursor').then(({ updateCursor }) => {
-        updateCursor();
-      });
-    }
-  });
+  }, []);
 
   return (
     <>

@@ -103,7 +103,6 @@ const PublicDeckPage = () => {
           <button
             onClick={handleLearnClick}
             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-            data-cursor="block"
           >
             <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
             <span className="font-semibold">Learn</span>
@@ -111,7 +110,6 @@ const PublicDeckPage = () => {
           <button
             onClick={handleTestClick}
             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-            data-cursor="block"
           >
             <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
             <span className="font-semibold">Test</span>
@@ -119,7 +117,6 @@ const PublicDeckPage = () => {
           <button
             onClick={handleMatchClick}
             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-            data-cursor="block"
           >
             <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
             <span className="font-semibold">Match</span>
@@ -127,7 +124,6 @@ const PublicDeckPage = () => {
           <button
             onClick={handleKChatClick}
             className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
-            data-cursor="block"
           >
             <BiSolidMessageSquareDots className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
             <span className="font-semibold">K-Chat</span>

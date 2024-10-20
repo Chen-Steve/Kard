@@ -4,7 +4,6 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import SketchPickerWrapper from '../SketchPickerWrapper';
 import { useToast } from "../ui/use-toast";
-import { updateCursor } from 'ipad-cursor';
 import { LuDelete } from "react-icons/lu";
 
 interface Tag {
@@ -122,10 +121,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
     }
   }, [initialDeck, isOpen]);
 
-  useEffect(() => {
-    updateCursor();
-  });
-
   const handleSubmit = () => {
     if (state.name.trim() === '' || state.description.trim() === '') {
       toast({
@@ -175,7 +170,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
               placeholder="Deck Name"
               value={state.name}
               onChange={(e) => dispatch({ type: 'SET_NAME', payload: e.target.value })}
-              data-cursor="text"
               maxLength={20}
               className="w-full text-sm"
             />
@@ -192,7 +186,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
               placeholder="Deck Description"
               value={state.description}
               onChange={(e) => dispatch({ type: 'SET_DESCRIPTION', payload: e.target.value })}
-              data-cursor="text"
               className="w-full text-sm"
             />
           </div>
@@ -207,11 +200,9 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
                   value={state.newTagName}
                   onChange={(e) => dispatch({ type: 'SET_NEW_TAG_NAME', payload: e.target.value })}
                   className="w-full text-sm"
-                  data-cursor="text"
                 />
                 <Button 
                   onClick={() => dispatch({ type: 'ADD_TAG' })} 
-                  data-cursor="block"
                   className="w-full sm:w-auto text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4"
                 >
                   Add Tag
@@ -222,7 +213,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
                   color={state.newTagColor}
                   onChangeComplete={(color) => dispatch({ type: 'SET_NEW_TAG_COLOR', payload: color.hex })}
                   className="w-full sm:w-auto"
-                  data-cursor="text"
                 />
               </div>
             </div>
@@ -258,7 +248,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ isOpen, onClose, onSubm
           <Button 
             onClick={handleSubmit} 
             disabled={!isFormValid} 
-            data-cursor="block"
             className="w-full sm:w-auto text-xs sm:text-sm py-1 px-2 sm:py-2 sm:px-4"
           >
             {initialDeck ? 'Update Deck' : 'Create Deck'}

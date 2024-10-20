@@ -1,13 +1,11 @@
 import '../app/globals.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
-import Cookies from 'js-cookie';
 import { signIn } from 'next-auth/react';
-import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 import ForgotPassword from '../components/forgotPassword';
 import { updateStreak } from '../utils/streak';
 
@@ -19,37 +17,6 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-
-  useEffect(() => {
-    initializeCursor();
-  }, []);
-
-  useEffect(() => {
-    if (errorMessage) {
-      initializeCursor();
-    }
-  }, [errorMessage]);
-
-  const initializeCursor = () => {
-    if (typeof window !== 'undefined') {
-      initCursor({
-        normalStyle: { 
-          background: 'rgba(255, 255, 255, 0.3)',
-          border: '2px solid black'
-        },
-        textStyle: { 
-          background: 'rgba(255, 255, 255, 0.5)',
-          border: '2px solid black'
-        },
-        blockStyle: { 
-          background: 'rgba(255, 255, 255, 0.2)',
-          radius: 'auto',
-          border: '2px solid black'
-        },
-      });
-      updateCursor();
-    }
-  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,22 +44,13 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" data-cursor="normal">
+    <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
       {loading ? (
         <Spinner />
       ) : (
         <>
-          <div className="absolute top-4 left-4 sm:top-20 sm:left-40" data-cursor="block">
-            <Link 
-              href="/" 
-              data-cursor="block"
-              data-cursor-style={customCursorStyle({ 
-                background: 'rgba(255, 255, 255, 0.4)',
-                width: '40px',
-                height: '40px',
-                radius: '50%'
-              })}
-            >
+          <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
+            <Link href="/">
               <FaArrowLeft className="text-black text-2xl" />
             </Link>
           </div>
@@ -117,7 +75,6 @@ const SignIn = () => {
                          focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                   placeholder="you@example.com"
                   required
-                  data-cursor="text"
                 />
               </div>
               <div>
@@ -134,12 +91,10 @@ const SignIn = () => {
                            focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
                     placeholder="••••••••"
                     required
-                    data-cursor="text"
                   />
                   <div
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
-                    data-cursor="block"
                   >
                     {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </div>
@@ -154,12 +109,6 @@ const SignIn = () => {
                       setIsForgotPasswordOpen(true);
                     }}
                     className="font-medium text-black underline hover:text-gray-800"
-                    data-cursor="block"
-                    data-cursor-style={customCursorStyle({ 
-                      background: 'rgba(0, 0, 0, 0.1)',
-                      radius: '20px',
-                      padding: '8px 10px'
-                    })}
                   >
                     Forgot password?
                   </a>
@@ -169,8 +118,6 @@ const SignIn = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 disabled={loading}
-                data-cursor="block"
-                data-cursor-style={customCursorStyle({ background: 'rgba(255, 255, 255, 0.4)' })}
               >
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
@@ -180,13 +127,7 @@ const SignIn = () => {
             Don&apos;t have an account?{' '}
             <Link 
               href="/signup" 
-              className="font-medium text-black underline hover:text-gray-800" 
-              data-cursor="block"
-              data-cursor-style={customCursorStyle({ 
-                background: 'rgba(0, 0, 0, 0.1)',
-                radius: '20px',
-                padding: '8px 10px'
-              })}
+              className="font-medium text-black underline hover:text-gray-800"
             >
               Sign up
             </Link>

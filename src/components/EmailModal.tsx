@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback } from 'react';
-import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,24 +16,6 @@ const EmailModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscapeKey);
-      if (typeof window !== 'undefined') {
-        initCursor({
-          normalStyle: { 
-            background: 'rgba(255, 255, 255, 0.3)',
-            border: '2px solid black'
-          },
-          textStyle: { 
-            background: 'rgba(255, 255, 255, 0.5)',
-            border: '2px solid black'
-          },
-          blockStyle: { 
-            background: 'rgba(255, 255, 255, 0.2)',
-            radius: 'auto',
-            border: '2px solid black'
-          },
-        });
-        updateCursor();
-      }
     }
 
     return () => {
@@ -50,7 +31,6 @@ const EmailModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         <button
           className="absolute top-2 left-2 px-2 py-1 text-sm font-semibold text-gray-600 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
           onClick={onClose}
-          data-cursor="block"
         >
           Esc
         </button>

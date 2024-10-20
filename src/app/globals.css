@@ -277,14 +277,6 @@ nav {
   transform: rotateY(180deg);
 }
 
-/* Add this to your global CSS file */
-* {
-  cursor: none !important;
-}
-
-html, body {
-  cursor: none !important;
-}
 
 /* Custom scrollbar styles */
 @layer utilities {
@@ -320,4 +312,8 @@ html, body {
   .text-title {
     font-size: 1.75rem; /* Adjust this value as needed */
   }
+}
+
+* {
+  cursor: default;
 }

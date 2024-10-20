@@ -2,13 +2,11 @@ import '../app/globals.css';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
-import { getGlassAvatarSvg } from '../utils/avatar';
 import NavMenu from '../components/dashboard/NavMenu';
 import FlashcardComponent from '../components/dashboard/Flashcard';
 import { useToast } from '../components/ui/use-toast';
 import { Toaster } from '../components/ui/toaster';
 import Cookies from 'js-cookie';
-import { initCursor } from 'ipad-cursor';
 import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
 import StickerSelector from '../components/sticker-selector';
@@ -65,22 +63,6 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    initCursor({
-      normalStyle: { 
-        background: 'rgba(255, 255, 255, 0.3)',
-        border: '2px solid black'
-      },
-      textStyle: { 
-        background: 'rgba(255, 255, 255, 0.5)',
-        border: '2px solid black'
-      },
-      blockStyle: { 
-        background: 'rgba(255, 255, 255, 0.2)',
-        radius: 'auto',
-        border: '2px solid black'
-      },
-    });
-
     const getSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -139,11 +121,11 @@ const Dashboard = () => {
     setShowFlashcardList(!showFlashcardList);
   };
 
-  if (!user) return <p data-cursor="text">Loading...</p>;
+  if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col" data-cursor="normal">
-      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50" data-cursor="normal">
+    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col">
+      <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50">
         {/* Left section */}
         <div className="flex items-center space-x-4 w-1/3">
           <DashSettings
@@ -179,7 +161,7 @@ const Dashboard = () => {
         </div>
       </header>
       
-      <main className="flex-grow p-4 relative" data-cursor="normal">
+      <main className="flex-grow p-4 relative">
         <div className="absolute inset-0">
           {dashboardComponents.find(comp => comp.id === 'stickers')?.visible && (
             <StickerSelector
@@ -193,7 +175,7 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center">
               <div className="flex flex-col sm:flex-row items-center sm:items-center">
                 {selectedDeckName && (
-                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0" data-cursor="text">
+                  <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0">
                     {selectedDeckName}
                   </h2>
                 )}
@@ -239,14 +221,14 @@ const Dashboard = () => {
         )}
         {decks.length === 0 && (
           <div className="flex flex-col justify-center items-center h-full mt-20">
-            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4" data-cursor="text">
+            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
               Go to your library and create some decks!
             </p>
           </div>
         )}
       </main>
-      <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center" data-cursor="normal">
-        <p data-cursor="text">&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
+      <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center">
+        <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
       <Toaster />
     </div>
