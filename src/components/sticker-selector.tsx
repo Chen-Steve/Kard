@@ -31,6 +31,7 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
   const [error, setError] = useState<string | null>(null);
   const [dragInfo, setDragInfo] = useState<DragInfo | null>(null);
   const initialFetchRef = useRef(false);
+  const [isPositioned, setIsPositioned] = useState(false);
 
   const saveStickersToLocalStorage = useCallback(() => {
     localStorage.setItem('stickers', JSON.stringify(stickers));
@@ -41,25 +42,33 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       const { data, error } = await supabase.storage.from('stickers').list();
       if (error) throw error;
 
-      const stickerPromises = data.map(async (file) => {
+      const newStickers = data.map((file) => {
         const { data: urlData } = supabase.storage.from('stickers').getPublicUrl(file.name);
-        const { data: signedUrlData } = await supabase.storage.from('stickers').createSignedUrl(file.name, 3600);
         return {
           id: file.id,
           path: file.name,
           publicUrl: urlData.publicUrl,
-          signedUrl: signedUrlData?.signedUrl || '',
-          x: Math.random() * (window.innerWidth - 100),
-          y: Math.random() * (window.innerHeight - 100),
+          signedUrl: urlData.publicUrl,
+          x: 0,
+          y: 0,
           width: 175,
           height: 175,
         };
       });
 
-      const newStickers = await Promise.all(stickerPromises);
       setStickers(newStickers);
-      saveStickersToLocalStorage();
       setIsLoading(false);
+      
+      // Delay positioning to ensure DOM is ready
+      setTimeout(() => {
+        setStickers(prevStickers => prevStickers.map(sticker => ({
+          ...sticker,
+          x: Math.random() * (window.innerWidth - sticker.width),
+          y: Math.random() * (window.innerHeight - sticker.height),
+        })));
+        setIsPositioned(true);
+        saveStickersToLocalStorage();
+      }, 100);
     } catch (error) {
       console.error('Error fetching stickers:', error);
       setError('Failed to load stickers');
@@ -167,6 +176,8 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
             width: sticker.width,
             height: sticker.height,
             zIndex: dragInfo?.stickerId === sticker.id ? 1000 : 1,
+            opacity: isPositioned ? 1 : 0,
+            transition: 'opacity 0.3s ease-in-out',
           }}
           onMouseDown={(e) => handleDragStart(e, sticker.id)}
           onTouchStart={(e) => handleDragStart(e, sticker.id)}
@@ -177,8 +188,8 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
             width={sticker.width}
             height={sticker.height}
             onError={() => console.error(`Failed to load image: ${sticker.signedUrl}`)}
-            style={{ pointerEvents: 'none' }} // Prevent image from interfering with drag
-            draggable={false} // Prevent default image drag behavior
+            style={{ pointerEvents: 'none' }}
+            draggable={false} 
           />
         </div>
       ))}

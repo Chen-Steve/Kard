@@ -3,7 +3,17 @@ const nextConfig = {
     reactStrictMode: true,
     swcMinify: true,
     images: {
-      domains: ['www.gravatar.com', 'mvnsmwxwjklawrlkksyl.supabase.co'],
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'www.gravatar.com',
+        },
+        {
+          protocol: 'https',
+          hostname: 'mvnsmwxwjklawrlkksyl.supabase.co',
+          pathname: '/storage/v1/object/public/stickers/**',
+        },
+      ],
     },
   };
   
