@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import UserAvatar from '../UserAvatar';
 import { MdDarkMode } from "react-icons/md";
@@ -11,11 +11,10 @@ interface UserAvatarDropdownProps {
   user: UserType;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
-  handleSignOut: () => void;
-  streak: number;
+  handleSignOut: () => Promise<void>;
 }
 
-const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMode, toggleDarkMode, handleSignOut, streak }) => {
+const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMode, toggleDarkMode, handleSignOut }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -23,7 +22,7 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
   return (
     <div className="relative" ref={dropdownRef}>
       <UserAvatar
-        avatarSvg={user.avatarUrl || ''}
+        avatarUrl={user.avatar_url}
         alt="User Avatar"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       />
@@ -73,9 +72,6 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
               <FaPowerOff className="mr-2" />
               Log Out
             </button>
-          </div>
-          <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
-            Streak: {streak} days
           </div>
         </div>
       )}

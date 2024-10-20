@@ -2,32 +2,43 @@ import React from 'react';
 import Image from 'next/image';
 
 interface UserAvatarProps {
-  avatarSvg: string | null;
+  avatarUrl: string | null;
   alt: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ avatarSvg, alt, onClick }) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({ avatarUrl, alt, onClick }) => {
+  const isDataUrl = avatarUrl?.startsWith('data:');
+  const isSvgString = avatarUrl?.startsWith('<svg');
+
   return (
-    <button
-      aria-label="Change Avatar"
+    <div 
+      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden cursor-pointer"
       onClick={onClick}
-      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
     >
-      {avatarSvg ? (
-        <Image
-          src={`data:image/svg+xml;utf8,${encodeURIComponent(avatarSvg)}`}
-          alt={alt}
-          width={80}
-          height={80}
-          className="w-full h-full object-cover"
-        />
+      {avatarUrl ? (
+        isDataUrl || isSvgString ? (
+          <div 
+            dangerouslySetInnerHTML={{ 
+              __html: isDataUrl ? atob(avatarUrl.split(',')[1]) : avatarUrl 
+            }} 
+            className="w-full h-full"
+          />
+        ) : (
+          <Image
+            src={avatarUrl}
+            alt={alt}
+            width={80}
+            height={80}
+            className="w-full h-full object-cover"
+          />
+        )
       ) : (
         <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600">
-          No Avatar
+          {alt.charAt(0).toUpperCase()}
         </div>
       )}
-    </button>
+    </div>
   );
 };
 

@@ -7,11 +7,12 @@ import StatsContainer from '../components/profile/stats-container';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { FaArrowLeft, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { FaArrowLeft, FaKey, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaShuffle } from "react-icons/fa6";
 import { toast, useToast } from '../components/ui/use-toast'; 
 import { Toaster } from '../components/ui/toaster'; 
-import { getMicahAvatarSvg } from '../utils/avatar';
-import { differenceInDays } from 'date-fns';
+import { getGlassAvatarSvg } from '../utils/avatar';
+import Image from 'next/image';
 
 interface User {
   id: string;
@@ -29,7 +30,6 @@ const Profile = () => {
   const [email, setEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,13 +37,14 @@ const Profile = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const router = useRouter();
   const { dismiss } = useToast();
+  const [avatarOptions, setAvatarOptions] = useState<string[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (session && session.user) {
-        // User is authenticated
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('*')
@@ -57,38 +58,22 @@ const Profile = () => {
             description: 'Failed to load user data. Please try again.',
           });
         } else {
-          setIsAnonymous(false);
           setUser(userData);
           setName(userData.name);
           setEmail(userData.email);
-          setSelectedAvatar(userData.avatar_url || getMicahAvatarSvg(userData.email));
+          setSelectedAvatar(userData.avatar_url || getGlassAvatarSvg(userData.email));
         }
       } else {
-        // Check for anonymous user
-        const anonymousUserId = localStorage.getItem('anonymousUserId');
-        
-        if (anonymousUserId) {
-          setIsAnonymous(true);
-          const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
-          setUser({
-            id: anonymousUserId,
-            name: localUserData.name || 'Anonymous User',
-            email: '',
-            avatar_url: localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId),
-            streak: localUserData.streak || 0,
-            joined_at: localUserData.joined_at || new Date().toISOString(),
-          });
-          setName(localUserData.name || 'Anonymous User');
-          setEmail('');
-          setSelectedAvatar(localUserData.avatar_url || getMicahAvatarSvg(anonymousUserId));
-        } else {
-          // No authenticated session or anonymous user, redirect to sign in
-          router.push('/signin');
-        }
+        // No authenticated session, redirect to sign in
+        router.push('/signin');
       }
     };
 
     getSession();
+
+    // Generate avatar options
+    const options = Array.from({ length: 5 }, () => getGlassAvatarSvg(Math.random().toString()));
+    setAvatarOptions(options);
   }, [router]);
 
   const handleEdit = () => {
@@ -96,48 +81,29 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    if (isAnonymous) {
-      const updatedUserData: User = {
-        id: user!.id,
-        name: name.trim(),
-        email: '',
-        avatar_url: selectedAvatar,
-        streak: user!.streak,
-        joined_at: user!.joined_at,
-      };
-      localStorage.setItem('anonymousUserData', JSON.stringify(updatedUserData));
-      setUser(updatedUserData);
+    const { data, error } = await supabase
+      .from('users')
+      .update({ 
+        name: name.trim(), 
+        email: email.trim(), 
+        avatar_url: selectedAvatar 
+      })
+      .eq('id', user!.id)
+      .select();
+
+    if (error) {
+      console.error('Error updating user data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile. Please try again.',
+      });
+    } else {
+      setUser(data[0]);
       setIsEditing(false);
       toast({
         title: 'Profile Updated',
-        description: 'Your profile has been updated locally.',
+        description: 'Your profile has been updated successfully.',
       });
-    } else {
-      // For authenticated users
-      const { data, error } = await supabase
-        .from('users')
-        .update({ 
-          name: name.trim(), 
-          email: email.trim(), 
-          avatar_url: selectedAvatar 
-        })
-        .eq('id', user!.id)
-        .select();
-
-      if (error) {
-        console.error('Error updating user data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to update profile. Please try again.',
-        });
-      } else {
-        setUser(data[0]);
-        setIsEditing(false);
-        toast({
-          title: 'Profile Updated',
-          description: 'Your profile has been updated successfully.',
-        });
-      }
     }
   };
 
@@ -187,23 +153,15 @@ const Profile = () => {
         <div className="flex space-x-2">
           <button
             onClick={async () => {
-              if (isAnonymous) {
-                localStorage.removeItem('anonymousUserId');
-                localStorage.removeItem('anonymousUserData');
-                // Also remove any other related data (e.g., decks)
-                localStorage.removeItem('decks_' + user!.id);
-                router.push('/');
+              const { error } = await supabase.auth.admin.deleteUser(user!.id);
+              if (error) {
+                console.error('Error deleting account:', error);
+                toast({
+                  title: 'Error',
+                  description: 'There was an error deleting your account. Please try again.',
+                });
               } else {
-                const { error } = await supabase.auth.admin.deleteUser(user!.id);
-                if (error) {
-                  console.error('Error deleting account:', error);
-                  toast({
-                    title: 'Error',
-                    description: 'There was an error deleting your account. Please try again.',
-                  });
-                } else {
-                  router.push('/signin');
-                }
+                router.push('/signin');
               }
             }}
             className="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
@@ -221,46 +179,39 @@ const Profile = () => {
     });
   };
 
-  const handleSignUp = () => {
-    router.push('/signup');
-  };
+  const handleAvatarChange = async (newAvatar: string) => {
+    // If newAvatar is already a data URL, use it as is
+    // Otherwise, convert it to a data URL
+    const avatarUrl = newAvatar.startsWith('data:') 
+      ? newAvatar 
+      : `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(newAvatar)))}`;
 
-  const handleAvatarChange = () => {
-    if (isAnonymous) {
-      const newAvatar = getMicahAvatarSvg(Math.random().toString());
-      setSelectedAvatar(newAvatar);
-    } else {
-      // Existing avatar change logic for authenticated users
+    setSelectedAvatar(avatarUrl);
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ avatar_url: avatarUrl })
+        .eq('id', user!.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      setUser({ ...user!, avatar_url: avatarUrl });
+      toast({
+        title: 'Avatar Updated',
+        description: 'Your avatar has been updated successfully.',
+      });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      toast({
+        title: 'Update Failed',
+        description: 'Failed to update avatar. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
-
-  const updateAnonymousStreak = () => {
-    const localUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
-    const lastLogin = new Date(localUserData.last_login);
-    const today = new Date();
-    const daysSinceLastLogin = differenceInDays(today, lastLogin);
-
-    let newStreak = localUserData.streak || 0;
-    if (daysSinceLastLogin === 1) {
-      newStreak += 1;
-    } else if (daysSinceLastLogin > 1) {
-      newStreak = 1;
-    }
-
-    const updatedUserData = {
-      ...localUserData,
-      streak: newStreak,
-      last_login: today.toISOString(),
-    };
-    localStorage.setItem('anonymousUserData', JSON.stringify(updatedUserData));
-    setUser((prevUser: User | null) => prevUser ? { ...prevUser, streak: newStreak } : null);
-  };
-
-  useEffect(() => {
-    if (isAnonymous) {
-      updateAnonymousStreak();
-    }
-  }, [isAnonymous]);
 
   const handleChangePassword = async () => {
     if (newPassword.length < 8) {
@@ -328,10 +279,38 @@ const Profile = () => {
           <CardContent>
             <div className="flex flex-col items-center">
               <UserAvatar 
-                avatarSvg={selectedAvatar || user.avatar_url} 
-                alt="User Avatar" 
-                onClick={handleAvatarChange}
+                avatarUrl={selectedAvatar || user?.avatar_url || null}
+                alt="User Avatar"
+                onClick={() => setDropdownOpen(!dropdownOpen)}  // This line is now valid
               />
+              <div className="mt-4 flex space-x-2">
+                {avatarOptions.map((avatar, index) => (
+                  <button
+                    aria-label={`Avatar option ${index + 1}`}
+                    key={index}
+                    onClick={() => handleAvatarChange(avatar)}
+                    className="w-10 h-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
+                  >
+                    <Image
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar)}`}
+                      alt={`Avatar option ${index + 1}`}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+                <button
+                  aria-label="Shuffle Avatar"
+                  onClick={() => {
+                    const newOptions = Array.from({ length: 5 }, () => getGlassAvatarSvg(Math.random().toString()));
+                    setAvatarOptions(newOptions);
+                  }}
+                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
+                >
+                  <FaShuffle className="text-gray-600 dark:text-gray-300" />
+                </button>
+              </div>
               <div className="w-full mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                 {isEditing ? (
@@ -346,35 +325,19 @@ const Profile = () => {
                 )}
               </div>
               <div className="w-full mt-4">
-                {isAnonymous ? (
-                  <div className="flex items-center justify-between">
-                    <Button 
-                      onClick={handleSignUp}
-                      className="bg-black hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-                    >
-                      Sign Up
-                    </Button>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-4">
-                      Sync and save your data
-                    </span>
-                  </div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                {isEditing ? (
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
+                  />
                 ) : (
-                  <>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                    {isEditing ? (
-                      <Input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="mt-1 block w-full bg-white dark:bg-gray-600 text-black dark:text-white"
-                      />
-                    ) : (
-                      <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
-                    )}
-                  </>
+                  <p className="mt-1 text-gray-600 dark:text-gray-300">{user.email}</p>
                 )}
               </div>
-              {!isAnonymous && (
+              {!isEditing && (
                 <div className="w-full mt-4">
                   {isChangingPassword ? (
                     <div className="space-y-2">
@@ -464,15 +427,13 @@ const Profile = () => {
             >
               Privacy Policy
             </Button>
-            {!isAnonymous && (
-              <Button 
-                variant="outline" 
-                onClick={handleDeleteAccount} 
-                className="text-red-600 dark:bg-gray-800 dark:text-red-400"
-              >
-                Delete Account
-              </Button>
-            )}
+            <Button 
+              variant="outline" 
+              onClick={handleDeleteAccount} 
+              className="text-red-600 dark:bg-gray-800 dark:text-red-400"
+            >
+              Delete Account
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -489,11 +450,6 @@ const Profile = () => {
               <Button onClick={handleConfirmSave} className="text-white dark:text-black">Confirm</Button>
             </div>
           </div>
-        </div>
-      )}
-      {isAnonymous && (
-        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          You are using an anonymous account. Your data is stored locally in your browser.
         </div>
       )}
     </div>

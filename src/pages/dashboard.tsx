@@ -2,7 +2,7 @@ import '../app/globals.css';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
-import { getMicahAvatarSvg } from '../utils/avatar';
+import { getGlassAvatarSvg } from '../utils/avatar';
 import NavMenu from '../components/dashboard/NavMenu';
 import FlashcardComponent from '../components/dashboard/Flashcard';
 import { useToast } from '../components/ui/use-toast';
@@ -87,22 +87,18 @@ const Dashboard = () => {
       if (session && session.user) {
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('*')
+          .select('id, name, email, avatar_url, membership, streak')
           .eq('id', session.user.id)
           .single();
 
-        if (userError) {
-          console.error('Error fetching user data:', userError);
-        } else {
-          setUser({
-            ...userData,
-            avatarUrl: userData.avatarUrl || getMicahAvatarSvg(userData.email)
-          });
-          fetchUserDecksAndSetSelected(session.user.id);
-
-          // Set streak from user data
-          setStreak(userData.streak || 0);
+        if (userData) {
+          setUser(userData as UserType);
         }
+
+        fetchUserDecksAndSetSelected(session.user.id);
+
+        // Set streak from user data
+        setStreak(userData?.streak || 0);
       } else {
         router.push('/signin');
       }
@@ -178,7 +174,6 @@ const Dashboard = () => {
               isDarkMode={isDarkMode}
               toggleDarkMode={toggleDarkMode}
               handleSignOut={handleSignOut}
-              streak={streak}
             />
           )}
         </div>

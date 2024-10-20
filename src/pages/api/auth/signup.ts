@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 import prisma from '../../../lib/prisma';
-import { getMicahAvatarSvg } from '../../../utils/avatar';
+import { getGlassAvatarSvg } from '../../../utils/avatar';
 import axios from 'axios';
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -59,7 +59,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
       // Generate Micah avatar SVG with email as seed
-      const avatarSvg = getMicahAvatarSvg(email);
+      const avatarSvg = getGlassAvatarSvg(email);
 
       const user = await prisma.user.create({
         data: {
