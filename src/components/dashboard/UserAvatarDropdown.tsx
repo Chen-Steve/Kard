@@ -12,9 +12,10 @@ interface UserAvatarDropdownProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   handleSignOut: () => void;
+  streak: number;
 }
 
-const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMode, toggleDarkMode, handleSignOut }) => {
+const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMode, toggleDarkMode, handleSignOut, streak }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -72,6 +73,9 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
               <FaPowerOff className="mr-2" />
               Log Out
             </button>
+          </div>
+          <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+            Streak: {streak} days
           </div>
         </div>
       )}

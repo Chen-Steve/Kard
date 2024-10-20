@@ -1,7 +1,7 @@
 "use client";
 
 import '../app/globals.css';
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 import { RiFeedbackFill } from "react-icons/ri";
@@ -15,8 +15,6 @@ import Head from 'next/head';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
-import { useRouter } from 'next/router';
-import debounce from 'lodash/debounce';
 
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
@@ -46,7 +44,6 @@ const HomePage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -85,47 +82,6 @@ const HomePage: React.FC = () => {
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAnonymousSignIn = useCallback(() => {
-    // Check if an anonymous user ID already exists
-    let anonymousId = localStorage.getItem('anonymousUserId');
-    
-    if (!anonymousId) {
-      // If no existing anonymous ID, generate a new one
-      anonymousId = 'anon_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('anonymousUserId', anonymousId);
-      
-      // Generate a random name
-      const adjectives = ['Happy', 'Clever', 'Brave', 'Kind', 'Witty'];
-      const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox'];
-      const randomName = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
-      
-      // Save anonymous user data
-      const anonymousUserData = {
-        id: anonymousId,
-        name: randomName,
-        email: '',
-        avatarUrl: '',
-        membership: 'free',
-        streak: 0,
-        last_login: new Date().toISOString()
-      };
-      
-      localStorage.setItem('anonymousUserData', JSON.stringify(anonymousUserData));
-    } else {
-      // If an anonymous ID exists, retrieve the existing user data
-      const existingUserData = JSON.parse(localStorage.getItem('anonymousUserData') || '{}');
-      existingUserData.last_login = new Date().toISOString();
-      localStorage.setItem('anonymousUserData', JSON.stringify(existingUserData));
-    }
-    
-    router.push('/anonDashboard', undefined, { shallow: true });
-  }, [router]);
-
-  const debouncedHandleAnonymousSignIn = useMemo(
-    () => debounce(handleAnonymousSignIn, 300),
-    [handleAnonymousSignIn]
-  );
 
   return (
     <>
@@ -178,25 +134,12 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
             <Link href="/signin">
               <Button
-                className="px-6 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-white hover:bg-gray-100 text-black border-2 border-black"
+                className="px-6 py-3 rounded-md font-semibold w-full sm:w-auto bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-200 ease-out hover:-translate-y-0.5 hover:translate-x-0.5 active:translate-y-0 active:translate-x-0 shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] active:shadow-none hover:bg-white"
                 data-cursor={!isMobile ? "block" : undefined}
               >
-                <span className="text-lg">Get Started</span>
+                <span className="text-lg relative z-10">Get Started</span>
               </Button>
             </Link>
-            {/*   
-            
-            <Link href="#" onClick={debouncedHandleAnonymousSignIn}>
-              <Button
-                className="px-4 py-3 rounded-md font-semibold shadow-lg shine-effect w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white"
-                data-cursor={!isMobile ? "block" : undefined}
-              >
-                <span className="text-lg">Create Now</span>
-              </Button>
-            </Link>
-            
-            */}
-            
           </div>
         </main>
 

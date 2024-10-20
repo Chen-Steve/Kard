@@ -45,6 +45,7 @@ const Dashboard = () => {
   ]);
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
   const [showFlashcardList, setShowFlashcardList] = useState(true);
+  const [streak, setStreak] = useState(0);
 
   const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
     const { data: decksData, error: decksError } = await supabase
@@ -98,6 +99,9 @@ const Dashboard = () => {
             avatarUrl: userData.avatarUrl || getMicahAvatarSvg(userData.email)
           });
           fetchUserDecksAndSetSelected(session.user.id);
+
+          // Set streak from user data
+          setStreak(userData.streak || 0);
         }
       } else {
         router.push('/signin');
@@ -174,6 +178,7 @@ const Dashboard = () => {
               isDarkMode={isDarkMode}
               toggleDarkMode={toggleDarkMode}
               handleSignOut={handleSignOut}
+              streak={streak}
             />
           )}
         </div>

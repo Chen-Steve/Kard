@@ -1,5 +1,5 @@
 import '../app/globals.css';
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import { signIn } from 'next-auth/react';
 import { initCursor, updateCursor, customCursorStyle } from 'ipad-cursor';
 import ForgotPassword from '../components/forgotPassword';
+import { updateStreak } from '../utils/streak';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -50,8 +51,8 @@ const SignIn = () => {
     }
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -60,14 +61,14 @@ const SignIn = () => {
     });
 
     if (error) {
-      console.error('Error signing in:', error.message);
       setErrorMessage(error.message);
-      setLoading(false);
-    } else {
-      console.log('Signed in successfully:', data);
-      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+    } else if (data.user) {
+      // Update streak after successful login
+      await updateStreak(data.user.id);
       router.push('/dashboard');
     }
+
+    setLoading(false);
   };
 
   const handleGoogleSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -102,7 +103,7 @@ const SignIn = () => {
                 <span className="block sm:inline">{errorMessage}</span>
               </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSignIn} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
