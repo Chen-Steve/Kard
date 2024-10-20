@@ -119,6 +119,20 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
     saveStickersToLocalStorage();
   }, [saveStickersToLocalStorage]);
 
+  useEffect(() => {
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('touchmove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchend', handleDragEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [handleDragMove, handleDragEnd]);
+
   return (
     <div className="absolute inset-0 pointer-events-none">
       {stickers.map((sticker) => (
