@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
-import { FaCircleNotch, FaFolderOpen } from "react-icons/fa";
+import { FaCircleNotch } from "react-icons/fa";
 import { useRouter } from 'next/router';
-import DeckSelectionPopup from './DeckSelectionPopup';
 import { useToast } from "@/components/ui/use-toast";
 import supabase from '../lib/supabaseClient';
 
