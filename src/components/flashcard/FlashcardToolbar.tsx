@@ -19,6 +19,7 @@ interface FlashcardToolbarProps {
   flashcards: Flashcard[];
   onShuffleComplete: (shuffledCards: Flashcard[]) => void;
   children?: ReactNode;
+  isPublicDeck?: boolean;
 }
 
 const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
@@ -31,6 +32,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
   flashcards,
   onShuffleComplete,
   children,
+  isPublicDeck = false,
 }) => {
   return (
     <div className="flex justify-between items-center space-x-4 flex-wrap">
@@ -55,6 +57,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
         <FlashcardShuffle 
           flashcards={flashcards}
           onShuffleComplete={onShuffleComplete}
+          isPublicDeck={isPublicDeck}
         />
       </div>
       <div className="flex space-x-2">

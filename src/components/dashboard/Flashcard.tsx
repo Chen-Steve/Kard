@@ -18,6 +18,7 @@ interface FlashcardProps {
   readOnly?: boolean;
   isTableView?: boolean;
   showFlashcardList: boolean;
+  isPublicDeck?: boolean;
 }
 
 interface Flashcard {
@@ -34,7 +35,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, isPublicDeck = false }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -396,17 +397,20 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               readOnly={readOnly}
               flashcards={flashcards}
               onShuffleComplete={handleShuffleComplete}
+              isPublicDeck={isPublicDeck}
             >
-              <FlashcardImportGenerate
-                userId={userId}
-                deckId={deckId}
-                onFlashcardsAdded={handleFlashcardsAdded}
-                currentFlashcardsCount={flashcards.length}
-                onToggleImport={handleToggleImport}
-                onToggleGenerate={handleToggleGenerate}
-                isImportVisible={isImportVisible}
-                isGenerateVisible={isGenerateVisible}
-              />
+              {!isPublicDeck && (
+                <FlashcardImportGenerate
+                  userId={userId}
+                  deckId={deckId}
+                  onFlashcardsAdded={handleFlashcardsAdded}
+                  currentFlashcardsCount={flashcards.length}
+                  onToggleImport={handleToggleImport}
+                  onToggleGenerate={handleToggleGenerate}
+                  isImportVisible={isImportVisible}
+                  isGenerateVisible={isGenerateVisible}
+                />
+              )}
             </FlashcardToolbar>
 
             <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>

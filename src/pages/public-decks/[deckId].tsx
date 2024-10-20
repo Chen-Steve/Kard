@@ -100,22 +100,38 @@ const PublicDeckPage = () => {
         <p className="text-center mb-4 text-black dark:text-white">Created by: {deck.user.name}</p>
         
         <div className="flex flex-wrap justify-center gap-2 mb-4">
-          <Button onClick={handleLearnClick} className="flex items-center space-x-2">
+          <button
+            onClick={handleLearnClick}
+            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+            data-cursor="block"
+          >
             <SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />
-            <span>Learn</span>
-          </Button>
-          <Button onClick={handleTestClick} className="flex items-center space-x-2">
+            <span className="font-semibold">Learn</span>
+          </button>
+          <button
+            onClick={handleTestClick}
+            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+            data-cursor="block"
+          >
             <RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-            <span>Test</span>
-          </Button>
-          <Button onClick={handleMatchClick} className="flex items-center space-x-2">
+            <span className="font-semibold">Test</span>
+          </button>
+          <button
+            onClick={handleMatchClick}
+            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+            data-cursor="block"
+          >
             <PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-            <span>Match</span>
-          </Button>
-          <Button onClick={handleKChatClick} className="flex items-center space-x-2">
+            <span className="font-semibold">Match</span>
+          </button>
+          <button
+            onClick={handleKChatClick}
+            className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
+            data-cursor="block"
+          >
             <BiSolidMessageSquareDots className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-            <span>K-Chat</span>
-          </Button>
+            <span className="font-semibold">K-Chat</span>
+          </button>
         </div>
 
         <FlashcardComponent 
@@ -124,6 +140,7 @@ const PublicDeckPage = () => {
           decks={[deck]} 
           readOnly={true} 
           showFlashcardList={true}
+          isPublicDeck={true}
         />
 
         <button

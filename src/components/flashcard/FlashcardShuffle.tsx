@@ -12,9 +12,10 @@ interface Flashcard {
 interface FlashcardShuffleProps {
   flashcards: Flashcard[];
   onShuffleComplete: (shuffledCards: Flashcard[]) => void;
+  isPublicDeck?: boolean;
 }
 
-const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuffleComplete }) => {
+const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuffleComplete, isPublicDeck = false }) => {
   const shuffleFlashcards = async () => {
     const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
     const updatedFlashcards = shuffled.map((card, index) => ({
@@ -24,25 +25,31 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
 
     console.log('Shuffling flashcards:', updatedFlashcards);
 
-    try {
-      const response = await fetch('/api/flashcard', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flashcards: updatedFlashcards }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to shuffle flashcards: ${errorData.error}, ${errorData.details}`);
-      }
-
-      const result = await response.json();
-      console.log('Shuffle response:', result);
-
+    if (isPublicDeck) {
+      // For public decks, just update the local state
       onShuffleComplete(updatedFlashcards);
-    } catch (error) {
-      console.error('Error shuffling flashcards:', error);
-      toast.error('Failed to shuffle flashcards. Please try again.');
+    } else {
+      try {
+        const response = await fetch('/api/flashcard', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ flashcards: updatedFlashcards }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to shuffle flashcards: ${errorData.error}, ${errorData.details}`);
+        }
+
+        const result = await response.json();
+        console.log('Shuffle response:', result);
+
+        onShuffleComplete(updatedFlashcards);
+        toast.success('Flashcards shuffled and saved');
+      } catch (error) {
+        console.error('Error shuffling flashcards:', error);
+        toast.error('Failed to shuffle flashcards. Please try again.');
+      }
     }
   };
 
@@ -53,7 +60,6 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
       aria-label="Shuffle flashcards"
     >
       <FaShuffle />
-      
     </button>
   );
 };
