@@ -31,7 +31,6 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
   const [error, setError] = useState<string | null>(null);
   const [dragInfo, setDragInfo] = useState<DragInfo | null>(null);
   const initialFetchRef = useRef(false);
-  const [isPositioned, setIsPositioned] = useState(false);
 
   const saveStickersToLocalStorage = useCallback(() => {
     localStorage.setItem('stickers', JSON.stringify(stickers));
@@ -49,8 +48,8 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
           path: file.name,
           publicUrl: urlData.publicUrl,
           signedUrl: urlData.publicUrl,
-          x: 0,
-          y: 0,
+          x: Math.random() * (window.innerWidth - 175),
+          y: Math.random() * (window.innerHeight - 175),
           width: 175,
           height: 175,
         };
@@ -58,17 +57,7 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
 
       setStickers(newStickers);
       setIsLoading(false);
-      
-      // Delay positioning to ensure DOM is ready
-      setTimeout(() => {
-        setStickers(prevStickers => prevStickers.map(sticker => ({
-          ...sticker,
-          x: Math.random() * (window.innerWidth - sticker.width),
-          y: Math.random() * (window.innerHeight - sticker.height),
-        })));
-        setIsPositioned(true);
-        saveStickersToLocalStorage();
-      }, 100);
+      saveStickersToLocalStorage();
     } catch (error) {
       console.error('Error fetching stickers:', error);
       setError('Failed to load stickers');
@@ -81,12 +70,10 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
     if (savedStickers) {
       setStickers(JSON.parse(savedStickers));
       setIsLoading(false);
-    } else if (stickers.length === 0) {
-      fetchStickers();
     } else {
-      setIsLoading(false);
+      fetchStickers();
     }
-  }, [setStickers, stickers, fetchStickers, setIsLoading]);
+  }, [setStickers, fetchStickers]);
 
   useEffect(() => {
     if (!initialFetchRef.current) {
@@ -94,14 +81,6 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       loadStickersFromLocalStorage();
     }
   }, [loadStickersFromLocalStorage]);
-
-  useEffect(() => {
-    if (stickers.length === 0) {
-      fetchStickers();
-    } else {
-      setIsLoading(false);
-    }
-  }, [stickers, fetchStickers]);
 
   useEffect(() => {
     if (stickers.length > 0) {
@@ -140,30 +119,6 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
     saveStickersToLocalStorage();
   }, [saveStickersToLocalStorage]);
 
-  useEffect(() => {
-    if (dragInfo) {
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('mouseup', handleDragEnd);
-      window.addEventListener('touchmove', handleDragMove);
-      window.addEventListener('touchend', handleDragEnd);
-    } else {
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('mouseup', handleDragEnd);
-      window.removeEventListener('touchmove', handleDragMove);
-      window.removeEventListener('touchend', handleDragEnd);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('mouseup', handleDragEnd);
-      window.removeEventListener('touchmove', handleDragMove);
-      window.removeEventListener('touchend', handleDragEnd);
-    };
-  }, [dragInfo, handleDragMove, handleDragEnd]);
-
-  if (isLoading) return <div>Loading stickers...</div>;
-  if (error) return <div>Error: {error}</div>;
-
   return (
     <div className="absolute inset-0 pointer-events-none">
       {stickers.map((sticker) => (
@@ -176,8 +131,6 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
             width: sticker.width,
             height: sticker.height,
             zIndex: dragInfo?.stickerId === sticker.id ? 1000 : 1,
-            opacity: isPositioned ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
           }}
           onMouseDown={(e) => handleDragStart(e, sticker.id)}
           onTouchStart={(e) => handleDragStart(e, sticker.id)}
