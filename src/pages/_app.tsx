@@ -6,7 +6,6 @@ import { ToastContainer } from 'react-toastify';
 import Head from 'next/head';
 import 'react-toastify/dist/ReactToastify.css';
 import '../app/globals.css';
-import '../lib/fontAwesome';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from '../components/ui/toaster';
