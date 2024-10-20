@@ -95,9 +95,10 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
                     onClick={() => flipCard(flashcard.id)}
                   >
                     <CardContent className="p-2">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap pr-8">
-                        {flashcard.isFlipped ? flashcard.answer : flashcard.question}
-                      </p>
+                      <div 
+                        className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap pr-8"
+                        dangerouslySetInnerHTML={{ __html: flashcard.isFlipped ? flashcard.answer : flashcard.question }}
+                      />
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
