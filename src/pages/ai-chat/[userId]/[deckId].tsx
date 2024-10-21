@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
 import AIChatComponent from '../../../components/modes/AIChatComponent';
 import { toast } from 'react-toastify';
 
@@ -28,12 +26,14 @@ const AIChatPage: React.FC = () => {
 
   useEffect(() => {
     const checkMembership = async () => {
+      console.log('Checking membership for userId:', userId);
       if (userId && typeof userId === 'string') {
         try {
           const response = await fetch(`/api/user?userId=${userId}`);
           if (response.ok) {
             const userData = await response.json();
-            console.log('User data:', userData);
+            console.log('Raw user data:', userData);
+            console.log('Membership status:', userData.membership);
             setUserMembership(userData.membership === 'pro');
             if (userData.membership !== 'pro') {
               toast.error('This feature is only available for pro members.');

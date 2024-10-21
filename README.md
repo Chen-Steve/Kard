@@ -16,7 +16,7 @@
 - [ ] **Customizable Dashboard**.
 - [ ] **Test Mode**.
 - [ ] **Upload flashcards** from PDF, Docs.
-- [ ] Fix **streaks system** for tracking progress.
+- [x] Fix **streaks system** for tracking progress.
 - [ ] Add **reward/gamification**.
 - [ ] **Anonymous sign-in** support.
 - [x] Enhanced text formatting: **bold, underline, italics** in flashcards (10/18/24).
