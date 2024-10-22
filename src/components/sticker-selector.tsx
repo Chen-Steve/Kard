@@ -40,21 +40,30 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
     try {
       const { data, error } = await supabase.storage.from('stickers').list();
       if (error) throw error;
-
-      const newStickers = data.map((file) => {
-        const { data: urlData } = supabase.storage.from('stickers').getPublicUrl(file.name);
-        return {
-          id: file.id,
-          path: file.name,
-          publicUrl: urlData.publicUrl,
-          signedUrl: urlData.publicUrl,
-          x: Math.random() * (window.innerWidth - 175),
-          y: Math.random() * (window.innerHeight - 175),
-          width: 175,
-          height: 175,
-        };
-      });
-
+  
+      const newStickers = await Promise.all(
+        data.map(async (file) => {
+          // Generate a signed URL for each file
+          const { data: signedUrlData, error: signedUrlError } = await supabase
+            .storage
+            .from('stickers')
+            .createSignedUrl(file.name, 60 * 60);  // URL expires in 1 hour
+          
+          if (signedUrlError) throw signedUrlError;
+  
+          return {
+            id: file.id,
+            path: file.name,
+            publicUrl: signedUrlData.signedUrl,
+            signedUrl: signedUrlData.signedUrl,  // Use signed URL
+            x: Math.random() * (window.innerWidth - 175),
+            y: Math.random() * (window.innerHeight - 175),
+            width: 175,
+            height: 175,
+          };
+        })
+      );
+  
       setStickers(newStickers);
       setIsLoading(false);
       saveStickersToLocalStorage();
@@ -64,6 +73,7 @@ const StickerSelector: React.FC<StickerSelectorProps> = ({ stickers, setStickers
       setIsLoading(false);
     }
   }, [setStickers, saveStickersToLocalStorage]);
+  
 
   const loadStickersFromLocalStorage = useCallback(() => {
     const savedStickers = localStorage.getItem('stickers');
