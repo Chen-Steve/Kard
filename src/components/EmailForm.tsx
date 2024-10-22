@@ -5,12 +5,14 @@ const EmailForm: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
       setIsLoading(true);
       setError(null);
+      setMessage(null);
       try {
         const response = await fetch('/api/subscribe', {
           method: 'POST',
@@ -20,13 +22,23 @@ const EmailForm: React.FC = () => {
           body: JSON.stringify({ email }),
         });
 
-        if (!response.ok) {
-          throw new Error('Subscription failed');
-        }
+        const data = await response.json();
 
-        setIsSubmitted(true);
+        if (!response.ok) {
+          if (response.status === 400 && data.message === 'Already signed up!') {
+            setMessage(data.message);
+          } else {
+            throw new Error(data.message || 'Subscription failed');
+          }
+        } else {
+          setIsSubmitted(true);
+        }
       } catch (error) {
-        setError('Failed to subscribe. Please try again.');
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('Failed to subscribe. Please try again.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -66,6 +78,7 @@ const EmailForm: React.FC = () => {
         </button>
       </form>
       {error && <p className="mt-4 text-red-500">{error}</p>}
+      {message && <p className="mt-4 text-blue-500">{message}</p>}
     </div>
   );
 };

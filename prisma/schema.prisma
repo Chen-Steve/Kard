@@ -7,7 +7,6 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
 model User {
   id         String      @id
   email      String      @unique @db.Text
@@ -108,4 +107,12 @@ model PasswordResetToken {
   @@index([token])
   @@index([email])
   @@map("password_reset_tokens")
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email     String   @unique @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("newsletter_subscriptions")
 }

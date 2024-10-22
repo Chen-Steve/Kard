@@ -1,5 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,39 +18,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('Creating transporter...');
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.com',
-      port: 465,
-      secure: true, // use SSL
-      auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
-      },
-    });
+    // Check if the email already exists
+    const { data: existingSubscription, error: checkError } = await supabase
+      .from('newsletter_subscriptions')
+      .select('email')
+      .eq('email', email)
+      .single();
 
-    console.log('Verifying transporter...');
-    await transporter.verify();
-    console.log('Transporter verified successfully');
+    if (checkError && checkError.code !== 'PGRST116') {
+      // PGRST116 means no rows returned, which is fine
+      throw checkError;
+    }
 
-    console.log('Sending confirmation email...');
-    await transporter.sendMail({
-      from: process.env.ZOHO_EMAIL,
-      to: email,
-      subject: 'Welcome to Kard Updates',
-      text: 'Thank you for subscribing to Kard updates!',
-      html: '<p>Thank you for subscribing to Kard updates!</p>',
-    });
-    console.log('Confirmation email sent successfully');
+    if (existingSubscription) {
+      return res.status(400).json({ message: 'Already signed up!' });
+    }
+
+    // Insert the email into the 'newsletter_subscriptions' table
+    const { data, error } = await supabase
+      .from('newsletter_subscriptions')
+      .insert({ email })
+      .select();
+
+    if (error) throw error;
+
+    console.log('Subscription added:', data);
 
     res.status(200).json({ message: 'Subscription successful' });
   } catch (error) {
     console.error('Subscription error:', error);
-    if (error instanceof Error) {
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
     res.status(500).json({ message: 'Subscription failed', error: (error as Error).message });
   }
 }
