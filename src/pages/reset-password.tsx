@@ -19,14 +19,29 @@ const ResetPassword = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const { token } = router.query;
+    const { token, email } = router.query;
     
-    if (!token) {
-      setError('Invalid or missing reset token');
+    if (!token || !email) {
+      setError('Invalid or missing reset token or email');
       return;
     }
 
-    setIsValidToken(true);
+    const verifyToken = async () => {
+      try {
+        const { error } = await supabase.auth.verifyOtp({
+          token: token as string,
+          type: 'recovery',
+          email: email as string
+        });
+        if (error) throw error;
+        setIsValidToken(true);
+      } catch (error) {
+        console.error('Error verifying token:', error);
+        setError('Invalid or expired reset token');
+      }
+    };
+
+    verifyToken();
   }, [router]);
 
   if (!isValidToken) {
@@ -52,7 +67,9 @@ const ResetPassword = () => {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { error } = await supabase.auth.updateUser({ 
+        password: newPassword
+      });
       
       if (error) throw error;
       

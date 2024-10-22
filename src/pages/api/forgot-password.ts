@@ -58,14 +58,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('Failed to generate reset link');
     }
 
-    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${data.properties.action_link.split('token=')[1]}`;
+    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${data.properties.action_link.split('token=')[1]}&email=${encodeURIComponent(email)}`;
 
     // Log the generated link (remove this in production)
     console.log('Generated reset link:', resetLink);
 
     // Send email using nodemailer
     const mailOptions = {
-      from: process.env.ZOHO_EMAIL, // Ensure this matches the authenticated email
+      from: process.env.ZOHO_EMAIL,
       to: email,
       subject: 'Password Reset',
       text: `Click this link to reset your password: ${resetLink}`,
