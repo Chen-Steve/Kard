@@ -28,16 +28,41 @@ const ResetPassword = () => {
 
     const verifyToken = async () => {
       try {
+        // First, try to verify the OTP
         const { error } = await supabase.auth.verifyOtp({
           token: token as string,
           type: 'recovery',
           email: email as string
         });
-        if (error) throw error;
+
+        if (error) {
+          // If verification fails, try to refresh the session
+          const { error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) throw refreshError;
+
+          // After refreshing, try to verify the OTP again
+          const { error: secondVerifyError } = await supabase.auth.verifyOtp({
+            token: token as string,
+            type: 'recovery',
+            email: email as string
+          });
+          if (secondVerifyError) throw secondVerifyError;
+        }
+
         setIsValidToken(true);
       } catch (error) {
         console.error('Error verifying token:', error);
-        setError('Invalid or expired reset token');
+        if (error instanceof Error) {
+          if (error.message.includes('expired')) {
+            setError('Reset token has expired. Please request a new password reset.');
+          } else if (error.message.includes('invalid')) {
+            setError('Invalid reset token. Please check your reset link or request a new one.');
+          } else {
+            setError(`An error occurred: ${error.message}`);
+          }
+        } else {
+          setError('An unknown error occurred while verifying the reset token.');
+        }
       }
     };
 
