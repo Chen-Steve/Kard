@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { SiRobotframework } from "react-icons/si";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,7 +17,32 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [devError, setDevError] = useState('');
+  const [isValidToken, setIsValidToken] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const { access_token } = router.query;
+    if (typeof access_token === 'string') {
+      verifyToken(access_token);
+    } else {
+      setError('Oops.. something went wrong, try again!');
+      setDevError('Invalid or missing reset token');
+    }
+  }, [router.query]);
+
+  const verifyToken = async (token: string) => {
+    try {
+      const { error } = await supabase.auth.getUser(token);
+      if (error) throw error;
+      setIsValidToken(true);
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      setError('Oops.. something went wrong, try again!');
+      setDevError('Invalid or expired reset token');
+      setTimeout(() => router.push('/signin'), 3000);
+    }
+  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +74,33 @@ const ResetPassword = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  if (!isValidToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="flex flex-col items-center">
+            <SiRobotframework className="h-20 w-20 text-indigo-600" />
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              {error || 'Verifying reset token...'}
+            </h2>
+          </div>
+          {typeof window !== 'undefined' && 
+           window.location.hostname === 'localhost' && 
+           devError && (
+            <p className="mt-2 text-center text-sm text-red-600">
+              Dev Error: {devError}
+            </p>
+          )}
+          <div className="text-center">
+            <Link href="/" className="text-indigo-600 hover:text-indigo-500">
+              Go back
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
