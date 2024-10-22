@@ -21,7 +21,6 @@ model User {
   streak     Int         @default(0)
   lastLogin  DateTime?   @map("last_login")
   joinedAt   DateTime    @default(now()) @map("joined_at")
-  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -93,20 +92,6 @@ model Sticker {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("stickers")
-}
-
-model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  email     String   @db.Text
-  token     String   @unique @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  expiresAt DateTime @map("expires_at")
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([token])
-  @@index([email])
-  @@map("password_reset_tokens")
 }
 
 model NewsletterSubscription {

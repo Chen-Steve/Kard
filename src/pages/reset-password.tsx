@@ -15,75 +15,7 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isValidToken, setIsValidToken] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('Supabase Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Not Set');
-    
-    if (!supabase) {
-      console.error('Supabase client not initialized');
-      setError('Unable to connect to authentication service');
-      return;
-    }
-
-    const { token, email } = router.query;
-    
-    if (!token || !email) {
-      setError('Invalid or missing reset token or email');
-      return;
-    }
-
-    const verifyToken = async () => {
-      const { token, email } = router.query;
-      
-      console.log('Token:', token);
-      console.log('Email:', email);
-
-      if (!token || !email) {
-        setError('Invalid or missing reset token or email');
-        return;
-      }
-
-      try {
-        console.log('Attempting to verify OTP with:', { token, email, type: 'recovery' });
-        const { data, error } = await supabase.auth.verifyOtp({
-          token: token as string,
-          type: 'recovery',
-          email: email as string
-        });
-
-        console.log('Verify OTP response:', { data, error });
-
-        if (error) throw error;
-
-        setIsValidToken(true);
-      } catch (error) {
-        console.error('Error verifying token:', error);
-        if (error instanceof Error) {
-          setError(`An error occurred: ${error.message}`);
-        } else {
-          setError('An unknown error occurred while verifying the reset token.');
-        }
-        setIsValidToken(false);
-      }
-    };
-
-    verifyToken();
-  }, [router]);
-
-  if (!isValidToken) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {error || 'Invalid reset token'}
-          </h2>
-        </div>
-      </div>
-    );
-  }
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,9 +28,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({ 
-        password: newPassword
-      });
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
       
       if (error) throw error;
       
