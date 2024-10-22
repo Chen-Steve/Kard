@@ -143,40 +143,47 @@ const Profile = () => {
 
   const handleDeleteAccount = () => {
     toast({
-      title: 'Account Deletion',
-      description: (
-        <span>
-          Are you sure you want to delete your account? This action cannot be undone.
-        </span>
-      ),
+      title: 'Delete Account',
+      description: 'Are you sure you want to delete your account? This action cannot be undone.',
       action: (
         <div className="flex space-x-2">
-          <button
-            onClick={async () => {
-              const { error } = await supabase.auth.admin.deleteUser(user!.id);
-              if (error) {
-                console.error('Error deleting account:', error);
-                toast({
-                  title: 'Error',
-                  description: 'There was an error deleting your account. Please try again.',
-                });
-              } else {
-                router.push('/signin');
-              }
-            }}
-            className="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
+          <Button
+            onClick={confirmDeleteAccount}
+            variant="destructive"
           >
             Confirm
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => dismiss()}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            variant="secondary"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       ),
+      duration: 5000,
     });
+  };
+
+  const confirmDeleteAccount = async () => {
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(user!.id);
+      if (error) {
+        throw error;
+      }
+      toast({
+        title: 'Account Deleted',
+        description: 'Your account has been successfully deleted.',
+      });
+      router.push('/signin');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: 'Error',
+        description: 'There was an error deleting your account. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleAvatarChange = async (newAvatar: string) => {
@@ -253,22 +260,56 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-4xl mb-4">
+      <div className="w-full max-w-3xl mb-4">
         <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:bg-gray-700 dark:text-white">
           <FaArrowLeft className="mr-2" /> Back to Dashboard
         </Button>
       </div>
-      <div className="w-full max-w-4xl flex flex-col md:flex-row gap-4">
+      <div className="w-full max-w-3xl flex flex-col md:flex-row gap-4">
         <StatsContainer 
           joinedAt={user.joined_at} 
           streak={user.streak} 
         />
 
         {/* Main Profile Container */}
-        <Card className="w-full md:w-2/3 bg-white dark:bg-gray-700">
+        <Card className="w-full md:w-3/5 bg-white dark:bg-gray-700">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-black dark:text-white">Profile</CardTitle>
+              <div className="flex items-center space-x-3">
+                <UserAvatar 
+                  avatarUrl={selectedAvatar || user?.avatar_url || null}
+                  alt="User Avatar"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                />
+                <div className="flex space-x-1">
+                  {avatarOptions.map((avatar, index) => (
+                    <button
+                      aria-label={`Avatar option ${index + 1}`}
+                      key={index}
+                      onClick={() => handleAvatarChange(avatar)}
+                      className="w-6 h-6 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
+                    >
+                      <Image
+                        src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar)}`}
+                        alt={`Avatar option ${index + 1}`}
+                        width={24}
+                        height={24}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                  <button
+                    aria-label="Shuffle Avatar"
+                    onClick={() => {
+                      const newOptions = Array.from({ length: 5 }, () => getGlassAvatarSvg(Math.random().toString()));
+                      setAvatarOptions(newOptions);
+                    }}
+                    className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
+                  >
+                    <FaShuffle className="text-gray-600 dark:text-gray-300 text-xs" />
+                  </button>
+                </div>
+              </div>
               {!isEditing && (
                 <Button variant="outline" onClick={handleEdit} className="text-black dark:bg-gray-800 dark:text-white">
                   Edit
@@ -278,39 +319,6 @@ const Profile = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center">
-              <UserAvatar 
-                avatarUrl={selectedAvatar || user?.avatar_url || null}
-                alt="User Avatar"
-                onClick={() => setDropdownOpen(!dropdownOpen)}  // This line is now valid
-              />
-              <div className="mt-4 flex space-x-2">
-                {avatarOptions.map((avatar, index) => (
-                  <button
-                    aria-label={`Avatar option ${index + 1}`}
-                    key={index}
-                    onClick={() => handleAvatarChange(avatar)}
-                    className="w-10 h-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
-                  >
-                    <Image
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar)}`}
-                      alt={`Avatar option ${index + 1}`}
-                      width={40}
-                      height={40}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-                <button
-                  aria-label="Shuffle Avatar"
-                  onClick={() => {
-                    const newOptions = Array.from({ length: 5 }, () => getGlassAvatarSvg(Math.random().toString()));
-                    setAvatarOptions(newOptions);
-                  }}
-                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
-                >
-                  <FaShuffle className="text-gray-600 dark:text-gray-300" />
-                </button>
-              </div>
               <div className="w-full mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
                 {isEditing ? (
