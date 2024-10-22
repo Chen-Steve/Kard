@@ -351,51 +351,53 @@ const DecksPage = () => {
               setIsCreateDialogOpen={setIsCreateDialogOpen}
               handleCreateDeck={handleCreateDeck}
             />
-            <div className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
-              <TbArrowsSort className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Reorder
-              </span>
-              <Switch
-                checked={isReorderingEnabled}
-                onCheckedChange={setIsReorderingEnabled}
-                className="data-[state=checked]:bg-[#637FBF]"
-              />
+            <div className="w-full sm:w-auto flex justify-center sm:justify-start">
+              <div className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
+                <TbArrowsSort className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Reorder
+                </span>
+                <Switch
+                  checked={isReorderingEnabled}
+                  onCheckedChange={setIsReorderingEnabled}
+                  className="data-[state=checked]:bg-[#637FBF]"
+                />
+              </div>
             </div>
           </div>
-          {filteredDecks.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">No decks found. Create a new deck to get started.</p>
-          ) : (
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="decks" type="DECK">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {filteredDecks.map((deck, index) => (
-                      deck && deck.id ? (
-                        <Draggable key={deck.id} draggableId={deck.id} index={index} isDragDisabled={!isReorderingEnabled}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...(isReorderingEnabled ? provided.dragHandleProps : {})}
-                            >
-                              <DeckCard
-                                deck={deck}
-                                isSelected={deck.id === selectedDeckId}
-                                onEdit={handleEditDeck}
-                                onDelete={handleDeleteDeck}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ) : null
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="decks" type="DECK">
+              {(provided) => (
+                <div 
+                  {...provided.droppableProps} 
+                  ref={provided.innerRef} 
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                >
+                  {filteredDecks.map((deck, index) => (
+                    deck && deck.id ? (
+                      <Draggable key={deck.id} draggableId={deck.id} index={index} isDragDisabled={!isReorderingEnabled}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...(isReorderingEnabled ? provided.dragHandleProps : {})}
+                          >
+                            <DeckCard
+                              deck={deck}
+                              isSelected={deck.id === selectedDeckId}
+                              onEdit={handleEditDeck}
+                              onDelete={handleDeleteDeck}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ) : null
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </main>
         <DeckFormDialog
           isOpen={!!editingDeck}

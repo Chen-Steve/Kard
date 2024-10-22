@@ -27,7 +27,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
     <Card
       className={`hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700 ${
         isSelected ? 'border-2 border-blue-500' : ''
-      }`}
+      } max-w-sm mx-auto`}
     >
       <CardHeader>
         <div className="flex justify-between items-center">
