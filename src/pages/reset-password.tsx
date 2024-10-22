@@ -19,6 +19,15 @@ const ResetPassword = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Not Set');
+    
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      setError('Unable to connect to authentication service');
+      return;
+    }
+
     const { token, email } = router.query;
     
     if (!token || !email) {
@@ -27,42 +36,37 @@ const ResetPassword = () => {
     }
 
     const verifyToken = async () => {
+      const { token, email } = router.query;
+      
+      console.log('Token:', token);
+      console.log('Email:', email);
+
+      if (!token || !email) {
+        setError('Invalid or missing reset token or email');
+        return;
+      }
+
       try {
-        // First, try to verify the OTP
-        const { error } = await supabase.auth.verifyOtp({
+        console.log('Attempting to verify OTP with:', { token, email, type: 'recovery' });
+        const { data, error } = await supabase.auth.verifyOtp({
           token: token as string,
           type: 'recovery',
           email: email as string
         });
 
-        if (error) {
-          // If verification fails, try to refresh the session
-          const { error: refreshError } = await supabase.auth.refreshSession();
-          if (refreshError) throw refreshError;
+        console.log('Verify OTP response:', { data, error });
 
-          // After refreshing, try to verify the OTP again
-          const { error: secondVerifyError } = await supabase.auth.verifyOtp({
-            token: token as string,
-            type: 'recovery',
-            email: email as string
-          });
-          if (secondVerifyError) throw secondVerifyError;
-        }
+        if (error) throw error;
 
         setIsValidToken(true);
       } catch (error) {
         console.error('Error verifying token:', error);
         if (error instanceof Error) {
-          if (error.message.includes('expired')) {
-            setError('Reset token has expired. Please request a new password reset.');
-          } else if (error.message.includes('invalid')) {
-            setError('Invalid reset token. Please check your reset link or request a new one.');
-          } else {
-            setError(`An error occurred: ${error.message}`);
-          }
+          setError(`An error occurred: ${error.message}`);
         } else {
           setError('An unknown error occurred while verifying the reset token.');
         }
+        setIsValidToken(false);
       }
     };
 
