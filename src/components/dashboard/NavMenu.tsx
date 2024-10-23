@@ -18,17 +18,6 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const [left, setLeft] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const [isAnonymous, setIsAnonymous] = useState(false);
-
-  useEffect(() => {
-    const checkAnonymousUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const anonymousUserId = localStorage.getItem('anonymousUserId');
-      setIsAnonymous(!session && !!anonymousUserId);
-    };
-
-    checkAnonymousUser();
-  }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isVertical) {

@@ -10,7 +10,7 @@ import DeckSearchAndFilter from '../components/deck/DeckSearchAndFilter';
 import DeckCard from '../components/deck/DeckCard';
 import { Deck } from '../types/deck';
 import { Switch } from '@/components/ui/switch';
-import { TbArrowsSort } from "react-icons/tb"; // Import the sort icon
+import { TbArrowsSort } from "react-icons/tb";
 
 const DecksPage = () => {
   const [decks, setDecks] = useState<Deck[]>([]);

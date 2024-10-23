@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import UserAvatar from '../UserAvatar';
+import UserAvatar from '../profile/UserAvatar';
 import { MdDarkMode } from "react-icons/md";
 import { FaSun } from "react-icons/fa";
 import { HiLightningBolt } from "react-icons/hi";
