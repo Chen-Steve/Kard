@@ -96,7 +96,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-      <div className={`bg-white bg-opacity-10 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-lg flex border-2 border-black ${isVertical ? 'flex-col items-center space-y-4 sm:space-y-6' : 'items-center space-x-4 sm:space-x-6'}`}>
+      <div className={`bg-white dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-30 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-lg flex border-2 border-black dark:border-gray-600 ${isVertical ? 'flex-col items-center space-y-4 sm:space-y-6' : 'items-center space-x-4 sm:space-x-6'}`}>
         <NavIcon
           onClick={() => setIsVertical(!isVertical)}
           icon={FaArrowsAltH}
@@ -137,9 +137,9 @@ const NavIcon: React.FC<NavIconProps> = ({ href, onClick, icon: Icon, label, ind
     >
       <Icon 
         className={`text-2xl sm:text-3xl transition-all duration-200 
-          ${isHovered ? 'text-gray-600 scale-125' : 'text-black'}`} 
+          ${isHovered ? 'text-gray-600 dark:text-gray-300 scale-125' : 'text-black dark:text-white'}`} 
       />
-      <span className={`text-xs mt-1 absolute ${isVertical ? 'left-full ml-2 top-1/2 -translate-y-1/2' : '-bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2'} whitespace-nowrap bg-gray-800 text-white px-1 sm:px-2 py-0.5 sm:py-1 rounded transition-all duration-200 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+      <span className={`text-xs mt-1 absolute ${isVertical ? 'left-full ml-2 top-1/2 -translate-y-1/2' : '-bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2'} whitespace-nowrap bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded transition-all duration-200 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         {label}
       </span>
     </div>
