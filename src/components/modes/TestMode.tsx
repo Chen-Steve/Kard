@@ -161,15 +161,15 @@ const TestMode: React.FC<TestModeProps> = ({ flashcards }) => {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-3xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Test Mode</h2>
+    <div className="min-h-screen py-4">
+      <div className="max-w-2xl mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Test Mode</h2>
         {questions.length > 0 ? (
           <>
-            <div className="space-y-6 mb-8">
+            <div className="space-y-4 mb-4">
               {questions.map((question, index) => (
                 <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-                  <div className="bg-gray-800 text-white py-2 px-4">
+                  <div className="bg-gray-800 text-white py-1 px-2 text-sm">
                     <h3 className="font-semibold">Question {index + 1}</h3>
                   </div>
                   <div className="p-4">

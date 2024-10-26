@@ -15,15 +15,16 @@ interface TrueFalseQuestionProps {
 
 const TrueFalseQuestion: React.FC<TrueFalseQuestionProps> = ({ question, onAnswer, showSolution, isCorrect }) => {
   return (
-    <div>
+    <div className="p-3">
       <h3 
-        className="text-xl mb-4 [&>*]:text-xl"
+        className="text-sm mb-2"
         dangerouslySetInnerHTML={renderFormattedText(question.question)}
       />
-      <div className="flex justify-center space-x-4">
+      <div className="flex justify-center space-x-2">
         <CustomButton 
           onClick={() => onAnswer(true)}
           className={`
+            px-3 py-1 text-md
             ${question.userAnswer === true ? 'bg-[#D0E8D9]' : 'bg-white text-black border border-gray-300'}
             ${showSolution && question.correctAnswer === true ? 'border-green-500 border-2' : ''}
           `}
@@ -34,6 +35,7 @@ const TrueFalseQuestion: React.FC<TrueFalseQuestionProps> = ({ question, onAnswe
         <CustomButton 
           onClick={() => onAnswer(false)}
           className={`
+            px-3 py-1 text-sm
             ${question.userAnswer === false ? 'bg-[#D0E8D9]' : 'bg-white text-black border border-gray-300'}
             ${showSolution && question.correctAnswer === false ? 'border-green-500 border-2' : ''}
           `}
@@ -43,7 +45,7 @@ const TrueFalseQuestion: React.FC<TrueFalseQuestionProps> = ({ question, onAnswe
         </CustomButton>
       </div>
       {showSolution && (
-        <div className={`mt-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+        <div className={`mt-2 ${isCorrect ? 'text-green-600' : 'text-red-600'} text-xs`}>
           <span className="font-semibold">Correct answer: </span>
           {question.correctAnswer ? 'True' : 'False'}
         </div>

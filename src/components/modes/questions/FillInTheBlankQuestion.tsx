@@ -26,9 +26,9 @@ const FillInTheBlankQuestion: React.FC<FillInTheBlankQuestionProps> = ({ questio
   };
 
   return (
-    <div>
+    <div className="p-3">
       <h3 
-        className="text-xl mb-4 [&>*]:text-xl"
+        className="text-sm mb-2"
         dangerouslySetInnerHTML={renderFormattedText(question.question)}
       />
       <input
@@ -36,7 +36,7 @@ const FillInTheBlankQuestion: React.FC<FillInTheBlankQuestionProps> = ({ questio
         value={answer}
         onChange={handleChange}
         className={`
-          border rounded px-3 py-2 w-full 
+          border rounded px-2 py-1 w-full text-sm {/* Smaller padding and text */}
           ${answer ? 'bg-[#D0E8D9]' : 'border-gray-300'}
           ${showSolution ? (isCorrect ? 'border-green-500' : 'border-red-500') + ' border-2' : ''}
         `}
@@ -44,9 +44,9 @@ const FillInTheBlankQuestion: React.FC<FillInTheBlankQuestionProps> = ({ questio
         disabled={showSolution}
       />
       {showSolution && (
-        <div className={`mt-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+        <div className={`mt-2 ${isCorrect ? 'text-green-600' : 'text-red-600'} text-xs`}> {/* Smaller text */}
           <span className="font-semibold">Correct answer: </span>
-          <span className="[&>*]:text-base" dangerouslySetInnerHTML={renderFormattedText(question.correctAnswer)} />
+          <span dangerouslySetInnerHTML={renderFormattedText(question.correctAnswer)} />
         </div>
       )}
     </div>
