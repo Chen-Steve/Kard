@@ -18,7 +18,7 @@ const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({ questio
   return (
     <div>
       <h3 
-        className="text-xl mb-4"
+        className="text-xl mb-4 [&>*]:text-xl"
         dangerouslySetInnerHTML={renderFormattedText(question.question)}
       />
       <div className="flex flex-col space-y-2">
@@ -27,7 +27,7 @@ const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({ questio
             key={index} 
             onClick={() => onAnswer(option)}
             className={`
-              text-left 
+              text-left [&>*]:text-base
               ${question.userAnswer === option ? 'bg-[#D0E8D9]' : 'bg-white text-black border border-gray-300'}
               ${showSolution && question.correctAnswer === option ? 'border-green-500 border-2' : ''}
             `}
@@ -40,7 +40,7 @@ const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({ questio
       {showSolution && (
         <div className={`mt-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
           <span className="font-semibold">Correct answer: </span>
-          <span dangerouslySetInnerHTML={renderFormattedText(question.correctAnswer)} />
+          <span className="[&>*]:text-base" dangerouslySetInnerHTML={renderFormattedText(question.correctAnswer)} />
         </div>
       )}
     </div>

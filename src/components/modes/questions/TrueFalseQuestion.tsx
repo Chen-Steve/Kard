@@ -17,7 +17,7 @@ const TrueFalseQuestion: React.FC<TrueFalseQuestionProps> = ({ question, onAnswe
   return (
     <div>
       <h3 
-        className="text-xl mb-4"
+        className="text-xl mb-4 [&>*]:text-xl"
         dangerouslySetInnerHTML={renderFormattedText(question.question)}
       />
       <div className="flex justify-center space-x-4">

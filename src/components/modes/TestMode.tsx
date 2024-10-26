@@ -48,11 +48,25 @@ const TestMode: React.FC<TestModeProps> = ({ flashcards }) => {
   }, [flashcards]);
 
   const generateQuestions = (cards: Flashcard[]): Question[] => {
-    return cards.flatMap((card) => [
-      generateTrueFalseQuestion(card),
-      generateFillInTheBlankQuestion(card),
-      generateMultipleChoiceQuestion(card, cards),
-    ]);
+    const shuffledCards = shuffle([...cards]);
+    const questions: Question[] = [];
+
+    shuffledCards.forEach((card, index) => {
+      const questionType = index % 3;
+      switch (questionType) {
+        case 0:
+          questions.push(generateTrueFalseQuestion(card));
+          break;
+        case 1:
+          questions.push(generateFillInTheBlankQuestion(card));
+          break;
+        case 2:
+          questions.push(generateMultipleChoiceQuestion(card, shuffledCards));
+          break;
+      }
+    });
+
+    return shuffle(questions);
   };
 
   const generateTrueFalseQuestion = (card: Flashcard): Question => {
