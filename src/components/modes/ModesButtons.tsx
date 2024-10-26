@@ -34,10 +34,19 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
   };
 
   const handleTestClick = () => {
-    toast({
-      title: 'Coming Soon!',
-      description: 'The Test feature is coming soon.',
-    });
+    if (userId && selectedDeckId) {
+      router.push(`/test-mode/${userId}/${selectedDeckId}`);
+    } else if (!userId) {
+      toast({
+        title: 'User Not Found',
+        description: 'Please sign in to access test mode.',
+      });
+    } else {
+      toast({
+        title: 'No Deck Selected',
+        description: 'Please select a deck to start the test.',
+      });
+    }
   };
 
   const handleMatchClick = () => {

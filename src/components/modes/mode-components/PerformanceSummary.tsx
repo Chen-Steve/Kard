@@ -3,8 +3,8 @@ import React from 'react';
 interface PerformanceSummaryProps {
   totalCards: number;
   correctAnswers: number;
-  maxStreak: number;
-  retriedCards: number;
+  maxStreak?: number;  // Optional
+  retriedCards?: number;  // Optional
 }
 
 const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
@@ -29,14 +29,18 @@ const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           <span>Accuracy:</span>
           <span className="font-semibold">{((correctAnswers / totalCards) * 100).toFixed(1)}%</span>
         </div>
-        <div className="flex justify-between">
-          <span>Max Correct Streak:</span>
-          <span className="font-semibold text-blue-600">{maxStreak}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Cards Retried:</span>
-          <span className="font-semibold text-orange-600">{retriedCards}</span>
-        </div>
+        {maxStreak !== undefined && (
+          <div className="flex justify-between">
+            <span>Max Correct Streak:</span>
+            <span className="font-semibold text-blue-600">{maxStreak}</span>
+          </div>
+        )}
+        {retriedCards !== undefined && (
+          <div className="flex justify-between">
+            <span>Cards Retried:</span>
+            <span className="font-semibold text-orange-600">{retriedCards}</span>
+          </div>
+        )}
       </div>
     </div>
   );
