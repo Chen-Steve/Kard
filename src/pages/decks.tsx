@@ -212,20 +212,64 @@ const DecksPage = () => {
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId, type } = result;
 
-    if (!destination) {
+    if (!destination) return;
+
+    // Handle deck reordering
+    if (type === 'DECK') {
+      if (source.index === destination.index) return;
+
+      const newDecks = Array.from(decks);
+      const [removed] = newDecks.splice(source.index, 1);
+      newDecks.splice(destination.index, 0, removed);
+
+      setDecks(newDecks);
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('No active session');
+
+        // Update deck orders in the database
+        const response = await fetch('/api/decks/reorder', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: session.user.id,
+            decks: newDecks.map((deck, index) => ({
+              id: deck.id,
+              order: index,
+            })),
+          }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update deck order');
+
+      } catch (error) {
+        console.error('Error updating deck order:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update deck order",
+          variant: "destructive",
+        });
+        // Optionally revert the state if the API call fails
+        fetchDecks();
+      }
       return;
     }
 
-    if (source.index === destination.index) {
-      return;
-    }
-
+    // Handle flashcard moving between decks
     if (type === 'FLASHCARD') {
+      if (source.droppableId === destination.droppableId) return;
+
       const sourceDeckId = source.droppableId;
       const destinationDeckId = destination.droppableId;
       const flashcardId = draggableId;
 
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('No active session');
+
         const response = await fetch('/api/flashcards/move', {
           method: 'POST',
           headers: {
@@ -235,14 +279,13 @@ const DecksPage = () => {
             flashcardId,
             sourceDeckId,
             destinationDeckId,
+            userId: session.user.id,
           }),
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to move flashcard');
-        }
+        if (!response.ok) throw new Error('Failed to move flashcard');
 
-        // Update the local state to reflect the change
+        // Update local state for flashcard move
         setDecks(prevDecks => {
           return prevDecks.map(deck => {
             if (deck.id === sourceDeckId) {
@@ -268,53 +311,14 @@ const DecksPage = () => {
         });
 
         toast({
-          title: "Flashcard moved",
-          description: "The flashcard has been moved to the new deck successfully.",
+          title: "Success",
+          description: "Flashcard moved successfully",
         });
-
       } catch (error) {
         console.error('Error moving flashcard:', error);
         toast({
           title: "Error",
-          description: "Failed to move the flashcard. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } else if (type === 'DECK' && isReorderingEnabled) {
-      const reorderedDecks = Array.from(decks);
-      const [movedDeck] = reorderedDecks.splice(source.index, 1);
-      reorderedDecks.splice(destination.index, 0, movedDeck);
-
-      // Update the order of the decks
-      const updatedDecks = reorderedDecks.map((deck, index) => ({
-        ...deck,
-        order: index + 1,
-      }));
-
-      // Update the local state immediately
-      setDecks(updatedDecks);
-
-      try {
-        const response = await fetch('/api/decks', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ decks: updatedDecks }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to update deck order');
-        }
-
-        // Optionally, you can update the state again with the response from the server
-        // const updatedDecksFromServer = await response.json();
-        // setDecks(updatedDecksFromServer);
-      } catch (error) {
-        console.error('Error updating deck order:', error);
-        // Revert the local state if the API call fails
-        fetchDecks();
-        toast({
-          title: "Error",
-          description: "Failed to update deck order. Please try again.",
+          description: "Failed to move flashcard",
           variant: "destructive",
         });
       }

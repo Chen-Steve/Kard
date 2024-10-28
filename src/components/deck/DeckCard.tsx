@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/Card';
 import { Deck } from '../../types/deck';
 import MiniatureFlashcards from './MiniatureFlashcards';
-import { Draggable } from '@hello-pangea/dnd';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 
 interface DeckCardProps {
   deck: Deck;
@@ -24,12 +24,8 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
   };
 
   const content = (
-    <Card
-      className={`hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-700 ${
-        isSelected ? 'border-2 border-blue-500' : ''
-      } max-w-sm mx-auto`}
-    >
-      <CardHeader>
+    <Card className={`relative ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+      <CardHeader className="cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
         <div className="flex justify-between items-center">
           <CardTitle className="text-black dark:text-gray-100 text-lg sm:text-xl">{deck.name}</CardTitle>
           <Button
@@ -53,7 +49,20 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
         </div>
       </CardHeader>
       <CardContent className="flex flex-col space-y-2">
-        {isDropdownOpen && <MiniatureFlashcards deckId={deck.id} />}
+        <Droppable droppableId={deck.id} type="FLASHCARD">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`min-h-[50px] rounded-md transition-colors ${
+                snapshot.isDraggingOver ? 'bg-blue-100 dark:bg-blue-900' : ''
+              }`}
+            >
+              {isDropdownOpen && <MiniatureFlashcards deckId={deck.id} />}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
           <Link href={`/decks/${deck.id}`}>
             <Button variant="outline" className="text-black dark:text-gray-200 w-full sm:w-auto">View Deck</Button>
