@@ -40,18 +40,21 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
     filterDecks(searchTerm);
   }, [searchTerm, filterDecks]);
 
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setOpen(true);
+    if (!open) setOpen(true);
   };
 
   const handleSelect = (deckId: string) => {
     onDeckSelect(deckId);
     setOpen(false);
-    const selectedDeck = decks.find(deck => deck.id === deckId);
-    if (selectedDeck) {
-      setSearchTerm(selectedDeck.name);
-    }
+    setSearchTerm('');
   };
 
   return (
