@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import Papa from 'papaparse';
 import { toast } from 'react-toastify';
-import Popup from '../Popup';
+import Popup from '../AIGenerateModal';
 import { BiCloudUpload } from 'react-icons/bi';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 
