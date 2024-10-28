@@ -41,6 +41,7 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
         <title>Kard - A Better Quizlet Alternative</title>
         <link rel="icon" href="/blob.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Kard is a modern, user-friendly alternative to Quizlet. Create, study, and share flashcards with an uncomplicated and fast learning platform designed for everyone." />
       </Head>
       <SessionProvider session={initialSession}>
         <AuthWrapper>

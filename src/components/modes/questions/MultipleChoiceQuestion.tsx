@@ -16,18 +16,19 @@ interface MultipleChoiceQuestionProps {
 
 const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({ question, onAnswer, showSolution, isCorrect }) => {
   return (
-    <div className="p-3">
+    <div className="p-1">
       <h3 
-        className="text-sm mb-2"
+        className="text-sm mb-1"
         dangerouslySetInnerHTML={renderFormattedText(question.question)}
       />
-      <div className="flex flex-col space-y-1">
+      <div className="flex flex-col space-y-0.5">
         {question.options.map((option, index) => (
           <CustomButton 
             key={index} 
             onClick={() => onAnswer(option)}
             className={`
-              text-left text-md py-1 px-2
+              text-center text-sm w-1/3 mx-auto
+              py-0.25 px-1
               ${question.userAnswer === option ? 'bg-[#D0E8D9]' : 'bg-white text-black border border-gray-300'}
               ${showSolution && question.correctAnswer === option ? 'border-green-500 border-2' : ''}
             `}

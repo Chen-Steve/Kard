@@ -11,7 +11,6 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import FlipCard from '../components/demo/FlipCard';
 import FeaturesSection from '../components/demo/FeaturesSection';
-import Head from 'next/head';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
@@ -85,9 +84,6 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title>Kard - A Better Quizlet Alternative</title>
-      </Head>
       <div className={`min-h-screen flex flex-col relative bg-[#F8F7F6] text-black overflow-hidden ${isMounted && !isMobile ? 'cursor-none' : ''}`}>
         {isMounted && <Bubbles />}
         
