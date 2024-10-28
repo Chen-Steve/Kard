@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { FaCircleNotch, FaFolder, FaPenNib, FaArrowsAltH } from "react-icons/fa";
 import { PiCardsThreeBold } from "react-icons/pi";
 import Link from 'next/link';
-import supabase from '../../lib/supabaseClient';
 import { useToast } from "../../components/ui/use-toast";
 
 interface NavMenuProps {
@@ -109,7 +108,6 @@ const NavMenu: React.FC<NavMenuProps> = () => {
         <NavIcon href="/dashboard" icon={FaCircleNotch} label="Home" index={0} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/decks" icon={FaFolder} label="Your Library" index={1} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
         <NavIcon href="/public-decks" icon={PiCardsThreeBold} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        <NavIcon href="/DrawingBoardPage" icon={FaPenNib} label="Drawing Board" index={3} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
       </div>
     </div>
   );
