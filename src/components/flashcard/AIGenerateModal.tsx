@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button } from './ui/Button';
-import { Textarea } from './ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/Card';
-import { generateFlashcards } from '../lib/openai';
+import { Button } from '../ui/Button';
+import { Textarea } from '../ui/textarea';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
+import { generateFlashcards } from '../../lib/openai';
 import { AiOutlineExperiment, AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { toast } from './ui/use-toast';
-import { isAxiosError } from '../lib/axiosErrorGuard';
+import { toast } from '../ui/use-toast';
+import { isAxiosError } from '../../lib/axiosErrorGuard';
 
 interface PopupProps {
   onClose: () => void;

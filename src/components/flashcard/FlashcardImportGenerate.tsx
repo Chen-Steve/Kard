@@ -2,9 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import Papa from 'papaparse';
 import { toast } from 'react-toastify';
-import Popup from '../AIGenerateModal';
-import { BiCloudUpload } from 'react-icons/bi';
-import { FaWandMagicSparkles } from "react-icons/fa6";
+import Popup from './AIGenerateModal';
+import { Icon } from '@iconify/react';
+import { BsFiletypeCsv } from "react-icons/bs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FlashcardImportGenerateProps {
   userId: string;
@@ -25,6 +26,38 @@ interface Flashcard {
 }
 
 const MAX_CHAR_LIMIT = 930;
+
+interface ImportOption {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  accept: string;
+  description: string;
+}
+
+const importOptions: ImportOption[] = [
+  {
+    id: 'csv',
+    label: 'CSV File',
+    icon: <BsFiletypeCsv className="w-10 h-10 ml-1 text-green-600" />,
+    accept: '.csv',
+    description: 'Import from a CSV file with question and answer columns'
+  },
+  {
+    id: 'pdf',
+    label: 'PDF Document',
+    icon: <Icon icon="mingcute:pdf-line" width="48" height="48" className="text-red-600" />,
+    accept: '.pdf',
+    description: 'Extract flashcards from a PDF document'
+  },
+  {
+    id: 'doc',
+    label: 'Word Document',
+    icon: <Icon icon="icon-park:file-word" width="48" height="48" />,
+    accept: '.doc,.docx',
+    description: 'Import from Word document format'
+  }
+];
 
 const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
   userId,
@@ -83,7 +116,7 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
         const savedFlashcards = await saveFlashcards(importedFlashcards);
         onFlashcardsAdded(savedFlashcards);
 
-        onToggleImport(); // Close the import dialog
+        onToggleImport();
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
@@ -128,7 +161,7 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
       }
 
       const newFlashcards = await response.json();
-      return newFlashcards[0]; // Return the first (and only) flashcard
+      return newFlashcards[0];
     } catch (error) {
       console.error('Error adding flashcard:', error);
       toast.error('Failed to add flashcard. Please try again.');
@@ -163,42 +196,117 @@ const FlashcardImportGenerate: React.FC<FlashcardImportGenerateProps> = ({
 
   return (
     <div className="flex items-center space-x-2 relative">
-      <button
-        onClick={onToggleGenerate}
-        className="text-green-500 hover:text-green-600 transition-colors duration-200"
-        title="Generate Flashcards"
-      >
-        <FaWandMagicSparkles className="text-2xl" />
-      </button>
-      <button
-        ref={importButtonRef}
-        onClick={onToggleImport}
-        className="text-blue-500 hover:text-blue-600 transition-colors duration-200"
-        title="Import Flashcards"
-      >
-        <BiCloudUpload className="text-3xl" />
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              aria-label='generate-flashcards'
+              onClick={onToggleGenerate}
+              className="text-green-500 hover:text-green-600 transition-colors duration-200"
+            >
+              <Icon icon="fa6-solid:wand-magic-sparkles" width="24" height="24" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Generate Flashcards</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              aria-label='import-flashcards'
+              ref={importButtonRef}
+              onClick={onToggleImport}
+              className="text-blue-500 hover:text-blue-600 transition-colors duration-200"
+            >
+              <Icon icon="tabler:table-import" width="24" height="24" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Import Flashcards</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       {isImportVisible && (
-        <div ref={importModalRef} className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleCsvUpload}
-            ref={fileInputRef}
-            className="hidden"
-            title="input file"
+        <div className="fixed inset-0 z-50">
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-md transition-all"
+            onClick={onToggleImport}
           />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-gray-700 dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-4 py-2 rounded w-full mb-2"
-            aria-label="Choose csv file"
-          >
-            Choose csv file
-          </button>
-          <div className="flex items-center mt-2 text-xs text-muted-foreground dark:text-gray-400">
-            <FaQuestionCircle className="mr-2" />
-            <span>Format: question, answer</span>
+          
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <div 
+              ref={importModalRef}
+              className="relative z-50 w-full max-w-md bg-white dark:bg-gray-800 rounded-lg p-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Import Flashcards</h2>
+                <button 
+                  onClick={onToggleImport}
+                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {importOptions.map((option) => (
+                  <div
+                    key={option.id}
+                    className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
+                      aria-label='import-file'
+                      type="file"
+                      accept={option.accept}
+                      onChange={handleCsvUpload}
+                      ref={fileInputRef}
+                      className="hidden"
+                    />
+                    <div className="flex items-center space-x-4">
+                      <div className="text-blue-500">
+                        {option.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{option.label}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {option.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                <FaQuestionCircle className="mr-2" />
+                <span>Select a file type to import your flashcards</span>
+              </div>
+
+              <div className="mt-6 border-t dark:border-gray-700 pt-4">
+                <div className="relative border dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800 opacity-60 cursor-not-allowed">
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                      Coming Soon
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div>
+                      <Icon icon="logos:google-drive" width="32" height="32" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Google Drive</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Import directly from your Google Drive
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
