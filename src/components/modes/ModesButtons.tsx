@@ -83,11 +83,23 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
 
   return (
     <div className="flex flex-wrap justify-center gap-2">
-      <ModeButton icon={<SiStagetimer className="text-[#637FBF]" style={{ fontSize: '1rem' }} />} text="Learn" onClick={handleLearnClick} />
-      <ModeButton icon={<RiTimerFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />} text="Test" onClick={handleTestClick} />
-      <ModeButton icon={<PiCardsFill className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />} text="Match" onClick={handleMatchClick} />
       <ModeButton 
-        icon={<BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />} 
+        icon={<SiStagetimer className="text-emerald-500" style={{ fontSize: '1rem' }} />} 
+        text="Learn" 
+        onClick={handleLearnClick} 
+      />
+      <ModeButton 
+        icon={<RiTimerFill className="text-orange-500" style={{ fontSize: '1.2rem' }} />} 
+        text="Test" 
+        onClick={handleTestClick} 
+      />
+      <ModeButton 
+        icon={<PiCardsFill className="text-purple-500" style={{ fontSize: '1.2rem' }} />} 
+        text="Match" 
+        onClick={handleMatchClick} 
+      />
+      <ModeButton 
+        icon={<BiSolidMessageSquareDots className="text-sky-500 font-bold" style={{ fontSize: '1.2rem' }} />} 
         text="K-Chat" 
         onClick={handleKChatClick} 
       />
