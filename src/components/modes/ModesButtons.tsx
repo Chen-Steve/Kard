@@ -66,27 +66,17 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
   };
 
   const handleKChatClick = () => {
-    if (userMembership === 'pro') {
-      if (selectedDeckId) {
-        router.push(`/ai-chat/${userId}/${selectedDeckId}`);
-      } else {
-        toast({
-          title: 'No Deck Selected',
-          description: 'Please select a deck to start the AI chat.',
-        });
-      }
+    if (userId && selectedDeckId) {
+      router.push(`/ai-chat/${userId}/${selectedDeckId}`);
+    } else if (!userId) {
+      toast({
+        title: 'User Not Found',
+        description: 'Please sign in to access the AI chat.',
+      });
     } else {
       toast({
-        title: 'Upgrade to Pro',
-        description: 'K-Chat is a Pro feature. Upgrade your account to access it!',
-        action: (
-          <button
-            onClick={() => router.push('/pricing')}
-            className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600"
-          >
-            Upgrade
-          </button>
-        ),
+        title: 'No Deck Selected',
+        description: 'Please select a deck to start the AI chat.',
       });
     }
   };
@@ -100,8 +90,6 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
         icon={<BiSolidMessageSquareDots className="text-[#637FBF] font-bold" style={{ fontSize: '1.2rem' }} />} 
         text="K-Chat" 
         onClick={handleKChatClick} 
-        isPro={true}
-        userMembership={userMembership}
       />
     </div>
   );

@@ -48,7 +48,7 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
               {isDarkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-600">
+          {/* <div className="border-t border-gray-200 dark:border-gray-600">
             {user.membership === 'pro' ? (
               <div className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 flex items-center">
                 <HiLightningBolt className="mr-2" />
@@ -63,7 +63,7 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
                 Upgrade
               </button>
             )}
-          </div>
+          </div> */}
           <div className="border-t border-gray-200 dark:border-gray-600">
             <button
               onClick={handleSignOut}
