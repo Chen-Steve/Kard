@@ -25,36 +25,47 @@ const AIChatPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkMembership = async () => {
-      console.log('Checking membership for userId:', userId);
-      if (userId && typeof userId === 'string') {
-        try {
-          const response = await fetch(`/api/user?userId=${userId}`);
-          if (response.ok) {
-            const userData = await response.json();
-            console.log('Raw user data:', userData);
-            console.log('Membership status:', userData.membership);
-            setUserMembership(userData.membership === 'pro');
-            if (userData.membership !== 'pro') {
-              toast.error('This feature is only available for pro members.');
-              router.push('/dashboard');
-            }
-          } else {
-            throw new Error('Failed to fetch user data');
-          }
-        } catch (error) {
-          console.error('Error checking membership:', error);
-          toast.error('Failed to verify user membership. Please try again.');
-          setUserMembership(false);
-        }
+    if (!router.isReady) return;
+  
+    if (userId && typeof userId === 'string') {
+      checkMembership();
+      fetchDecks();
+      if (deckId && typeof deckId === 'string') {
+        setSelectedDeckId(deckId);
+        fetchFlashcards(deckId);
       }
-    };
-    checkMembership();
-  }, [userId, router]);
+    }
+  }, [router.isReady, userId, deckId]);
+
+  const checkMembership = async () => {
+    console.log('Checking membership for userId:', userId);
+    if (userId && typeof userId === 'string') {
+      try {
+        const response = await fetch(`/api/user?userId=${userId}`);
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('Raw user data:', userData);
+          console.log('Membership status:', userData.membership);
+          setUserMembership(userData.membership === 'pro');
+          if (userData.membership !== 'pro') {
+            toast.error('This feature is only available for pro members.');
+            router.push('/dashboard');
+          }
+        } else {
+          throw new Error('Failed to fetch user data');
+        }
+      } catch (error) {
+        console.error('Error checking membership:', error);
+        toast.error('Failed to verify user membership. Please try again.');
+        setUserMembership(false);
+      }
+    }
+  };
 
   const fetchDecks = useCallback(async () => {
     if (!userId) return;
   
+    console.log('Fetching decks for userId:', userId);
     try {
       const response = await fetch(`/api/decks?userId=${userId}`, {
         headers: {
@@ -66,6 +77,7 @@ const AIChatPage: React.FC = () => {
         throw new Error('Failed to fetch decks');
       }
       const data: Deck[] = await response.json();
+      console.log('Fetched decks:', data);
       setDecks(data);
     } catch (error) {
       console.error('Error fetching decks:', error);
@@ -92,17 +104,6 @@ const AIChatPage: React.FC = () => {
       setError('Failed to fetch flashcards. Please try again.');
     }
   }, [userId]);
-
-  useEffect(() => {
-    fetchDecks();
-  }, [fetchDecks]);
-
-  useEffect(() => {
-    if (deckId && typeof deckId === 'string') {
-      setSelectedDeckId(deckId);
-      fetchFlashcards(deckId);
-    }
-  }, [deckId, fetchFlashcards]);
 
   const handleDeckChange = (newDeckId: string) => {
     setSelectedDeckId(newDeckId);
