@@ -6,6 +6,8 @@ import { generateFlashcards } from '../../lib/openai';
 import { AiOutlineExperiment, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { toast } from '../ui/use-toast';
 import { isAxiosError } from '../../lib/axiosErrorGuard';
+import { extractTextFromPDF } from '../../lib/pdfUtils';
+import { FiUpload } from 'react-icons/fi';
 
 interface PopupProps {
   onClose: () => void;
@@ -16,6 +18,8 @@ interface PopupProps {
 const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId }) => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pdfText, setPdfText] = useState<string>('');
+  const [isProcessingPDF, setIsProcessingPDF] = useState(false);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -69,6 +73,37 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !file.type.includes('pdf')) {
+      toast({
+        title: 'Invalid File',
+        description: 'Please upload a PDF file.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsProcessingPDF(true);
+    try {
+      const text = await extractTextFromPDF(file);
+      setPdfText(text);
+      setDescription(text);
+      toast({
+        title: 'PDF Processed',
+        description: 'Your PDF has been processed successfully.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to process PDF file.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessingPDF(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50">
       <div 
@@ -92,16 +127,40 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <label htmlFor="description" className="block text-sm font-medium">
-                What would you like to create flashcards about?
-              </label>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label htmlFor="description" className="block text-sm font-medium">
+                    What would you like to create flashcards about?
+                  </label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter text directly or upload a PDF file
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <label htmlFor="pdf-upload" className="cursor-pointer">
+                    <div className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <FiUpload className="h-4 w-4" />
+                      <span className="text-sm">Upload PDF</span>
+                    </div>
+                    <input
+                      id="pdf-upload"
+                      type="file"
+                      accept=".pdf"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      disabled={isProcessingPDF}
+                    />
+                  </label>
+                </div>
+              </div>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="min-h-[150px] resize-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Example: The water cycle process, including evaporation, condensation, and precipitation..."
+                disabled={isProcessingPDF}
               />
             </div>
           </CardContent>
