@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import FlashcardTable from './FlashcardTable';
 import FlashcardDisplay from '../flashcard/FlashcardDisplay';
 import FlashcardToolbar from '../flashcard/FlashcardToolbar';
-import FlashcardImportGenerate from '../flashcard/FlashcardImportGenerate';
+import FlashcardActions from '../flashcard/FlashcardActions';
 
 interface FlashcardProps {
   userId: string;
@@ -400,11 +400,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               isPublicDeck={isPublicDeck}
             >
               {!isPublicDeck && (
-                <FlashcardImportGenerate
+                <FlashcardActions
                   userId={userId}
                   deckId={deckId}
                   onFlashcardsAdded={handleFlashcardsAdded}
-                  currentFlashcardsCount={flashcards.length}
                   onToggleImport={handleToggleImport}
                   onToggleGenerate={handleToggleGenerate}
                   isImportVisible={isImportVisible}
