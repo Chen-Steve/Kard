@@ -261,9 +261,18 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-200 dark:bg-gray-800 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-3xl mb-4">
-        <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:bg-gray-700 dark:text-white">
-          <FaArrowLeft className="mr-2" /> Back to Dashboard
-        </Button>
+        <div className="flex justify-between items-center max-w-3xl">
+          <Button variant="outline" onClick={() => router.push('/dashboard')} className="flex items-center text-black dark:bg-gray-700 dark:text-white">
+            <FaArrowLeft className="mr-2" /> Back to Dashboard
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => window.open('https://forms.gle/WpceELe2NcyDoP7J8', '_blank')}
+            className="text-black dark:bg-gray-700 dark:text-white sm:mr-9"
+          >
+            Feedback
+          </Button>
+        </div>
       </div>
       <div className="w-full max-w-3xl flex flex-col md:flex-row gap-4">
         <StatsContainer 
