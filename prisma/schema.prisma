@@ -101,3 +101,12 @@ model NewsletterSubscription {
 
   @@map("newsletter_subscriptions")
 }
+
+model IPUsage {
+  id          String   @id @default(uuid())
+  ip          String   @unique
+  aiCount     Int      @default(0)
+  lastReset   DateTime @default(now())
+
+  @@map("ip_usage")
+}
