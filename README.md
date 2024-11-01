@@ -12,9 +12,9 @@
 
 ## 🚧 Current Development
 
-- [ ] **Drag-and-drop flashcards** between Decks.
+- [x] **Drag-and-drop flashcards** between Decks.
 - [ ] **Customizable Dashboard**.
-- [ ] **Test Mode**.
+- [x] **Test Mode**.
 - [ ] **Upload flashcards** from PDF, Docs.
 - [x] Fix **streaks system** for tracking progress.
 - [ ] Add **reward/gamification**.
