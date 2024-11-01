@@ -18,7 +18,6 @@ interface Deck {
 const AIChatPage: React.FC = () => {
   const router = useRouter();
   const { userId, deckId } = router.query;
-  const [userMembership, setUserMembership] = useState<boolean | null>(null);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
@@ -28,7 +27,6 @@ const AIChatPage: React.FC = () => {
     if (!router.isReady) return;
   
     if (userId && typeof userId === 'string') {
-      checkMembership();
       fetchDecks();
       if (deckId && typeof deckId === 'string') {
         setSelectedDeckId(deckId);
@@ -36,31 +34,6 @@ const AIChatPage: React.FC = () => {
       }
     }
   }, [router.isReady, userId, deckId]);
-
-  const checkMembership = async () => {
-    console.log('Checking membership for userId:', userId);
-    if (userId && typeof userId === 'string') {
-      try {
-        const response = await fetch(`/api/user?userId=${userId}`);
-        if (response.ok) {
-          const userData = await response.json();
-          console.log('Raw user data:', userData);
-          console.log('Membership status:', userData.membership);
-          setUserMembership(userData.membership === 'pro');
-          if (userData.membership !== 'pro') {
-            toast.error('This feature is only available for pro members.');
-            router.push('/dashboard');
-          }
-        } else {
-          throw new Error('Failed to fetch user data');
-        }
-      } catch (error) {
-        console.error('Error checking membership:', error);
-        toast.error('Failed to verify user membership. Please try again.');
-        setUserMembership(false);
-      }
-    }
-  };
 
   const fetchDecks = useCallback(async () => {
     if (!userId) return;
@@ -110,19 +83,6 @@ const AIChatPage: React.FC = () => {
     fetchFlashcards(newDeckId);
     router.push(`/ai-chat/${userId}/${newDeckId}`, undefined, { shallow: true });
   };
-
-  if (userMembership === null) {
-    return <div>Loading...</div>;
-  }
-
-  if (userMembership === false) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[85vh] bg-white dark:bg-gray-800 dark:text-white">
-        <p className="text-xl mb-4">Unable to access AI Chat</p>
-        <p>Please check your membership status or try again later.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto p-4 max-w-full min-h-screen dark:bg-gray-800 dark:text-white">
