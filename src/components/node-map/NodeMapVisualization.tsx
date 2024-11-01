@@ -1,11 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import ReactFlow, { 
   Background,
   Controls,
   Node,
   Edge,
   Position,
-  Panel
+  Panel,
+  useNodesState,
+  useEdgesState,
+  OnNodesChange,
+  NodeChange
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Deck } from '../../types/deck';
@@ -22,82 +26,118 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
     flashcardNode: FlashcardNode,
   }), []);
 
-  const { nodes, edges } = useMemo(() => {
-    const nodes: Node[] = [];
-    const edges: Edge[] = [];
+  // Initialize nodes and edges with state
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  // Custom node change handler to move flashcards with their deck
+  const handleNodesChange: OnNodesChange = useCallback((changes: NodeChange[]) => {
+    // Handle regular node changes
+    onNodesChange(changes);
+
+    // Handle dragging of deck nodes
+    changes.forEach(change => {
+      if (change.type === 'position' && change.dragging) {
+        const deckNode = nodes.find(n => n.id === change.id && n.type === 'deckNode');
+        if (deckNode) {
+          // Get all flashcards connected to this deck
+          const connectedEdges = edges.filter(edge => edge.source === change.id);
+          const flashcardIds = connectedEdges.map(edge => edge.target);
+
+          // Update positions of connected flashcards
+          setNodes(nds => 
+            nds.map(node => {
+              if (flashcardIds.includes(node.id)) {
+                // Calculate the relative position from the deck to the flashcard
+                const deltaX = node.position.x - (deckNode.position.x || 0);
+                const deltaY = node.position.y - (deckNode.position.y || 0);
+
+                // Move flashcard maintaining the same relative position
+                return {
+                  ...node,
+                  position: {
+                    x: (change.position?.x || 0) + deltaX,
+                    y: (change.position?.y || 0) + deltaY,
+                  },
+                };
+              }
+              return node;
+            })
+          );
+        }
+      }
+    });
+  }, [nodes, edges, onNodesChange]);
+
+  // Initialize the nodes and edges when decks change
+  useMemo(() => {
+    const newNodes: Node[] = [];
+    const newEdges: Edge[] = [];
     
     const DECK_SPACING = 800;
     const RADIUS = 250;
     
-    console.log('Processing decks:', decks);
-
     decks.forEach((deck, deckIndex) => {
-      console.log(`Processing deck ${deckIndex}:`, deck);
-      console.log('Flashcards for this deck:', deck.flashcards);
-
-      // Calculate deck position
       const deckX = deckIndex * DECK_SPACING;
       const deckY = 300;
 
       // Add deck node
-      nodes.push({
+      newNodes.push({
         id: deck.id,
         type: 'deckNode',
         position: { x: deckX, y: deckY },
         data: { label: deck.name },
+        draggable: true, // Make deck nodes draggable
       });
 
       // Position flashcards in a circle around the deck
-      if (deck.flashcards && deck.flashcards.length > 0) {
-        deck.flashcards.forEach((flashcard, cardIndex) => {
-          console.log(`Processing flashcard ${cardIndex}:`, flashcard);
-          
-          const flashcardNodeId = `flashcard-${flashcard.id}`;
-          const numCards = deck.flashcards?.length || 1;
-          const angle = (2 * Math.PI * cardIndex) / numCards;
-          
-          const flashcardX = deckX + RADIUS * Math.cos(angle);
-          const flashcardY = deckY + RADIUS * Math.sin(angle);
+      deck.flashcards?.forEach((flashcard, cardIndex) => {
+        const flashcardNodeId = `flashcard-${flashcard.id}`;
+        const numCards = deck.flashcards?.length || 1;
+        const angle = (2 * Math.PI * cardIndex) / numCards;
+        
+        const flashcardX = deckX + RADIUS * Math.cos(angle);
+        const flashcardY = deckY + RADIUS * Math.sin(angle);
 
-          nodes.push({
-            id: flashcardNodeId,
-            type: 'flashcardNode',
-            position: { 
-              x: flashcardX, 
-              y: flashcardY 
-            },
-            data: { 
-              question: flashcard.question,
-              answer: flashcard.answer,
-            },
-          });
-
-          edges.push({
-            id: `edge-${deck.id}-${flashcardNodeId}`,
-            source: deck.id,
-            target: flashcardNodeId,
-            type: 'smoothstep',
-            animated: true,
-            style: { 
-              stroke: '#637FBF',
-              strokeWidth: 2,
-            },
-          });
+        newNodes.push({
+          id: flashcardNodeId,
+          type: 'flashcardNode',
+          position: { 
+            x: flashcardX, 
+            y: flashcardY 
+          },
+          data: { 
+            question: flashcard.question,
+            answer: flashcard.answer,
+          },
+          draggable: false, // Make flashcard nodes non-draggable
         });
-      }
+
+        newEdges.push({
+          id: `edge-${deck.id}-${flashcardNodeId}`,
+          source: deck.id,
+          target: flashcardNodeId,
+          type: 'smoothstep',
+          animated: true,
+          style: { 
+            stroke: '#637FBF',
+            strokeWidth: 2,
+          },
+        });
+      });
     });
 
-    console.log('Generated nodes:', nodes);
-    console.log('Generated edges:', edges);
-
-    return { nodes, edges };
-  }, [decks]);
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [decks, setNodes, setEdges]);
 
   return (
     <div className="h-screen w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{
@@ -117,7 +157,7 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
         <Controls className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm" />
         <Panel position="bottom-center" className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-t-lg backdrop-blur-sm">
           <div className="text-sm text-black dark:text-white">
-            Click cards to flip • Drag to pan • Scroll to zoom
+            Click cards to flip • Drag decks to move • Scroll to zoom
           </div>
         </Panel>
       </ReactFlow>
