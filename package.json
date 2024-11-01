@@ -78,6 +78,7 @@
     "react-simple-typewriter": "^5.0.1",
     "react-spring": "^9.7.4",
     "react-toastify": "^10.0.5",
+    "reactflow": "^11.11.4",
     "seedrandom": "^3.0.5",
     "shadcn": "^1.0.0",
     "stripe": "^16.8.0",

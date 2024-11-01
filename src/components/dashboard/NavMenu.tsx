@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { FaCircleNotch, FaFolder, FaPenNib, FaArrowsAltH } from "react-icons/fa";
-import { PiCardsThreeBold } from "react-icons/pi";
+import { FaCircleNotch, FaArrowsAltH } from "react-icons/fa";
+import { PiCardsThreeBold, PiCardsFill } from "react-icons/pi";
 import Link from 'next/link';
 import { useToast } from "../../components/ui/use-toast";
+import { FcMindMap } from "react-icons/fc";
 
 interface NavMenuProps {
   onDeckSelect?: (deckId: string) => void;
+}
+
+interface IconProps {
+  className?: string;
 }
 
 const NavMenu: React.FC<NavMenuProps> = () => {
@@ -83,6 +88,29 @@ const NavMenu: React.FC<NavMenuProps> = () => {
     setLeft(window.innerWidth / 2);
   }, []);
 
+  const menuItems = [
+    {
+      href: '/dashboard',
+      icon: FaCircleNotch,
+      label: 'Home',
+    },
+    {
+      href: '/decks',
+      icon: PiCardsFill,
+      label: 'Library',
+    },
+    {
+      href: '/node-map',
+      icon: FcMindMap,
+      label: 'Node Map',
+    },
+    {
+      href: '/public-decks',
+      icon: PiCardsThreeBold,
+      label: 'Public Decks',
+    },
+  ];
+
   return (
     <div 
       ref={navRef}
@@ -105,9 +133,9 @@ const NavMenu: React.FC<NavMenuProps> = () => {
           setHoveredIndex={setHoveredIndex}
           isVertical={isVertical}
         />
-        <NavIcon href="/dashboard" icon={FaCircleNotch} label="Home" index={0} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        <NavIcon href="/decks" icon={FaFolder} label="Your Library" index={1} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
-        <NavIcon href="/public-decks" icon={PiCardsThreeBold} label="Public Decks" index={2} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
+        {menuItems.map((item, index) => (
+          <NavIcon key={index} href={item.href} icon={item.icon} label={item.label} index={index} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
+        ))}
       </div>
     </div>
   );

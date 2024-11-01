@@ -19,7 +19,7 @@
 - [x] Fix **streaks system** for tracking progress.
 - [ ] Add **reward/gamification**.
 - [ ] **Anonymous sign-in** support.
-- [x] Enhanced text formatting: **bold, underline, italics** in flashcards (10/18/24).
+- [x] Enhanced text formatting: **bold, underline, italics** in flashcards.
 - [ ] **Image support** in flashcards.
 - [x] Completed: **Learn Mode, Matching Mode, AI-Chat.**
 
