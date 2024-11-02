@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background,
   Controls,
@@ -31,28 +31,54 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Custom node change handler to maintain relative positions
+  // Add a ref to store the previous position of deck nodes
+  const prevPositionsRef = useRef<{ [key: string]: { x: number; y: number } }>({});
+
+  // Custom node change handler with position validation
   const handleNodesChange: OnNodesChange = useCallback((changes: NodeChange[]) => {
     changes.forEach(change => {
       if (change.type === 'position' && change.dragging && change.position) {
         const deckNode = nodes.find(n => n.id === change.id && n.type === 'deckNode');
         if (deckNode) {
-          // Calculate the change in position
-          const deltaX = change.position.x - deckNode.position.x;
-          const deltaY = change.position.y - deckNode.position.y;
+          // Initialize previous position if not exists
+          if (!prevPositionsRef.current[deckNode.id]) {
+            prevPositionsRef.current[deckNode.id] = { ...deckNode.position };
+          }
 
-          // Move all connected flashcards by the same delta
+          // Calculate the change in position
+          const prevPos = prevPositionsRef.current[deckNode.id];
+          const deltaX = change.position.x - prevPos.x;
+          const deltaY = change.position.y - prevPos.y;
+
+          // Validate movement speed (limit maximum delta)
+          const maxDelta = 50; // Maximum allowed movement per frame
+          const validDeltaX = Math.min(Math.max(deltaX, -maxDelta), maxDelta);
+          const validDeltaY = Math.min(Math.max(deltaY, -maxDelta), maxDelta);
+
+          // Update the previous position
+          prevPositionsRef.current[deckNode.id] = {
+            x: prevPos.x + validDeltaX,
+            y: prevPos.y + validDeltaY
+          };
+
+          // Move all connected flashcards by the validated delta
           const connectedEdges = edges.filter(edge => edge.source === change.id);
           const flashcardIds = connectedEdges.map(edge => edge.target);
 
           setNodes(nds => 
             nds.map(node => {
+              if (node.id === deckNode.id) {
+                return {
+                  ...node,
+                  position: prevPositionsRef.current[deckNode.id]
+                };
+              }
               if (flashcardIds.includes(node.id)) {
                 return {
                   ...node,
                   position: {
-                    x: node.position.x + deltaX,
-                    y: node.position.y + deltaY,
+                    x: node.position.x + validDeltaX,
+                    y: node.position.y + validDeltaY,
                   },
                 };
               }
@@ -60,11 +86,23 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
             })
           );
         }
+      } else if (change.type === 'position' && !change.dragging) {
+        // Reset previous position when dragging ends
+        if (change.id in prevPositionsRef.current) {
+          delete prevPositionsRef.current[change.id];
+        }
       }
     });
 
     onNodesChange(changes);
   }, [nodes, edges, onNodesChange]);
+
+  // Clean up previous positions when component unmounts
+  useEffect(() => {
+    return () => {
+      prevPositionsRef.current = {};
+    };
+  }, []);
 
   // Initialize the nodes and edges when decks change
   useMemo(() => {
