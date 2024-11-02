@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { HiLightningBolt } from "react-icons/hi";
 import { toast } from '../../components/ui/use-toast';
 import { Icon } from '@iconify/react';
 
@@ -8,10 +7,9 @@ interface ModesButtonsProps {
   userId: string;
   selectedDeckId: string | null;
   selectedDeckName: string | null;
-  userMembership: string;
 }
 
-const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, selectedDeckName, userMembership }) => {
+const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, selectedDeckName }) => {
   const router = useRouter();
 
   const handleLearnClick = () => {
@@ -108,11 +106,9 @@ interface ModeButtonProps {
   icon: React.ReactNode;
   text: string;
   onClick: () => void;
-  isPro?: boolean;
-  userMembership?: string;
 }
 
-const ModeButton: React.FC<ModeButtonProps> = ({ icon, text, onClick, isPro = false, userMembership }) => (
+const ModeButton: React.FC<ModeButtonProps> = ({ icon, text, onClick }) => (
   <div className="relative">
     <button
       className="flex items-center space-x-2 bg-white border-2 border-black dark:bg-gray-700 dark:border-gray-600 shadow-md rounded-lg p-2 sm:p-4 h-10 sm:h-12 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base"
@@ -121,25 +117,6 @@ const ModeButton: React.FC<ModeButtonProps> = ({ icon, text, onClick, isPro = fa
       {icon}
       <span className="font-semibold">{text}</span>
     </button>
-    {isPro && userMembership !== 'pro' && (
-      <>
-        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 opacity-30 rounded-lg pointer-events-none"
-             style={{
-               backgroundImage: `repeating-linear-gradient(
-               45deg,
-              transparent,
-              transparent 10px,
-              rgba(0,0,0,0.1) 10px,
-              rgba(0,0,0,0.1) 20px
-            )`
-             }}
-        />
-        <div className="absolute top-0 right-0 bg-yellow-400 text-xs text-black px-1 py-0.5 rounded-bl">
-          <HiLightningBolt className="inline-block mr-1" />
-          PRO
-        </div>
-      </>
-    )}
   </div>
 );
 
