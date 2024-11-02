@@ -31,38 +31,35 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Custom node change handler to handle both deck and flashcard movement
+  // Custom node change handler to maintain relative positions
   const handleNodesChange: OnNodesChange = useCallback((changes: NodeChange[]) => {
     changes.forEach(change => {
       if (change.type === 'position' && change.dragging && change.position) {
-        const node = nodes.find(n => n.id === change.id);
-        
-        if (node?.type === 'deckNode') {
-          // Handle deck node movement (maintain circular arrangement)
+        const deckNode = nodes.find(n => n.id === change.id && n.type === 'deckNode');
+        if (deckNode) {
+          // Calculate the change in position
+          const deltaX = change.position.x - deckNode.position.x;
+          const deltaY = change.position.y - deckNode.position.y;
+
+          // Move all connected flashcards by the same delta
           const connectedEdges = edges.filter(edge => edge.source === change.id);
           const flashcardIds = connectedEdges.map(edge => edge.target);
-          const numCards = flashcardIds.length;
-          const RADIUS = 250;
 
           setNodes(nds => 
-            nds.map(n => {
-              if (flashcardIds.includes(n.id)) {
-                const cardIndex = flashcardIds.indexOf(n.id);
-                const angle = (2 * Math.PI * cardIndex) / numCards;
-                
+            nds.map(node => {
+              if (flashcardIds.includes(node.id)) {
                 return {
-                  ...n,
+                  ...node,
                   position: {
-                    x: change.position!.x + RADIUS * Math.cos(angle),
-                    y: change.position!.y + RADIUS * Math.sin(angle),
+                    x: node.position.x + deltaX,
+                    y: node.position.y + deltaY,
                   },
                 };
               }
-              return n;
+              return node;
             })
           );
         }
-        // Individual flashcard movement is handled automatically by ReactFlow
       }
     });
 
