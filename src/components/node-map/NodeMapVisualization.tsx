@@ -9,7 +9,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   OnNodesChange,
-  NodeChange
+  NodeChange,
+  MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Deck } from '../../types/deck';
@@ -32,32 +33,29 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
 
   // Custom node change handler to move flashcards with their deck
   const handleNodesChange: OnNodesChange = useCallback((changes: NodeChange[]) => {
-    // Handle regular node changes
-    onNodesChange(changes);
-
-    // Handle dragging of deck nodes
     changes.forEach(change => {
-      if (change.type === 'position' && change.dragging) {
+      if (change.type === 'position' && change.dragging && change.position) {
         const deckNode = nodes.find(n => n.id === change.id && n.type === 'deckNode');
         if (deckNode) {
-          // Get all flashcards connected to this deck
           const connectedEdges = edges.filter(edge => edge.source === change.id);
           const flashcardIds = connectedEdges.map(edge => edge.target);
+          const numCards = flashcardIds.length;
+          const RADIUS = 250; // Keep this consistent with initial layout
 
-          // Update positions of connected flashcards
           setNodes(nds => 
             nds.map(node => {
               if (flashcardIds.includes(node.id)) {
-                // Calculate the relative position from the deck to the flashcard
-                const deltaX = node.position.x - (deckNode.position.x || 0);
-                const deltaY = node.position.y - (deckNode.position.y || 0);
-
-                // Move flashcard maintaining the same relative position
+                // Find the index of this flashcard
+                const cardIndex = flashcardIds.indexOf(node.id);
+                // Recalculate the angle for this flashcard
+                const angle = (2 * Math.PI * cardIndex) / numCards;
+                
+                // Calculate new position maintaining circular arrangement
                 return {
                   ...node,
                   position: {
-                    x: (change.position?.x || 0) + deltaX,
-                    y: (change.position?.y || 0) + deltaY,
+                    x: change.position!.x + RADIUS * Math.cos(angle),
+                    y: change.position!.y + RADIUS * Math.sin(angle),
                   },
                 };
               }
@@ -67,6 +65,8 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
         }
       }
     });
+
+    onNodesChange(changes);
   }, [nodes, edges, onNodesChange]);
 
   // Initialize the nodes and edges when decks change
@@ -87,7 +87,7 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
         type: 'deckNode',
         position: { x: deckX, y: deckY },
         data: { label: deck.name },
-        draggable: true, // Make deck nodes draggable
+        draggable: true,
       });
 
       // Position flashcards in a circle around the deck
@@ -110,18 +110,23 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
             question: flashcard.question,
             answer: flashcard.answer,
           },
-          draggable: false, // Make flashcard nodes non-draggable
+          draggable: false,
         });
 
         newEdges.push({
           id: `edge-${deck.id}-${flashcardNodeId}`,
           source: deck.id,
           target: flashcardNodeId,
-          type: 'smoothstep',
+          type: 'bezier',
           animated: true,
           style: { 
+            strokeDasharray: '5,5',
             stroke: '#637FBF',
-            strokeWidth: 2,
+            strokeWidth: 2
+          },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: '#637FBF',
           },
         });
       });
@@ -150,7 +155,12 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
         maxZoom={1.5}
         defaultEdgeOptions={{
           animated: true,
-          style: { stroke: '#637FBF', strokeWidth: 2 },
+          type: 'bezier',
+          style: { 
+            strokeDasharray: '5,5',
+            stroke: '#637FBF', 
+            strokeWidth: 2
+          }
         }}
       >
         <Background color="#637FBF" gap={16} size={1} />
