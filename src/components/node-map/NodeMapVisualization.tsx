@@ -31,38 +31,38 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Custom node change handler to move flashcards with their deck
+  // Custom node change handler to handle both deck and flashcard movement
   const handleNodesChange: OnNodesChange = useCallback((changes: NodeChange[]) => {
     changes.forEach(change => {
       if (change.type === 'position' && change.dragging && change.position) {
-        const deckNode = nodes.find(n => n.id === change.id && n.type === 'deckNode');
-        if (deckNode) {
+        const node = nodes.find(n => n.id === change.id);
+        
+        if (node?.type === 'deckNode') {
+          // Handle deck node movement (maintain circular arrangement)
           const connectedEdges = edges.filter(edge => edge.source === change.id);
           const flashcardIds = connectedEdges.map(edge => edge.target);
           const numCards = flashcardIds.length;
-          const RADIUS = 250; // Keep this consistent with initial layout
+          const RADIUS = 250;
 
           setNodes(nds => 
-            nds.map(node => {
-              if (flashcardIds.includes(node.id)) {
-                // Find the index of this flashcard
-                const cardIndex = flashcardIds.indexOf(node.id);
-                // Recalculate the angle for this flashcard
+            nds.map(n => {
+              if (flashcardIds.includes(n.id)) {
+                const cardIndex = flashcardIds.indexOf(n.id);
                 const angle = (2 * Math.PI * cardIndex) / numCards;
                 
-                // Calculate new position maintaining circular arrangement
                 return {
-                  ...node,
+                  ...n,
                   position: {
                     x: change.position!.x + RADIUS * Math.cos(angle),
                     y: change.position!.y + RADIUS * Math.sin(angle),
                   },
                 };
               }
-              return node;
+              return n;
             })
           );
         }
+        // Individual flashcard movement is handled automatically by ReactFlow
       }
     });
 
@@ -110,7 +110,7 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
             question: flashcard.question,
             answer: flashcard.answer,
           },
-          draggable: false,
+          draggable: true, // Changed to true to allow individual movement
         });
 
         newEdges.push({
@@ -167,7 +167,7 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
         <Controls className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm" />
         <Panel position="bottom-center" className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-t-lg backdrop-blur-sm">
           <div className="text-sm text-black dark:text-white">
-            Click cards to flip • Drag decks to move • Scroll to zoom
+            Click cards to flip • Drag decks and cards to move • Scroll to zoom
           </div>
         </Panel>
       </ReactFlow>
