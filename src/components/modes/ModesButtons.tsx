@@ -1,11 +1,8 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { SiStagetimer } from "react-icons/si";
-import { RiTimerFill } from "react-icons/ri";
-import { PiCardsFill } from "react-icons/pi";
-import { BiSolidMessageSquareDots } from "react-icons/bi";
 import { HiLightningBolt } from "react-icons/hi";
 import { toast } from '../../components/ui/use-toast';
+import { Icon } from '@iconify/react';
 
 interface ModesButtonsProps {
   userId: string;
@@ -84,22 +81,22 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
   return (
     <div className="flex flex-wrap justify-center gap-2">
       <ModeButton 
-        icon={<SiStagetimer className="text-emerald-500" style={{ fontSize: '1rem' }} />} 
+        icon={<Icon icon="pepicons-print:comet" className="text-red-500" style={{ fontSize: '1.8rem' }} />} 
         text="Learn" 
         onClick={handleLearnClick} 
       />
       <ModeButton 
-        icon={<RiTimerFill className="text-orange-500" style={{ fontSize: '1.2rem' }} />} 
+        icon={<Icon icon="pepicons-print:list" className="text-emerald-500" style={{ fontSize: '1.8rem' }} />} 
         text="Test" 
         onClick={handleTestClick} 
       />
       <ModeButton 
-        icon={<PiCardsFill className="text-purple-500" style={{ fontSize: '1.2rem' }} />} 
+        icon={<Icon icon="pepicons-print:duplicate" className="text-purple-500" style={{ fontSize: '1.8rem' }} />} 
         text="Match" 
         onClick={handleMatchClick} 
       />
       <ModeButton 
-        icon={<BiSolidMessageSquareDots className="text-sky-500 font-bold" style={{ fontSize: '1.2rem' }} />} 
+        icon={<Icon icon="pepicons-print:text-bubbles" className="text-sky-500" style={{ fontSize: '1.8rem' }} />} 
         text="K-Chat" 
         onClick={handleKChatClick} 
       />
