@@ -1,13 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { FaCircleNotch, FaArrowsAltH } from "react-icons/fa";
-import { PiCardsThreeBold, PiCardsFill } from "react-icons/pi";
-import { GrHomeOption } from "react-icons/gr";
-import { FcMindMap } from "react-icons/fc";
-import { RiMindMap } from "react-icons/ri";
-
-
+import { FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
 import { useToast } from "../../components/ui/use-toast";
+import { Icon } from "@iconify/react";
 
 interface NavMenuProps {
   onDeckSelect?: (deckId: string) => void;
@@ -95,22 +90,22 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const menuItems = [
     {
       href: '/dashboard',
-      icon: GrHomeOption,
+      icon: (props: IconProps) => <Icon icon="grommet-icons:home-option" {...props} />,
       label: 'Home',
     },
     {
       href: '/decks',
-      icon: PiCardsFill,
+      icon: (props: IconProps) => <Icon icon="ph:cards-three-bold"  {...props} />,
       label: 'Library',
     },
     {
       href: '/node-map',
-      icon: RiMindMap,
+      icon: (props: IconProps) => <Icon icon="mingcute:mind-map-line" {...props} />,
       label: 'Node Map',
     },
     {
       href: '/public-decks',
-      icon: PiCardsThreeBold,
+      icon: (props: IconProps) => <Icon icon="pepicons-pop:people" {...props} />,
       label: 'Public Decks',
     },
   ];
