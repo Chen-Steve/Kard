@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { FaCircleNotch, FaArrowsAltH } from "react-icons/fa";
 import { PiCardsThreeBold, PiCardsFill } from "react-icons/pi";
+import { GrHomeOption } from "react-icons/gr";
+import { FcMindMap } from "react-icons/fc";
+import { RiMindMap } from "react-icons/ri";
+
+
 import Link from 'next/link';
 import { useToast } from "../../components/ui/use-toast";
-import { FcMindMap } from "react-icons/fc";
 
 interface NavMenuProps {
   onDeckSelect?: (deckId: string) => void;
@@ -91,7 +95,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const menuItems = [
     {
       href: '/dashboard',
-      icon: FaCircleNotch,
+      icon: GrHomeOption,
       label: 'Home',
     },
     {
@@ -101,7 +105,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
     },
     {
       href: '/node-map',
-      icon: FcMindMap,
+      icon: RiMindMap,
       label: 'Node Map',
     },
     {
