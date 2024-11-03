@@ -77,7 +77,7 @@ const FlashcardActions: React.FC<FlashcardActionsProps> = ({
               onClick={onToggleGenerate}
               className="text-purple-500 hover:text-purple-600 transition-colors duration-200"
             >
-              <Icon icon="fa6-solid:wand-magic-sparkles" width="24" height="24" />
+              <Icon icon="pepicons-print:stars" width="24" height="24" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -92,7 +92,7 @@ const FlashcardActions: React.FC<FlashcardActionsProps> = ({
               onClick={onToggleImport}
               className="text-emerald-500 hover:text-emerald-600 transition-colors duration-200"
             >
-              <Icon icon="tabler:table-import" width="24" height="24" />
+              <Icon icon="pepicons-print:cloud-up" width="26" height="26" />
             </button>
           </TooltipTrigger>
           <TooltipContent>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GrFormViewHide, GrFormView } from "react-icons/gr";
 import KeyboardShortcuts from '../KeyboardShortcuts';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './FlashcardList';
@@ -9,6 +8,7 @@ import FlashcardTable from './FlashcardTable';
 import FlashcardDisplay from '../flashcard/FlashcardDisplay';
 import FlashcardToolbar from '../flashcard/FlashcardToolbar';
 import FlashcardActions from '../flashcard/FlashcardActions';
+import { Icon } from "@iconify/react";
 
 interface FlashcardProps {
   userId: string;
@@ -454,7 +454,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
             onClick={() => setShowDefinitions(!showDefinitions)}
             className="fixed text-md border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-1 sm:px-2 py-1 rounded-full shadow-lg flex items-center"
           >
-            {showDefinitions ? <GrFormViewHide className="text-xl sm:mr-2" /> : <GrFormView className="text-xl sm:mr-2" />}
+            {showDefinitions ? 
+              <Icon icon="pepicons-print:eye-closed" className="text-xl sm:mr-2" /> : 
+              <Icon icon="pepicons-print:eye" className="text-xl sm:mr-2" />
+            }
             <span className="hidden sm:inline">
               {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
             </span>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { TbEdit } from "react-icons/tb";
-import { MdDeleteOutline, MdOutlineSave } from "react-icons/md";
 import { Draggable } from '@hello-pangea/dnd';
 import { toast } from 'react-toastify';
 import EditableDiv from '../flashcard/EditableDiv';
+import { Icon } from "@iconify/react";
 
 interface EditFlashcardProps {
   id: string;
@@ -93,7 +92,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                 className="text-red-500 hover:text-red-700 text-xs"
                 aria-label="Delete card"
               >
-                <MdDeleteOutline size={20} />
+                <Icon icon="pepicons-print:trash" width={26} />
               </button>
             )}
           </div>
@@ -136,18 +135,18 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               {isEditing ? (
                 <button
                   onClick={handleSave}
-                  className="bg-green-700 text-white p-1 rounded-full hover:bg-green-800 transition-colors"
+                  className="text-emerald-500 hover:text-emerald-600 transition-colors"
                   title="Save"
                 >
-                  <MdOutlineSave size={16} />
+                  <Icon icon="pepicons-print:floppy-disk" width={22} />
                 </button>
               ) : (
                 <button
                   onClick={handleEdit}
-                  className="bg-blue-500 text-white p-1 rounded-full hover:bg-blue-600 transition-colors"
+                  className="text-blue-500 hover:text-blue-600 transition-colors"
                   title="Edit"
                 >
-                  <TbEdit size={16} />
+                  <Icon icon="pepicons-print:pen" width={22} />
                 </button>
               )}
             </div>

@@ -1,11 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import UserAvatar from '../profile/UserAvatar';
-import { MdDarkMode } from "react-icons/md";
-import { FaSun } from "react-icons/fa";
-import { HiLightningBolt } from "react-icons/hi";
-import { FaPowerOff } from "react-icons/fa6";
 import { UserType } from '../../types/user';
+import { Icon } from "@iconify/react";
 
 interface UserAvatarDropdownProps {
   user: UserType;
@@ -44,32 +41,19 @@ const UserAvatarDropdown: React.FC<UserAvatarDropdownProps> = ({ user, isDarkMod
               onClick={toggleDarkMode}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
             >
-              {isDarkMode ? <FaSun className="mr-2" /> : <MdDarkMode className="mr-2" />}
+              {isDarkMode ? 
+                <Icon icon="pepicons-print:sun" className="mr-2 text-yellow-400 text-lg" /> : 
+                <Icon icon="pepicons-print:moon" className="mr-2 text-gray-800 text-lg" />
+              }
               {isDarkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
           </div>
-          {/* <div className="border-t border-gray-200 dark:border-gray-600">
-            {user.membership === 'pro' ? (
-              <div className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 flex items-center">
-                <HiLightningBolt className="mr-2" />
-                Pro
-              </div>
-            ) : (
-              <button
-                onClick={() => router.push('/pricing')}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-              >
-                <HiLightningBolt className="mr-2" />
-                Upgrade
-              </button>
-            )}
-          </div> */}
           <div className="border-t border-gray-200 dark:border-gray-600">
             <button
               onClick={handleSignOut}
               className="flex w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150 items-center"
             >
-              <FaPowerOff className="mr-2" />
+              <Icon icon="pepicons-print:power" className="mr-2 text-xl" />
               Log Out
             </button>
           </div>
