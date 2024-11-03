@@ -129,17 +129,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       try {
-        const updatePromises = flashcards.map(card =>
-          prisma.flashcard.update({
-            where: { id: card.id },
-            data: { order: card.order },
-          })
-        );
-        await Promise.all(updatePromises);
+        await retry(async () => {
+          const updatePromises = flashcards.map(card =>
+            prisma.flashcard.update({
+              where: { id: card.id },
+              data: { order: card.order },
+            })
+          );
+          
+          // Wrap all updates in a transaction
+          await prisma.$transaction(updatePromises);
+        });
+        
         res.status(200).json({ message: 'Flashcards updated successfully' });
       } catch (error) {
         console.error('PATCH flashcards error:', error);
-        res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
+        res.status(500).json({ 
+          error: 'Internal Server Error', 
+          details: (error as Error).message,
+          stack: (error as Error).stack 
+        });
       }
     } else if (req.method === 'PUT' && req.query.action === 'shuffle') {
       console.log('Received shuffle request:', req.body);
