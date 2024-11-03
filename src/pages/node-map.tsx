@@ -9,6 +9,7 @@ const NodeMapPage = () => {
   const router = useRouter();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDecks = async () => {
@@ -44,6 +45,12 @@ const NodeMapPage = () => {
   if (loading) return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex items-center justify-center">
       <div className="text-xl text-black dark:text-white">Loading...</div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex items-center justify-center">
+      <div className="text-xl text-red-500">Error: {error}</div>
     </div>
   );
 

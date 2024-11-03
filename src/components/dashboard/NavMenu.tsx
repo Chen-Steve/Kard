@@ -21,11 +21,14 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const [left, setLeft] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const dragThreshold = 5;
+  const dragStartPos = useRef({ x: 0, moved: false });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isVertical) {
       setIsDragging(true);
       setStartX(e.clientX - left);
+      dragStartPos.current = { x: e.clientX, moved: false };
     }
   };
 
@@ -38,9 +41,14 @@ const NavMenu: React.FC<NavMenuProps> = () => {
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging || isVertical) return;
-    const newLeft = e.clientX - startX;
-    const navWidth = navRef.current?.offsetWidth || 0;
-    setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
+    
+    // Check if we've moved past the threshold
+    if (Math.abs(e.clientX - dragStartPos.current.x) > dragThreshold) {
+      dragStartPos.current.moved = true;
+      const newLeft = e.clientX - startX;
+      const navWidth = navRef.current?.offsetWidth || 0;
+      setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
+    }
   }, [isDragging, isVertical, startX]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
@@ -116,13 +124,17 @@ const NavMenu: React.FC<NavMenuProps> = () => {
       className={`fixed ${isVertical ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' : 'bottom-2 sm:bottom-4'} z-50`}
       style={{ 
         left: isVertical ? undefined : `${left}px`, 
-        transform: isVertical ? 'translateY(-50%)' : 'translateX(-50%)',
-        cursor: isVertical ? 'default' : 'move' 
+        transform: isVertical ? 'translateY(-50%)' : 'translateX(-50%)'
       }}
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
     >
       <div className={`bg-white dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-30 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-lg flex border-2 border-black dark:border-gray-600 ${isVertical ? 'flex-col items-center space-y-4 sm:space-y-6' : 'items-center space-x-4 sm:space-x-6'}`}>
+        {!isVertical && (
+          <div 
+            className="absolute inset-x-0 top-0 h-6 cursor-move"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+        )}
         <NavIcon
           onClick={() => setIsVertical(!isVertical)}
           icon={FaArrowsAltH}
@@ -133,7 +145,16 @@ const NavMenu: React.FC<NavMenuProps> = () => {
           isVertical={isVertical}
         />
         {menuItems.map((item, index) => (
-          <NavIcon key={index} href={item.href} icon={item.icon} label={item.label} index={index} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} isVertical={isVertical} />
+          <NavIcon 
+            key={index} 
+            href={item.href} 
+            icon={item.icon} 
+            label={item.label} 
+            index={index} 
+            hoveredIndex={hoveredIndex} 
+            setHoveredIndex={setHoveredIndex} 
+            isVertical={isVertical}
+          />
         ))}
       </div>
     </div>
@@ -149,9 +170,10 @@ interface NavIconProps {
   hoveredIndex: number | null;
   setHoveredIndex: (index: number | null) => void;
   isVertical: boolean;
+  isDragging?: boolean;
 }
 
-const NavIcon: React.FC<NavIconProps> = ({ href, onClick, icon: Icon, label, index, hoveredIndex, setHoveredIndex, isVertical }) => {
+const NavIcon: React.FC<NavIconProps> = ({ href, onClick, icon: Icon, label, index, hoveredIndex, setHoveredIndex, isVertical, isDragging }) => {
   const isHovered = hoveredIndex === index;
 
   const content = (

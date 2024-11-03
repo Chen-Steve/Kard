@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useRef, useEffect } from 'react';
+import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 import ReactFlow, { 
   Background,
   Controls,
@@ -11,20 +11,30 @@ import ReactFlow, {
   OnNodesChange,
   NodeChange,
   MarkerType,
+  MiniMap,
+  ReactFlowInstance,
+  XYPosition,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Deck } from '../../types/deck';
 import DeckNode from './DeckNode';
 import FlashcardNode from './FlashcardNode';
+import SearchPanel from './SearchPanel';
 
 interface NodeMapVisualizationProps {
   decks: Deck[];
+  searchTerm?: string;
+  filterByDeck?: string[];
 }
 
 const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) => {
+  const MemoizedDeckNode = useMemo(() => React.memo(DeckNode), []);
+  const MemoizedFlashcardNode = useMemo(() => React.memo(FlashcardNode), []);
+
+  // ignore react hook useMemo missing dependency warning, its stable, eslint is wrong
   const nodeTypes = useMemo(() => ({
-    deckNode: DeckNode,
-    flashcardNode: FlashcardNode,
+    deckNode: MemoizedDeckNode,
+    flashcardNode: MemoizedFlashcardNode,
   }), []);
 
   // Initialize nodes and edges with state
@@ -145,7 +155,7 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
             question: flashcard.question,
             answer: flashcard.answer,
           },
-          draggable: true, // Changed to true to allow individual movement
+          draggable: true,
         });
 
         newEdges.push({
@@ -170,6 +180,63 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
     setNodes(newNodes);
     setEdges(newEdges);
   }, [decks, setNodes, setEdges]);
+
+  // Add edge customization based on card status
+  const getEdgeStyle = (confidence: number) => ({
+    stroke: confidence > 3 ? '#4CAF50' : confidence > 1 ? '#FFC107' : '#F44336',
+    strokeWidth: 2,
+    strokeDasharray: '5,5',
+  });
+
+  // Reference to the ReactFlow instance for viewport manipulation
+  const flowInstance = useRef<ReactFlowInstance | null>(null);
+
+  // Add state to track current match index
+  const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(0);
+
+  const handleSearch = useCallback((searchTerm: string) => {
+    const matchingNodes: Node<any>[] = [];
+    
+    // Reset match index at the start of each new search
+    setCurrentMatchIndex(0);
+    
+    if (searchTerm.trim()) {
+      const lowercaseSearch = searchTerm.toLowerCase();
+      
+      // Find all matching nodes
+      nodes.forEach(node => {
+        let isMatch = false;
+        
+        if (node.type === 'flashcardNode') {
+          const question = node.data.question.toLowerCase();
+          const answer = node.data.answer.toLowerCase();
+          isMatch = question.includes(lowercaseSearch) || answer.includes(lowercaseSearch);
+        } else if (node.type === 'deckNode') {
+          const deckName = node.data.label.toLowerCase();
+          isMatch = deckName.includes(lowercaseSearch);
+        }
+
+        if (isMatch) {
+          matchingNodes.push(node);
+        }
+      });
+
+      // Cycle through matches
+      if (matchingNodes.length > 0) {
+        const index = currentMatchIndex % matchingNodes.length;
+        const targetNode = matchingNodes[index];
+        
+        if (flowInstance.current) {
+          flowInstance.current.setCenter(
+            targetNode.position.x,
+            targetNode.position.y,
+            { zoom: 1, duration: 800 }
+          );
+          setCurrentMatchIndex(prev => prev + 1);
+        }
+      }
+    }
+  }, [nodes, currentMatchIndex]);
 
   return (
     <div className="h-screen w-full">
@@ -197,14 +264,25 @@ const NodeMapVisualization: React.FC<NodeMapVisualizationProps> = ({ decks }) =>
             strokeWidth: 2
           }
         }}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        elementsSelectable={true}
+        nodesFocusable={false}
+        onInit={(instance) => {
+          flowInstance.current = instance;
+        }}
       >
         <Background color="#637FBF" gap={16} size={1} />
         <Controls className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm" />
-        <Panel position="bottom-center" className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-t-lg backdrop-blur-sm">
-          <div className="text-sm text-black dark:text-white">
-            Click cards to flip • Drag decks and cards to move • Scroll to zoom
-          </div>
-        </Panel>
+        <SearchPanel 
+          onSearch={handleSearch}
+        />
+        <MiniMap 
+          nodeColor={(node) => {
+            return node.type === 'deckNode' ? '#637FBF' : '#fff';
+          }}
+          className="bg-white/80 dark:bg-gray-800/80"
+        />
       </ReactFlow>
     </div>
   );
