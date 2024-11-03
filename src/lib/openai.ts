@@ -44,29 +44,31 @@ export const generateQuiz = async (flashcards: any[]): Promise<string> => {
 export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
     const response = await axios.post<OpenAIResponse>('/api/generate', {
-      prompt: `Generate comprehensive flashcards based on the following description: "${description}".
+      prompt: `Generate specific, fact-based flashcards about: "${description}"
 
-Instructions:
-1. Create clear, focused questions that test a single concept
-2. Provide detailed, accurate answers that fully explain the concept
-3. Use a variety of question types:
-   - Definitions
-   - Compare/contrast
-   - Cause/effect
-   - Process explanation
-   - Application of concepts
-4. Avoid yes/no questions
-5. Make answers concise but complete
-6. Use proper terminology
+Key Requirements:
+1. Focus on concrete facts, specific examples, and real cases
+2. Avoid generic or theoretical questions
+3. Include precise details like names, dates, locations, and measurements
+4. Each flashcard should teach a distinct, memorable fact
+5. Prioritize unique and lesser-known information
 
-Format each flashcard as follows:
-Question: What is photosynthesis?
-Answer: Photosynthesis is the process by which plants convert light energy into chemical energy. It uses sunlight, water, and carbon dioxide to produce glucose and oxygen as a byproduct.
+Question Types to Use:
+- Specific identification (What is the [specific item] and where is it found?)
+- Historical facts (When and where was [specific item] discovered?)
+- Characteristics (What unique features define [specific item]?)
+- Geographic distribution (In which specific regions can [item] be found?)
+- Cultural significance (How is [specific item] used in [specific culture]?)
+
+Example Format for Your Topic:
+Question: What is the Chernobyl mushroom and where was it discovered?
+Answer: The Cryptococcus neoformans fungus, discovered in 2020 inside the Chernobyl reactor, is a black fungus that feeds on radiation through radiosynthesis. It was found growing on the reactor walls.
 ---
-Question: Compare and contrast mitosis and meiosis.
-Answer: Mitosis produces two identical daughter cells for growth/repair, while meiosis produces four genetically diverse cells for reproduction. Mitosis maintains chromosome count, meiosis halves it.
+Question: When and where was the last wild Franklin tree (Franklinia alatamaha) documented?
+Answer: The last wild Franklin tree was documented in 1803 along the Altamaha River in Georgia, USA. It has been extinct in the wild since then, surviving only through cultivation.
 ---
-Continue this format for the entire description provided.`,
+
+Generate 8-10 similarly specific, fact-based flashcards about ${description}. Focus on concrete information rather than general concepts or theories.`,
       max_tokens: 1000,
       userId,
     }, { timeout: 45000 });
@@ -83,8 +85,12 @@ Continue this format for the entire description provided.`,
       const isValid = 
         flashcard.question.length >= 10 &&
         flashcard.answer.length >= 20 &&
-        !flashcard.question.toLowerCase().startsWith('what is') &&
-        !flashcard.question.toLowerCase().includes('yes or no') &&
+        !flashcard.question.toLowerCase().startsWith('what is the importance') &&
+        !flashcard.question.toLowerCase().startsWith('how does') &&
+        !flashcard.question.toLowerCase().includes('why is') &&
+        !flashcard.question.toLowerCase().includes('what are the benefits') &&
+        !flashcard.question.toLowerCase().includes('general') &&
+        !flashcard.question.toLowerCase().includes('concept') &&
         flashcard.question.trim().endsWith('?');
       return isValid;
     });
