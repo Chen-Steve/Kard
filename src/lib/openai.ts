@@ -44,20 +44,32 @@ export const generateQuiz = async (flashcards: any[]): Promise<string> => {
 export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
     const response = await axios.post<OpenAIResponse>('/api/generate', {
-      prompt: `Generate flashcards based on the following description: "${description}". 
-      Each flashcard should be formatted as follows:
-      Question: What is the capital of France?
-      Answer: Paris.
-      ---
-      Question: Define photosynthesis.
-      Answer: Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll.
-      ---
-      Continue this format for the entire description provided.`,
-      max_tokens: 500,
-      userId,
-    }, { timeout: 30000 });
+      prompt: `Generate comprehensive flashcards based on the following description: "${description}".
 
-    console.log('OpenAI API response:', response.data.text);
+Instructions:
+1. Create clear, focused questions that test a single concept
+2. Provide detailed, accurate answers that fully explain the concept
+3. Use a variety of question types:
+   - Definitions
+   - Compare/contrast
+   - Cause/effect
+   - Process explanation
+   - Application of concepts
+4. Avoid yes/no questions
+5. Make answers concise but complete
+6. Use proper terminology
+
+Format each flashcard as follows:
+Question: What is photosynthesis?
+Answer: Photosynthesis is the process by which plants convert light energy into chemical energy. It uses sunlight, water, and carbon dioxide to produce glucose and oxygen as a byproduct.
+---
+Question: Compare and contrast mitosis and meiosis.
+Answer: Mitosis produces two identical daughter cells for growth/repair, while meiosis produces four genetically diverse cells for reproduction. Mitosis maintains chromosome count, meiosis halves it.
+---
+Continue this format for the entire description provided.`,
+      max_tokens: 1000,
+      userId,
+    }, { timeout: 45000 });
 
     const flashcardsText = response.data.text.trim();
     const flashcards = flashcardsText.split('---').map(block => {
@@ -67,10 +79,17 @@ export const generateFlashcards = async (description: string, userId: string): P
       return { question, answer };
     });
 
-    const validFlashcards = flashcards.filter(flashcard => flashcard.question && flashcard.answer);
+    const validFlashcards = flashcards.filter(flashcard => {
+      const isValid = 
+        flashcard.question.length >= 10 &&
+        flashcard.answer.length >= 20 &&
+        !flashcard.question.toLowerCase().startsWith('what is') &&
+        !flashcard.question.toLowerCase().includes('yes or no') &&
+        flashcard.question.trim().endsWith('?');
+      return isValid;
+    });
 
-    console.log('Valid flashcards:', validFlashcards);
-
+    console.log('Generated flashcards:', validFlashcards);
     return validFlashcards;
   } catch (error) {
     console.error('Error generating flashcards:', error);
