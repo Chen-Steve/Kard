@@ -188,7 +188,6 @@ const Dashboard = () => {
                         userId={user.id}
                         selectedDeckId={selectedDeckId}
                         selectedDeckName={selectedDeckName}
-                        userMembership={user.membership}
                       />
                     ))}
                 </div>
