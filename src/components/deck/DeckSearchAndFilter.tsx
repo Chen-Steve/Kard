@@ -16,6 +16,7 @@ interface DeckSearchAndFilterProps {
   isCreateDialogOpen: boolean;
   setIsCreateDialogOpen: (isOpen: boolean) => void;
   handleCreateDeck: (newDeck: Partial<Deck>) => void;
+  existingTags: { id: number; name: string; }[];
 }
 
 const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
@@ -27,6 +28,7 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
   isCreateDialogOpen,
   setIsCreateDialogOpen,
   handleCreateDeck,
+  existingTags,
 }) => {
   return (
     <div className="flex flex-col mt-4 space-y-4 w-full px-4 sm:px-0 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
@@ -64,6 +66,7 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
             isOpen={isCreateDialogOpen}
             onClose={() => setIsCreateDialogOpen(false)}
             onSubmit={handleCreateDeck}
+            existingTags={existingTags}
           />
         </Dialog>
       </div>

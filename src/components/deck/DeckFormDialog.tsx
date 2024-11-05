@@ -6,7 +6,7 @@ import { useToast } from "../ui/use-toast";
 import { LuDelete } from "react-icons/lu";
 import { Label } from '../ui/label';
 import { Badge } from '../ui/badge';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Icon } from "@iconify/react";
 
@@ -116,8 +116,8 @@ const TagInput: React.FC<TagInputProps> = ({
   newTagName, 
   onTagNameChange, 
   onAddTag, 
-  tags,
-  existingTags = [] 
+  tags = [],
+  existingTags = []
 }) => {
   const [open, setOpen] = useState(false);
   const isDuplicate = tags.some(tag => tag.name === newTagName.trim());
@@ -129,8 +129,13 @@ const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
-  const filteredTags = existingTags.filter(tag => 
-    !tags.some(existingTag => existingTag.name === tag.name) &&
+  const safeExistingTags = Array.isArray(existingTags) ? existingTags : [];
+  const safeTags = Array.isArray(tags) ? tags : [];
+  
+  const filteredTags = safeExistingTags.filter(tag => 
+    tag &&
+    tag.name &&
+    !safeTags.some(existingTag => existingTag.name === tag.name) &&
     tag.name.toLowerCase().includes(newTagName.toLowerCase())
   );
 
@@ -160,22 +165,29 @@ const TagInput: React.FC<TagInputProps> = ({
         </PopoverTrigger>
         <PopoverContent className="p-0" align="start">
           <Command>
-            <CommandInput placeholder="Search existing tags..." />
-            <CommandEmpty>No matching tags found.</CommandEmpty>
-            <CommandGroup>
-              {filteredTags.map((tag) => (
-                <CommandItem
-                  key={tag.id}
-                  onSelect={() => {
-                    onTagNameChange(tag.name);
-                    setOpen(false);
-                  }}
-                >
-                  <Icon icon="pepicons-print:tag" className="mr-2 h-4 w-4" />
-                  {tag.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <CommandInput 
+              placeholder="Search existing tags..." 
+              value={newTagName}
+              onValueChange={onTagNameChange}
+            />
+            <CommandList>
+              <CommandEmpty>No matching tags found.</CommandEmpty>
+              <CommandGroup>
+                {filteredTags.map((tag) => (
+                  <CommandItem
+                    key={tag.id}
+                    value={tag.name}
+                    onSelect={() => {
+                      onTagNameChange(tag.name);
+                      setOpen(false);
+                    }}
+                  >
+                    <Icon icon="pepicons-print:tag" className="mr-2 h-4 w-4" />
+                    {tag.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

@@ -362,6 +362,7 @@ const DecksPage = () => {
               isCreateDialogOpen={isCreateDialogOpen}
               setIsCreateDialogOpen={setIsCreateDialogOpen}
               handleCreateDeck={handleCreateDeck}
+              existingTags={allTags}
             />
             <div className="w-full sm:w-auto flex justify-center sm:justify-start">
               <div className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
