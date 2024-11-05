@@ -3,7 +3,7 @@ import { Search, Plus } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/Button';
-import { Dialog, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/Dialog';
 import DeckFormDialog from './DeckFormDialog';
 import { Deck } from '../../types/deck';
 
