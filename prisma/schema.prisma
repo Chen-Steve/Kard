@@ -58,7 +58,6 @@ model Deck {
 model Tag {
   id       Int       @id @default(autoincrement())
   name     String    @unique
-  color    String    @default("#000000")
   deckTags DeckTag[]
 
   @@map("tags")

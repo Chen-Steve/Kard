@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
 
+interface TagInput {
+  id: number;
+  name: string;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     const userId = req.query.userId as string;
@@ -15,17 +20,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { userId },
         orderBy: { order: 'asc' },
         include: {
+          flashcards: true,
           deckTags: {
             include: {
-              tag: true,
-            },
-          },
-        },
+              tag: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
       });
 
       const decksWithTags = decks.map(deck => ({
         ...deck,
-        tags: deck.deckTags.map(dt => dt.tag),
+        tags: deck.deckTags.map(dt => ({
+          id: dt.tag.id,
+          name: dt.tag.name,
+        })),
       }));
 
       res.status(200).json(decksWithTags);
@@ -54,14 +68,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           userId,
           isPublic: isPublic || false,
           deckTags: {
-            create: tags.map((tag: { name: string; color: string }) => ({
-              tag: {
-                connectOrCreate: {
-                  where: { name: tag.name },
-                  create: { name: tag.name, color: tag.color },
+            create: tags
+              .filter((tag: TagInput, index: number, self: TagInput[]) => 
+                index === self.findIndex((t: TagInput) => t.name === tag.name)
+              )
+              .map((tag: TagInput) => ({
+                tag: {
+                  connectOrCreate: {
+                    where: { name: tag.name },
+                    create: { name: tag.name },
+                  },
                 },
-              },
-            })),
+              })),
           },
         },
         include: {
@@ -75,7 +93,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const deckWithTags = {
         ...newDeck,
-        tags: newDeck.deckTags.map(dt => dt.tag),
+        tags: newDeck.deckTags.map(dt => ({
+          id: dt.tag.id,
+          name: dt.tag.name,
+        })),
       };
 
       res.status(201).json(deckWithTags);
@@ -170,45 +191,55 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Create new tags
       if (tags && tags.length > 0) {
-        for (const tag of tags) {
-          const existingTag = await prisma.tag.findUnique({
+        const uniqueTags = tags.filter((tag: TagInput, index: number, self: TagInput[]) => 
+          index === self.findIndex((t: TagInput) => t.name === tag.name)
+        );
+
+        for (const tag of uniqueTags) {
+          let existingTag = await prisma.tag.findUnique({
             where: { name: tag.name },
+            select: { id: true }
           });
 
-          let tagId;
-          if (existingTag) {
-            tagId = existingTag.id;
-          } else {
-            const newTag = await prisma.tag.create({
-              data: { name: tag.name, color: tag.color },
+          if (!existingTag) {
+            existingTag = await prisma.tag.create({
+              data: { name: tag.name },
+              select: { id: true }
             });
-            tagId = newTag.id;
           }
 
           await prisma.deckTag.create({
             data: {
               deckId: deckId,
-              tagId: tagId,
+              tagId: existingTag.id,
             },
           });
         }
       }
 
       // Fetch the updated deck with tags
-      const deckWithTags = await prisma.deck.findUnique({
+      const updatedDeck = await prisma.deck.findUnique({
         where: { id: deckId },
         include: {
           deckTags: {
             include: {
-              tag: true,
+              tag: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
         },
       });
 
       const formattedDeck = {
-        ...deckWithTags,
-        tags: deckWithTags?.deckTags.map(dt => dt.tag) || [],
+        ...updatedDeck,
+        tags: updatedDeck?.deckTags.map(dt => ({
+          id: dt.tag.id,
+          name: dt.tag.name,
+        })) || [],
       };
 
       res.status(200).json(formattedDeck);

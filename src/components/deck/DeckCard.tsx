@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Button } from '../ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/Card';
 import { Deck } from '../../types/deck';
 import MiniatureFlashcards from './MiniatureFlashcards';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
+import { Badge } from '../ui/badge';
 
 interface DeckCardProps {
   deck: Deck;
@@ -23,9 +24,21 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit(deck);
+  };
+
   const content = (
     <Card className={`relative ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
-      <CardHeader className="cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+      <CardHeader 
+        className="cursor-pointer" 
+        onClick={(e) => {
+          if (!(e.target as HTMLElement).closest('button')) {
+            setIsDropdownOpen(!isDropdownOpen);
+          }
+        }}
+      >
         <div className="flex justify-between items-center">
           <CardTitle className="text-black dark:text-gray-100 text-lg sm:text-xl">{deck.name}</CardTitle>
           <Button
@@ -34,17 +47,25 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
             onClick={toggleDropdown}
             className="text-gray-500 dark:text-gray-400"
           >
-            {isDropdownOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isDropdownOpen ? (
+              <Icon icon="pepicons-print:angle-up" className="h-4 w-4" />
+            ) : (
+              <Icon icon="pepicons-print:angle-down" className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
           {deck.description}
         </CardDescription>
-        <div className="mt-2 flex flex-wrap">
-          {deck.tags.map((tag) => (
-            <span key={tag.id} className="inline-block text-gray-800 text-xs px-2 py-1 rounded mr-2 mb-2" style={{ backgroundColor: tag.color }}>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {Array.isArray(deck.tags) && deck.tags.map((tag) => (
+            <Badge
+              key={tag.id}
+              variant="outline"
+              className="text-xs bg-background hover:bg-background"
+            >
               {tag.name}
-            </span>
+            </Badge>
           ))}
         </div>
       </CardHeader>
@@ -70,10 +91,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button
               variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(deck);
-              }}
+              onClick={handleEdit}
               className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600 flex-grow sm:flex-grow-0"
             >
               Edit
@@ -86,7 +104,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
               }}
               className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600"
             >
-              <Trash2 className="h-4 w-4" />
+              <Icon icon="pepicons-print:trash" className="h-6 w-6" />
             </Button>
           </div>
         </div>

@@ -25,6 +25,8 @@ const DecksPage = () => {
   
   const [isReorderingEnabled, setIsReorderingEnabled] = useState(false);
   
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  
   const fetchDecks = useCallback(async () => {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -138,6 +140,7 @@ const DecksPage = () => {
 
   const handleEditDeck = (deck: Deck) => {
     setEditingDeck(deck);
+    setIsEditDialogOpen(true);
   };
 
   const handleUpdateDeck = async (updatedDeck: Partial<Deck>) => {
@@ -337,6 +340,11 @@ const DecksPage = () => {
     setSelectedDeckId(deckId);
   };
 
+  const allTags = decks.flatMap(deck => deck.tags)
+    .filter((tag, index, self) => 
+      index === self.findIndex((t) => t.name === tag.name)
+    );
+
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   return (
@@ -404,10 +412,20 @@ const DecksPage = () => {
           </DragDropContext>
         </main>
         <DeckFormDialog
-          isOpen={!!editingDeck}
-          onClose={() => setEditingDeck(null)}
+          isOpen={isCreateDialogOpen}
+          onClose={() => setIsCreateDialogOpen(false)}
+          onSubmit={handleCreateDeck}
+          existingTags={allTags}
+        />
+        <DeckFormDialog
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false);
+            setEditingDeck(null);
+          }}
           onSubmit={handleUpdateDeck}
           initialDeck={editingDeck || undefined}
+          existingTags={allTags}
         />
       </div>
     </div>
