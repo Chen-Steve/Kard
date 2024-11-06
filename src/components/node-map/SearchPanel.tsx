@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Panel } from 'reactflow';
 import debounce from 'lodash/debounce';
 
@@ -11,8 +11,9 @@ interface SearchPanelProps {
 const SearchPanel: React.FC<SearchPanelProps> = ({ onSearch, resultsCount, searchTerm: initialSearchTerm = '' }) => {
   const [localSearchTerm, setLocalSearchTerm] = useState(initialSearchTerm);
 
-  const debouncedSearch = useCallback(
-    debounce((term: string) => {
+  // Create memoized debounced search function
+  const debouncedSearch = useMemo(
+    () => debounce((term: string) => {
       onSearch(term);
     }, 300),
     [onSearch]
@@ -26,14 +27,16 @@ const SearchPanel: React.FC<SearchPanelProps> = ({ onSearch, resultsCount, searc
 
   return (
     <Panel position="top-center" className="translate-x-[-50%]">
-      <div className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-lg backdrop-blur-sm shadow-lg">
+      <div className="p-2 rounded-lg">
         <div className="relative">
           <input 
             type="text"
             value={localSearchTerm}
             placeholder="Search cards or decks..."
-            className="w-[300px] px-4 py-2 rounded-md border dark:bg-gray-700 dark:text-white 
-                       dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-[300px] px-4 py-2 rounded-md border border-gray-200 
+                       bg-transparent backdrop-blur-sm
+                       dark:border-gray-700 dark:text-white 
+                       focus:outline-none focus:ring-2 focus:ring-black"
             onChange={handleSearch}
           />
           {localSearchTerm && resultsCount !== undefined && (
