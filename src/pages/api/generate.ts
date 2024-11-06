@@ -25,6 +25,12 @@ const matcher = new RegExpMatcher({
   ...englishRecommendedTransformers,
 });
 
+// Add interface for the rate limit response
+interface RateLimitResponse {
+  canProceed: boolean;
+  remainingAttempts: number;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -52,10 +58,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // Check IP-based rate limit
-  const canProceed = await checkAndUpdateIPUsage(userIp);
-  if (!canProceed) {
-    res.status(429).json({ error: 'Daily generation limit reached. Please try again tomorrow.' });
+  // Type assertion for the rate limit check
+  const rateLimitCheck: RateLimitResponse = await checkAndUpdateIPUsage(userIp);
+  if (!rateLimitCheck.canProceed) {
+    res.status(429).json({ 
+      error: 'Daily generation limit reached. Please try again tomorrow.',
+      remainingAttempts: rateLimitCheck.remainingAttempts
+    });
     return;
   }
 
@@ -67,7 +76,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const generatedText = response.choices[0].message.content;
-    res.status(200).json({ text: generatedText });
+    res.status(200).json({ 
+      text: generatedText,
+      remainingAttempts: rateLimitCheck.remainingAttempts
+    });
   } catch (error) {
     console.error('Error generating text:', error);
     if (error instanceof Error) {

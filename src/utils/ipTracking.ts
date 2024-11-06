@@ -1,6 +1,12 @@
 import prisma from '../lib/prisma';
 
-export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Promise<boolean> {
+// Add the interface
+interface RateLimitResponse {
+  canProceed: boolean;
+  remainingAttempts: number;
+}
+
+export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Promise<RateLimitResponse> {
   const now = new Date();
   const dayInMs = 24 * 60 * 60 * 1000;
 
@@ -28,12 +34,21 @@ export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Prom
           lastReset: now
         }
       });
-      return true;
+      return {
+        canProceed: true,
+        remainingAttempts: limit - 1
+      };
     }
 
-    return ipUsage.aiCount <= limit;
+    return {
+      canProceed: ipUsage.aiCount <= limit,
+      remainingAttempts: Math.max(0, limit - ipUsage.aiCount)
+    };
   } catch (error) {
     console.error('Error checking IP usage:', error);
-    return false;
+    return {
+      canProceed: false,
+      remainingAttempts: 0
+    };
   }
 } 

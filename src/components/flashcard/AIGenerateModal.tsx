@@ -29,8 +29,19 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
   const [generatedFlashcards, setGeneratedFlashcards] = useState<{ question: string, answer: string }[]>([]);
 
   const handleError = (error: unknown) => {
-    if (isAxiosError(error) && error.response?.data) {
-      const errorData = error.response.data as ErrorResponse;
+    if (isAxiosError(error)) {
+      // Check specifically for rate limit error (429)
+      if (error.response?.status === 429) {
+        toast({
+          title: "Generation Limit Reached",
+          description: "You've used up your daily generations. Please try again tomorrow.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Handle other API errors
+      const errorData = error.response?.data as ErrorResponse;
       toast({
         title: "Error",
         description: errorData.message || "Failed to generate flashcards. Please try again.",
