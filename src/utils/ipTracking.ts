@@ -8,7 +8,6 @@ interface RateLimitResponse {
 
 export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Promise<RateLimitResponse> {
   const now = new Date();
-  const dayInMs = 24 * 60 * 60 * 1000;
 
   try {
     const ipUsage = await prisma.iPUsage.upsert({
@@ -25,8 +24,14 @@ export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Prom
       }
     });
 
-    // Reset count if it's been more than a day
-    if (now.getTime() - ipUsage.lastReset.getTime() >= dayInMs) {
+    // Check if the stored date is from a different day than today
+    const lastResetDate = new Date(ipUsage.lastReset);
+    const isDifferentDay = 
+      lastResetDate.getFullYear() !== now.getFullYear() ||
+      lastResetDate.getMonth() !== now.getMonth() ||
+      lastResetDate.getDate() !== now.getDate();
+
+    if (isDifferentDay) {
       await prisma.iPUsage.update({
         where: { ip },
         data: {

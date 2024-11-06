@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
@@ -21,16 +21,17 @@ interface PopupProps {
 }
 
 const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId }) => {
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [pdfText, setPdfText] = useState<string>('');
-  const [isProcessingPDF, setIsProcessingPDF] = useState(false);
-  const [showQualityControl, setShowQualityControl] = useState(false);
+  const [state, setState] = useState({
+    description: '',
+    pdfText: '',
+    isProcessingPDF: false,
+    loading: false,
+    showQualityControl: false,
+  });
   const [generatedFlashcards, setGeneratedFlashcards] = useState<{ question: string, answer: string }[]>([]);
 
-  const handleError = (error: unknown) => {
+  const handleError = useCallback((error: unknown) => {
     if (isAxiosError(error)) {
-      // Check specifically for rate limit error (429)
       if (error.response?.status === 429) {
         toast({
           title: "Generation Limit Reached",
@@ -39,8 +40,6 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         });
         return;
       }
-
-      // Handle other API errors
       const errorData = error.response?.data as ErrorResponse;
       toast({
         title: "Error",
@@ -54,29 +53,30 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         variant: "destructive",
       });
     }
-  };
+  }, []);
 
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = useCallback(async () => {
+    setState(prev => ({ ...prev, loading: true }));
     try {
-      const flashcards = await generateFlashcards(description, userId);
-      setLoading(false);
-      
-      // Show quality control instead of directly saving
-      setShowQualityControl(true);
+      const flashcards = await generateFlashcards(state.description, userId);
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        showQualityControl: true,
+      }));
       setGeneratedFlashcards(flashcards);
     } catch (error) {
-      setLoading(false);
+      setState(prev => ({ ...prev, loading: false }));
       handleError(error);
     }
-  };
+  }, [state.description, userId, handleError]);
 
   const handleSaveReviewedFlashcards = (reviewedFlashcards: { question: string; answer: string }[]) => {
     onFlashcardsGenerated(reviewedFlashcards);
     onClose();
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !file.type.includes('pdf')) {
       toast({
@@ -87,35 +87,43 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
       return;
     }
 
-    setIsProcessingPDF(true);
+    setState(prev => ({ ...prev, isProcessingPDF: true }));
     try {
       const text = await extractTextFromPDF(file);
-      setPdfText(text);
-      setDescription(text);
+      setState(prev => ({
+        ...prev,
+        pdfText: text,
+        description: text,
+        isProcessingPDF: false,
+      }));
       toast({
         title: 'PDF Processed',
         description: 'Your PDF has been processed successfully.',
       });
     } catch (error) {
+      setState(prev => ({ ...prev, isProcessingPDF: false }));
       toast({
         title: 'Error',
         description: 'Failed to process PDF file.',
         variant: 'destructive',
       });
-    } finally {
-      setIsProcessingPDF(false);
     }
-  };
+  }, []);
+
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+  }, [onClose]);
 
   return (
     <>
       <div className="fixed inset-0 z-50">
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-md transition-all"
-          onClick={onClose}
+          onClick={handleBackdropClick}
         />
         <div className={`fixed inset-y-0 flex items-center justify-center p-4 transition-all duration-300 ease-in-out
-          ${showQualityControl 
+          ${state.showQualityControl 
             ? 'right-[55%] w-[40%]'
             : 'inset-x-0'
           }`}
@@ -157,18 +165,18 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                         accept=".pdf"
                         className="hidden"
                         onChange={handleFileUpload}
-                        disabled={isProcessingPDF}
+                        disabled={state.isProcessingPDF}
                       />
                     </label>
                   </div>
                 </div>
                 <Textarea
                   id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={state.description}
+                  onChange={(e) => setState(prev => ({ ...prev, description: e.target.value }))}
                   className="min-h-[150px] resize-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Example: The water cycle process, including evaporation, condensation, and precipitation..."
-                  disabled={isProcessingPDF}
+                  disabled={state.isProcessingPDF}
                 />
               </div>
             </CardContent>
@@ -182,10 +190,10 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
               </Button>
               <Button 
                 onClick={handleSubmit} 
-                disabled={loading}
+                disabled={state.loading}
                 className="bg-black hover:bg-gray-800 text-white"
               >
-                {loading ? (
+                {state.loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <AiOutlineLoading3Quarters className="animate-spin h-4 w-4" />
                     Generating...
@@ -199,12 +207,12 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         </div>
       </div>
 
-      {showQualityControl && (
+      {state.showQualityControl && (
         <div className="fixed right-[5%] inset-y-0 w-[45%] flex items-center justify-center p-4 z-[51]">
           <FlashcardQualityControl
             flashcards={generatedFlashcards}
             onSave={handleSaveReviewedFlashcards}
-            onCancel={() => setShowQualityControl(false)}
+            onCancel={() => setState(prev => ({ ...prev, showQualityControl: false }))}
           />
         </div>
       )}
