@@ -34,6 +34,17 @@ const SignIn = () => {
       setLoading(false);
     } else if (data.user) {
       console.log('User signed in successfully:', data.user);
+      
+      // Update last_login in the database
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', data.user.id);
+
+      if (updateError) {
+        console.error('Error updating last login:', updateError);
+      }
+
       // Update streak after successful login
       await updateStreak(data.user.id);
       console.log('Streak updated');

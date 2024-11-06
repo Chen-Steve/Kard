@@ -82,10 +82,13 @@ const options: NextAuthOptions = {
           return false;
         }
 
-        // Update the user in database with Supabase ID
+        // Update the user in database with Supabase ID and last_login
         await prisma.user.update({
           where: { email: user.email! },
-          data: { id: data.user!.id },
+          data: { 
+            id: data.user!.id,
+            lastLogin: new Date()
+          },
         });
       }
       return true;
