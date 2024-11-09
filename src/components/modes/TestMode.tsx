@@ -6,6 +6,8 @@ import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion';
 import PerformanceSummary from './mode-components/PerformanceSummary';
 import CustomButton from '../ui/CustomButton';
 import { renderFormattedText } from '@/utils/textFormatting';
+import Link from 'next/link';
+import { FaArrowLeft } from 'react-icons/fa';
 
 interface Flashcard {
   id: string;
@@ -161,9 +163,15 @@ const TestMode: React.FC<TestModeProps> = ({ flashcards }) => {
   }
 
   return (
-    <div className="min-h-screen py-4">
+    <div className="min-h-screen mt-10 py-4">
       <div className="max-w-2xl mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Test Mode</h2>
+        <div className="mb-4">
+          <Link href="/dashboard" passHref>
+            <span className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
+              <FaArrowLeft className="mr-2" /> Back to Dashboard
+            </span>
+          </Link>
+        </div>
         {questions.length > 0 ? (
           <>
             <div className="space-y-4 mb-4">

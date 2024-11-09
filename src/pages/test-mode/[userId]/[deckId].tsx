@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import TestMode from '../../../components/modes/TestMode';
-import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
 
 interface Flashcard {
   id: string;
@@ -42,13 +40,6 @@ const TestModePage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
-      <div className="mb-4">
-        <Link href="/dashboard" passHref>
-          <span className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
-            <FaArrowLeft className="mr-2" /> Back to Dashboard
-          </span>
-        </Link>
-      </div>
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <TestMode flashcards={flashcards} />
     </div>

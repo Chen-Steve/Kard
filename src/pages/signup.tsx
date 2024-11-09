@@ -3,7 +3,8 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { FaArrowLeft, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
+import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { CgSpinner } from "react-icons/cg";
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SignUp = () => {
@@ -75,7 +76,7 @@ const SignUp = () => {
   return (
     <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 relative">
       <div className={`absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 ${loading ? '' : 'hidden'}`}>
-        <FaSpinner className="animate-spin text-4xl text-black" />
+        <CgSpinner className="animate-spin text-4xl text-black" />
       </div>
       <div className={`w-full ${loading ? 'blur-sm' : ''}`}>
         <div className="absolute top-4 left-4 sm:top-20 sm:left-40">

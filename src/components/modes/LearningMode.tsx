@@ -6,6 +6,8 @@ import DOMPurify from 'dompurify';
 import PerformanceSummary from './mode-components/PerformanceSummary';
 import { FaPlay } from 'react-icons/fa';
 import { FaClock } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaArrowLeft } from 'react-icons/fa';
 
 interface Flashcard {
   id: string;
@@ -249,12 +251,21 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
   const currentCard = currentCards[0];
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
-      <div className="flex justify-between items-center">
-        <CustomButton onClick={toggleMode} className="flex items-center">
-          {mode === 'normal' ? <FaClock className="mr-2" /> : <FaPlay className="mr-2" />}
-          {mode === 'normal' ? 'Switch to Timed' : 'Switch to Normal'}
-        </CustomButton>
+    <div className="max-w-2xl mx-auto mt-20">
+      <div className="flex items-center max-w-[672px] mx-auto">
+        <div>
+          <Link href="/dashboard" passHref>
+            <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
+              <FaArrowLeft className="mr-2" /> Back to Dashboard
+            </span>
+          </Link>
+        </div>
+        <div className="ml-auto">
+          <CustomButton onClick={toggleMode} className="flex items-center">
+            {mode === 'normal' ? <FaClock className="mr-2" /> : <FaPlay className="mr-2" />}
+            {mode === 'normal' ? 'Switch to Timed' : 'Switch to Normal'}
+          </CustomButton>
+        </div>
       </div>
       <Card className="mb-4">
         <CardContent className="p-6">
