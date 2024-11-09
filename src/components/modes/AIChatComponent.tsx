@@ -30,6 +30,9 @@ interface AIChatComponentProps {
   onDeckChange: (deckId: string) => void;
 }
 
+// Add a constant for maximum history length
+const MAX_HISTORY_LENGTH = 20;
+
 const AIChatComponent: React.FC<AIChatComponentProps> = ({ 
   flashcards, 
   decks, 
@@ -51,28 +54,40 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({
     if (selectedDeckId) {
       const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
       if (selectedDeck) {
-        const initialMessage: Message = {
-          role: 'assistant',
-          content: `How can I help you learn about ${selectedDeck.name}?`
-        };
-        setMessages([initialMessage]);
+        // Only set initial message if messages array is empty
+        if (messages.length === 0) {
+          const initialMessage: Message = {
+            role: 'assistant',
+            content: `How can I help you learn about ${selectedDeck.name}?`
+          };
+          setMessages([initialMessage]);
+        }
       }
     }
-  }, [selectedDeckId, decks]);
+  }, [selectedDeckId, decks, messages.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    setMessages(prevMessages => [...prevMessages, userMessage]);
+    
+    // Keep track of conversation context
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput('');
     setIsLoading(true);
 
     try {
-      const aiResponse = await generateAIResponse(input, flashcards, messages);
+      // Pass the entire conversation history to the AI
+      const aiResponse = await generateAIResponse(
+        input, 
+        flashcards,
+        // Only send the last MAX_HISTORY_LENGTH messages to stay within token limits
+        updatedMessages.slice(-MAX_HISTORY_LENGTH)
+      );
       const aiMessage: Message = { role: 'assistant', content: aiResponse };
-      setMessages(prevMessages => [...prevMessages, aiMessage]);
+      setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error in AI chat:', error);
       let errorMessage = 'Sorry, I encountered an error. Please try again.';

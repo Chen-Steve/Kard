@@ -12,6 +12,7 @@ const openai = new OpenAI({
 
 const MAX_HISTORY_LENGTH = 10;
 const MAX_MESSAGE_LENGTH = 500;
+const MAX_TOKENS = 4000;
 
 const matcher = new RegExpMatcher({
   ...englishDataset.build(),
@@ -47,16 +48,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const limitedHistory = history.slice(-MAX_HISTORY_LENGTH) as Message[];
     const messages: Message[] = [
-      { role: "system", content: "You are a helpful assistant that discusses flashcards. Use markdown formatting for emphasis: **bold**, *italic*, and __underline__. Here are the flashcards:" + JSON.stringify(flashcards) },
-      ...limitedHistory,
+      { 
+        role: "system", 
+        content: `You are a focused AI tutor helping students learn using flashcards. Follow these guidelines:
+
+1. Keep responses concise (2-3 sentences for simple questions, 4-5 for complex ones)
+2. Always reference specific flashcard content in your responses when relevant
+3. If the user's question isn't related to the flashcards, politely redirect them to the flashcard content
+4. Use examples from the flashcards to explain concepts
+5. Format important points using **bold** or *italic*
+6. Maintain context from previous messages in the conversation
+7. If referring to previous context, briefly mention what you're referring to
+
+Here are the flashcards for reference: ${JSON.stringify(flashcards)}`
+      },
+      ...history,
       { role: "user", content: message }
     ];
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: messages,
+      temperature: 0.7,
+      max_tokens: MAX_TOKENS,
     });
 
     const aiResponse = response.choices[0].message?.content || '';

@@ -23,18 +23,6 @@ const AIChatPage: React.FC = () => {
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!router.isReady) return;
-  
-    if (userId && typeof userId === 'string') {
-      fetchDecks();
-      if (deckId && typeof deckId === 'string') {
-        setSelectedDeckId(deckId);
-        fetchFlashcards(deckId);
-      }
-    }
-  }, [router.isReady, userId, deckId]);
-
   const fetchDecks = useCallback(async () => {
     if (!userId) return;
   
@@ -77,6 +65,18 @@ const AIChatPage: React.FC = () => {
       setError('Failed to fetch flashcards. Please try again.');
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+  
+    if (userId && typeof userId === 'string') {
+      fetchDecks();
+      if (deckId && typeof deckId === 'string') {
+        setSelectedDeckId(deckId);
+        fetchFlashcards(deckId);
+      }
+    }
+  }, [router.isReady, userId, deckId, fetchDecks, fetchFlashcards]);
 
   const handleDeckChange = (newDeckId: string) => {
     setSelectedDeckId(newDeckId);
