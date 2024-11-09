@@ -352,21 +352,27 @@ const DecksPage = () => {
       <NavMenu/>
       <div className="flex-1 pl-0 sm:pl-64">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 mt-16">
-          <div className="mb-6 flex flex-wrap gap-4 justify-between items-center">
-            <DeckSearchAndFilter
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              selectedTag={selectedTag}
-              setSelectedTag={setSelectedTag}
-              uniqueTags={uniqueTags}
-              isCreateDialogOpen={isCreateDialogOpen}
-              setIsCreateDialogOpen={setIsCreateDialogOpen}
-              handleCreateDeck={handleCreateDeck}
-              existingTags={allTags}
-            />
-            <div className="w-full sm:w-auto flex justify-center sm:justify-start">
-              <div className="flex items-center space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
-                <TbArrowsSort className="text-[#637FBF]" style={{ fontSize: '1.2rem' }} />
+          <div className="flex flex-col gap-4">
+            {/* Top Controls Row */}
+            <div className="flex flex-col items-center sm:flex-row sm:items-start gap-4">
+              {/* Search and Filter */}
+              <div className="w-full">
+                <DeckSearchAndFilter
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedTag={selectedTag}
+                  setSelectedTag={setSelectedTag}
+                  uniqueTags={uniqueTags}
+                  isCreateDialogOpen={isCreateDialogOpen}
+                  setIsCreateDialogOpen={setIsCreateDialogOpen}
+                  handleCreateDeck={handleCreateDeck}
+                  existingTags={allTags}
+                />
+              </div>
+              
+              {/* Reorder Control */}
+              <div className="flex items-center justify-center min-w-[150px] space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
+                <TbArrowsSort className="text-[#637FBF] text-xl" />
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Reorder
                 </span>
@@ -377,40 +383,42 @@ const DecksPage = () => {
                 />
               </div>
             </div>
+
+            {/* Decks Grid */}
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="decks" type="DECK">
+                {(provided) => (
+                  <div 
+                    {...provided.droppableProps} 
+                    ref={provided.innerRef} 
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                  >
+                    {filteredDecks.map((deck, index) => (
+                      deck && deck.id ? (
+                        <Draggable key={deck.id} draggableId={deck.id} index={index} isDragDisabled={!isReorderingEnabled}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...(isReorderingEnabled ? provided.dragHandleProps : {})}
+                            >
+                              <DeckCard
+                                deck={deck}
+                                isSelected={deck.id === selectedDeckId}
+                                onEdit={handleEditDeck}
+                                onDelete={handleDeleteDeck}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ) : null
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="decks" type="DECK">
-              {(provided) => (
-                <div 
-                  {...provided.droppableProps} 
-                  ref={provided.innerRef} 
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
-                >
-                  {filteredDecks.map((deck, index) => (
-                    deck && deck.id ? (
-                      <Draggable key={deck.id} draggableId={deck.id} index={index} isDragDisabled={!isReorderingEnabled}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...(isReorderingEnabled ? provided.dragHandleProps : {})}
-                          >
-                            <DeckCard
-                              deck={deck}
-                              isSelected={deck.id === selectedDeckId}
-                              onEdit={handleEditDeck}
-                              onDelete={handleDeleteDeck}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ) : null
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
         </main>
         <DeckFormDialog
           isOpen={isCreateDialogOpen}

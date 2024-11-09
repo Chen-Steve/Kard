@@ -32,12 +32,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
   const content = (
     <Card className={`relative ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
       <CardHeader 
-        className="cursor-pointer" 
-        onClick={(e) => {
-          if (!(e.target as HTMLElement).closest('button')) {
-            setIsDropdownOpen(!isDropdownOpen);
-          }
-        }}
+        className="cursor-default"
       >
         <div className="flex justify-between items-center">
           <CardTitle className="text-black dark:text-gray-100 text-lg sm:text-xl">{deck.name}</CardTitle>
