@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Markdown from 'markdown-to-jsx';
 import { MdDeleteOutline, MdOutlineSave, MdEdit } from "react-icons/md";
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import EditableDiv from '../flashcard/EditableDiv';
 
 interface Flashcard {
   id: string;
@@ -18,21 +19,6 @@ interface FlashcardTableProps {
 }
 
 const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, onSave, onReorder, readOnly }) => {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedQuestion, setEditedQuestion] = useState('');
-  const [editedAnswer, setEditedAnswer] = useState('');
-
-  const handleEdit = (card: Flashcard) => {
-    setEditingId(card.id);
-    setEditedQuestion(card.question);
-    setEditedAnswer(card.answer);
-  };
-
-  const handleSave = (id: string) => {
-    onSave(id, editedQuestion, editedAnswer);
-    setEditingId(null);
-  };
-
   return (
     <DragDropContext onDragEnd={onReorder}>
       <Droppable droppableId="flashcards" direction="vertical">
@@ -41,7 +27,7 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
             {...provided.droppableProps} 
             ref={provided.innerRef} 
             className="grid grid-cols-3 gap-4"
-            style={{ display: 'grid' }} // This ensures the grid layout is maintained
+            style={{ display: 'grid' }}
           >
             {flashcards.map((card, index) => (
               <Draggable key={card.id} draggableId={card.id} index={index}>
@@ -63,34 +49,24 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                     </div>
                     <div className="mb-2">
                       <h3 className="font-semibold text-lg mb-1">Question:</h3>
-                      {editingId === card.id ? (
-                        <textarea  
-                          aria-label="Edit question"
-                          value={editedQuestion}
-                          onChange={(e) => setEditedQuestion(e.target.value)}
-                          className="w-full p-2 border border-gray-300 rounded resize-none"
-                          rows={3}
-                        />
-                      ) : (
-                        <div className="text-sm"><Markdown>{card.question}</Markdown></div>
-                      )}
+                      <EditableDiv
+                        htmlContent={card.question}
+                        onChange={(content) => onSave(card.id, content, card.answer)}
+                        disabled={readOnly}
+                        placeholder="Enter question here..."
+                      />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Answer:</h3>
-                      {editingId === card.id ? (
-                        <textarea
-                          aria-label="Edit answer"
-                          value={editedAnswer}
-                          onChange={(e) => setEditedAnswer(e.target.value)}
-                          className="w-full p-2 border border-gray-300 rounded resize-none"
-                          rows={3}
-                        />
-                      ) : (
-                        <div className="text-sm"><Markdown>{card.answer}</Markdown></div>
-                      )}
+                      <EditableDiv
+                        htmlContent={card.answer}
+                        onChange={(content) => onSave(card.id, card.question, content)}
+                        disabled={readOnly}
+                        placeholder="Enter answer here..."
+                      />
                     </div>
                     {!readOnly && (
-                      <div className="mt-4 flex justify-between items-center">
+                      <div className="mt-4 flex justify-end">
                         <button 
                           onClick={() => onDelete(card.id)} 
                           className="text-red-500 hover:text-red-700 text-sm"
@@ -98,25 +74,6 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                         >
                           <MdDeleteOutline size={20} />
                         </button>
-                        {editingId === card.id ? (
-                          <div className="flex space-x-2">
-                            <button 
-                              onClick={() => handleSave(card.id)} 
-                              className="text-green-700 hover:text-green-800 text-sm"
-                              aria-label="Save changes"
-                            >
-                              <MdOutlineSave size={20} />
-                            </button>
-                          </div>
-                        ) : (
-                          <button 
-                            onClick={() => handleEdit(card)} 
-                            className="text-blue-500 hover:text-blue-700 text-sm"
-                            aria-label="Edit card"
-                          >
-                            <MdEdit size={20} />
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
