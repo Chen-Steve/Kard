@@ -68,19 +68,20 @@ const FlashcardActions: React.FC<FlashcardActionsProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-2 relative">
+    <div className="flex items-center gap-3 relative">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               aria-label='generate-flashcards'
               onClick={onToggleGenerate}
-              className="text-purple-500 hover:text-purple-600 transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-purple-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-200"
             >
               <Icon icon="pepicons-print:stars" width="24" height="24" />
+              <span className="hidden sm:inline text-sm font-medium">Generate</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className="sm:hidden">
             <p>Generate Flashcards</p>
           </TooltipContent>
         </Tooltip>
@@ -90,12 +91,13 @@ const FlashcardActions: React.FC<FlashcardActionsProps> = ({
             <button
               aria-label='import-flashcards'
               onClick={onToggleImport}
-              className="text-emerald-500 hover:text-emerald-600 transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200"
             >
-              <Icon icon="pepicons-print:cloud-up" width="26" height="26" />
+              <Icon icon="pepicons-print:cloud-up" width="24" height="24" />
+              <span className="hidden sm:inline text-sm font-medium">Import</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className="sm:hidden">
             <p>Import Flashcards</p>
           </TooltipContent>
         </Tooltip>

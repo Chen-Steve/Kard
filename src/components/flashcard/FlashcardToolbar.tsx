@@ -75,6 +75,20 @@ interface ViewSelectorProps {
 const ViewSelector: React.FC<ViewSelectorProps> = ({ isTableViewActive, onToggleView }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -95,6 +109,10 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ isTableViewActive, onToggle
     }
     setIsOpen(false);
   };
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
