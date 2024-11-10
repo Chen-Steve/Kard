@@ -58,18 +58,36 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
   const handleSubmit = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true }));
     try {
-      const flashcards = await generateFlashcards(state.description, userId);
+      const prompt = `Create a set of 5 flashcards about: ${state.description}
+        Format your response as an array of JSON objects, each with 'question' and 'answer' fields.
+        Make questions clear and concise.
+        Make answers comprehensive but not too long.
+        Example format: [{"question": "What is X?", "answer": "X is Y"}]`;
+
+      console.log('Sending prompt:', prompt);
+      const flashcards = await generateFlashcards(prompt, userId);
+      console.log('Received flashcards:', flashcards);
+
+      if (!Array.isArray(flashcards) || flashcards.length === 0) {
+        throw new Error('Invalid response format from AI');
+      }
+
+      setGeneratedFlashcards(flashcards);
       setState(prev => ({
         ...prev,
         loading: false,
         showQualityControl: true,
       }));
-      setGeneratedFlashcards(flashcards);
     } catch (error) {
+      console.error('Error in handleSubmit:', error);
       setState(prev => ({ ...prev, loading: false }));
-      handleError(error);
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "An error occurred while generating flashcards. Please try again.",
+        variant: "destructive",
+      });
     }
-  }, [state.description, userId, handleError]);
+  }, [state.description, userId]);
 
   const handleSaveReviewedFlashcards = (reviewedFlashcards: { question: string; answer: string }[]) => {
     onFlashcardsGenerated(reviewedFlashcards);

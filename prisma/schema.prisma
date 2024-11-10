@@ -80,6 +80,7 @@ model Generation {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, date])
   @@map("generations")
 }
 
@@ -99,13 +100,4 @@ model NewsletterSubscription {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("newsletter_subscriptions")
-}
-
-model IPUsage {
-  id          String   @id @default(uuid())
-  ip          String   @unique
-  aiCount     Int      @default(0)
-  lastReset   DateTime @default(now())
-
-  @@map("ip_usage")
 }

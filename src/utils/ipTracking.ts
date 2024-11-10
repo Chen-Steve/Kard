@@ -1,59 +1,55 @@
 import prisma from '../lib/prisma';
 
-// Add the interface
-interface RateLimitResponse {
+interface AIUsageResponse {
   canProceed: boolean;
   remainingAttempts: number;
 }
 
-export async function checkAndUpdateIPUsage(ip: string, limit: number = 5): Promise<RateLimitResponse> {
-  const now = new Date();
+export async function checkAndUpdateAIUsage(
+  userId: string,
+): Promise<AIUsageResponse> {
+  if (!userId) {
+    return {
+      canProceed: false,
+      remainingAttempts: 0
+    };
+  }
 
   try {
-    const ipUsage = await prisma.iPUsage.upsert({
-      where: { ip },
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for consistent tracking
+
+    // Track usage in the Generation model
+    await prisma.generation.upsert({
+      where: {
+        userId_date: {
+          userId: userId,
+          date: today
+        }
+      },
       update: {
-        aiCount: {
+        count: {
           increment: 1
         }
       },
       create: {
-        ip,
-        aiCount: 1,
-        lastReset: now
+        userId: userId,
+        date: today,
+        count: 1
       }
     });
 
-    // Check if the stored date is from a different day than today
-    const lastResetDate = new Date(ipUsage.lastReset);
-    const isDifferentDay = 
-      lastResetDate.getFullYear() !== now.getFullYear() ||
-      lastResetDate.getMonth() !== now.getMonth() ||
-      lastResetDate.getDate() !== now.getDate();
-
-    if (isDifferentDay) {
-      await prisma.iPUsage.update({
-        where: { ip },
-        data: {
-          aiCount: 1,
-          lastReset: now
-        }
-      });
-      return {
-        canProceed: true,
-        remainingAttempts: limit - 1
-      };
-    }
-
+    // Always allow authenticated users to proceed
     return {
-      canProceed: ipUsage.aiCount <= limit,
-      remainingAttempts: Math.max(0, limit - ipUsage.aiCount)
+      canProceed: true,
+      remainingAttempts: 999 // Arbitrary high number to indicate unlimited
     };
   } catch (error) {
-    console.error('Error checking IP usage:', error);
+    console.error('Error tracking AI usage:', error);
+    // Still allow the user to proceed even if tracking fails
     return {
-      canProceed: false,
-      remainingAttempts: 0
+      canProceed: true,
+      remainingAttempts: 999
     };
   }
 } 

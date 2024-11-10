@@ -43,8 +43,16 @@ export const generateQuiz = async (flashcards: any[]): Promise<string> => {
 
 export const generateFlashcards = async (description: string, userId: string): Promise<{ question: string, answer: string }[]> => {
   try {
+    // Extract number of flashcards from description
+    const numberMatch = description.match(/(\d+)\s*(flashcards?|cards?|facts?)/i);
+    const requestedCount = numberMatch ? parseInt(numberMatch[1]) : 5;
+    const finalCount = Math.min(Math.max(1, requestedCount), 20);
+
+    console.log('Generating flashcards for:', description);
+    console.log('Requested count:', requestedCount, 'Final count:', finalCount);
+
     const response = await axios.post<OpenAIResponse>('/api/generate', {
-      prompt: `Generate specific, fact-based flashcards about: "${description}"
+      prompt: `Generate ${finalCount} specific, fact-based flashcards about: "${description}"
 
 Key Requirements:
 1. Focus on concrete facts, specific examples, and real cases
@@ -60,43 +68,39 @@ Question Types to Use:
 - Geographic distribution (In which specific regions can [item] be found?)
 - Cultural significance (How is [specific item] used in [specific culture]?)
 
-Example Format for Your Topic:
-Question: What is the Chernobyl mushroom and where was it discovered?
-Answer: The Cryptococcus neoformans fungus, discovered in 2020 inside the Chernobyl reactor, is a black fungus that feeds on radiation through radiosynthesis. It was found growing on the reactor walls.
----
-Question: When and where was the last wild Franklin tree (Franklinia alatamaha) documented?
-Answer: The last wild Franklin tree was documented in 1803 along the Altamaha River in Georgia, USA. It has been extinct in the wild since then, surviving only through cultivation.
----
+Example Format:
+[
+  {
+    "question": "What is the Chernobyl mushroom and where was it discovered?",
+    "answer": "The Cryptococcus neoformans fungus, discovered in 2020 inside the Chernobyl reactor, is a black fungus that feeds on radiation through radiosynthesis. It was found growing on the reactor walls."
+  }
+]
 
-Generate 8-10 similarly specific, fact-based flashcards about ${description}. Focus on concrete information rather than general concepts or theories.`,
-      max_tokens: 1000,
+Generate exactly ${finalCount} specific, fact-based flashcards about the topic. Return them in a JSON array format.`,
       userId,
     }, { timeout: 45000 });
 
-    const flashcardsText = response.data.text.trim();
-    const flashcards = flashcardsText.split('---').map(block => {
-      const [questionPart, answerPart] = block.split('Answer:');
-      const question = questionPart ? questionPart.replace('Question:', '').trim() : '';
-      const answer = answerPart ? answerPart.trim() : '';
-      return { question, answer };
-    });
+    console.log('Raw API response:', response.data);
 
-    const validFlashcards = flashcards.filter(flashcard => {
-      const isValid = 
-        flashcard.question.length >= 10 &&
-        flashcard.answer.length >= 20 &&
-        !flashcard.question.toLowerCase().startsWith('what is the importance') &&
-        !flashcard.question.toLowerCase().startsWith('how does') &&
-        !flashcard.question.toLowerCase().includes('why is') &&
-        !flashcard.question.toLowerCase().includes('what are the benefits') &&
-        !flashcard.question.toLowerCase().includes('general') &&
-        !flashcard.question.toLowerCase().includes('concept') &&
-        flashcard.question.trim().endsWith('?');
-      return isValid;
-    });
+    if (!response.data || !response.data.text) {
+      throw new Error('Invalid response from API');
+    }
 
-    console.log('Generated flashcards:', validFlashcards);
-    return validFlashcards;
+    try {
+      const parsedFlashcards = JSON.parse(response.data.text);
+      if (Array.isArray(parsedFlashcards) && parsedFlashcards.length > 0) {
+        // Validate the generated count
+        if (parsedFlashcards.length !== finalCount) {
+          console.warn(`Expected ${finalCount} flashcards but received ${parsedFlashcards.length}`);
+        }
+        return parsedFlashcards;
+      }
+    } catch (e) {
+      console.error('Failed to parse JSON response:', e);
+      throw new Error('Invalid response format from AI');
+    }
+
+    throw new Error('Invalid response format');
   } catch (error) {
     console.error('Error generating flashcards:', error);
     throw error;
