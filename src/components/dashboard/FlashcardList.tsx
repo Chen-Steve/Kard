@@ -27,7 +27,6 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
 }) => {
   const [editedQuestion, setEditedQuestion] = useState<string>(question);
   const [editedAnswer, setEditedAnswer] = useState<string>(answer);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     setEditedQuestion(question);
@@ -36,18 +35,17 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
 
   const handleQuestionChange = useCallback((content: string) => {
     setEditedQuestion(content);
-  }, []);
+    if (!readOnly) {
+      onSave(id, content, editedAnswer);
+    }
+  }, [id, editedAnswer, onSave, readOnly]);
 
   const handleAnswerChange = useCallback((content: string) => {
     setEditedAnswer(content);
-  }, []);
-
-  const handleSave = () => {
     if (!readOnly) {
-      onSave(id, editedQuestion, editedAnswer);
-      setIsEditing(false);
+      onSave(id, editedQuestion, content);
     }
-  };
+  }, [id, editedQuestion, onSave, readOnly]);
 
   const handleDelete = async () => {
     if (!readOnly) {
@@ -69,10 +67,6 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
     }
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
   return (
     <Draggable key={id} draggableId={id} index={index}>
       {(provided) => (
@@ -80,7 +74,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 mb-3 text-sm"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-3 text-sm"
         >
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -96,61 +90,28 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
               </button>
             )}
           </div>
-          <div className="space-y-2">
-            <div className="rounded-lg">
+          <div className="space-y-4">
+            <div>
               <h3 className="font-semibold text-base mb-1">Question:</h3>
-              {isEditing ? (
-                <EditableDiv
-                  htmlContent={editedQuestion}
-                  onChange={handleQuestionChange}
-                  disabled={readOnly}
-                  placeholder="Enter question here..."
-                />
-              ) : (
-                <div className="prose dark:prose-invert max-w-none text-sm">
-                  <div dangerouslySetInnerHTML={{ __html: editedQuestion }} />
-                </div>
-              )}
+              <EditableDiv
+                htmlContent={editedQuestion}
+                onChange={handleQuestionChange}
+                disabled={readOnly}
+                placeholder="Enter question here..."
+              />
             </div>
             {showDefinitions && (
-              <div className="rounded-lg">
+              <div>
                 <h3 className="font-semibold text-base mb-1">Answer:</h3>
-                {isEditing ? (
-                  <EditableDiv
-                    htmlContent={editedAnswer}
-                    onChange={handleAnswerChange}
-                    disabled={readOnly}
-                    placeholder="Enter answer here..."
-                  />
-                ) : (
-                  <div className="prose dark:prose-invert max-w-none text-sm">
-                    <div dangerouslySetInnerHTML={{ __html: editedAnswer }} />
-                  </div>
-                )}
+                <EditableDiv
+                  htmlContent={editedAnswer}
+                  onChange={handleAnswerChange}
+                  disabled={readOnly}
+                  placeholder="Enter answer here..."
+                />
               </div>
             )}
           </div>
-          {!readOnly && (
-            <div className="flex justify-end mt-2 space-x-1">
-              {isEditing ? (
-                <button
-                  onClick={handleSave}
-                  className="text-emerald-500 hover:text-emerald-600 transition-colors"
-                  title="Save"
-                >
-                  <Icon icon="pepicons-print:floppy-disk" width={22} />
-                </button>
-              ) : (
-                <button
-                  onClick={handleEdit}
-                  className="text-blue-500 hover:text-blue-600 transition-colors"
-                  title="Edit"
-                >
-                  <Icon icon="pepicons-print:pen" width={22} />
-                </button>
-              )}
-            </div>
-          )}
         </div>
       )}
     </Draggable>

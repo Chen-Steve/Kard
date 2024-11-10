@@ -239,11 +239,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       return;
     }
 
-    // Check character limit (consider the HTML content)
-    if (updatedQuestion.length > MAX_CHAR_LIMIT || updatedAnswer.length > MAX_CHAR_LIMIT) {
-      setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
-      return;
-    }
+    // Immediately update local state
+    setFlashcards((prevFlashcards) =>
+      prevFlashcards.map((card) =>
+        card.id === id ? { ...card, question: updatedQuestion, answer: updatedAnswer } : card
+      )
+    );
 
     try {
       const response = await fetch('/api/flashcard', {
@@ -260,15 +261,14 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         const errorData = await response.json();
         throw new Error(`Failed to update flashcard: ${errorData.error}, ${errorData.details}`);
       }
-      const updatedCards = await response.json();
-      const updatedCard = updatedCards[0];
+      const updatedCard = await response.json();
       setFlashcards((prevFlashcards) =>
         prevFlashcards.map((card) => (card.id === id ? updatedCard : card))
       );
       setError(null);
     } catch (error) {
       console.error('Error updating flashcard:', error);
-      setError('Failed to update flashcard. Please try again.');
+      toast.error('Failed to update flashcard. Please try again.');
     }
   }, 500);
 
@@ -326,43 +326,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleFlashcardsAdded = (newFlashcards: Flashcard[]) => {
     setFlashcards(prevFlashcards => [...prevFlashcards, ...newFlashcards]);
-  };
-
-  const handleSaveCard = async (id: string, updatedQuestion: string, updatedAnswer: string) => {
-    // Immediately update the state
-    setFlashcards((prevFlashcards) =>
-      prevFlashcards.map((card) =>
-        card.id === id ? { ...card, question: updatedQuestion, answer: updatedAnswer } : card
-      )
-    );
-
-    // Now update the server
-    try {
-      const response = await fetch('/api/flashcard', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          id, 
-          question: updatedQuestion, 
-          answer: updatedAnswer,
-          order: flashcards.find(card => card.id === id)?.order,
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to update flashcard: ${errorData.error}, ${errorData.details}`);
-      }
-      const updatedCard = await response.json();
-      // Update the state again with the server response (in case of any changes)
-      setFlashcards((prevFlashcards) =>
-        prevFlashcards.map((card) => (card.id === id ? updatedCard : card))
-      );
-      setError(null);
-    } catch (error) {
-      console.error('Error updating flashcard:', error);
-      setError('Failed to update flashcard on the server. Please try again.');
-      // Optionally, you could revert the change here if you want to ensure consistency with the server
-    }
   };
 
   const handleToggleImport = () => {
@@ -426,7 +389,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                 <FlashcardTable 
                   flashcards={flashcards}
                   onDelete={handleDeleteCard}
-                  onSave={handleSaveCard}
+                  onSave={debouncedSaveCard}
                   onReorder={handleReorder}
                   readOnly={readOnly}
                 />
@@ -442,7 +405,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                             question={card.question}
                             answer={card.answer}
                             showDefinitions={showDefinitions}
-                            onSave={handleSaveCard}
+                            onSave={debouncedSaveCard}
                             onDelete={handleDeleteCard}
                             readOnly={readOnly}
                             index={index}
