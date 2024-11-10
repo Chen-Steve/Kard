@@ -173,11 +173,18 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleAddCard = async () => {
     console.log('Adding card for userId:', userId);
-    const newCardOrder = flashcards.length + 1;
+    
+    // Update all existing flashcards' order
+    const updatedFlashcards = flashcards.map(card => ({
+      ...card,
+      order: card.order + 1
+    }));
+
+    // Create new card with order 1
     const newCard = {
       question: 'Term',
       answer: 'Definition',
-      order: newCardOrder,
+      order: 1,
     };
 
     if (newCard.question.length > MAX_CHAR_LIMIT || newCard.answer.length > MAX_CHAR_LIMIT) {
@@ -186,8 +193,9 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     }
 
     const tempId = `temp-${Date.now()}`;
-    setFlashcards((prevFlashcards) => [...prevFlashcards, { ...newCard, id: tempId }]);
-    setCurrentCardIndex(flashcards.length);
+    // Add new card at the beginning of the array
+    setFlashcards([{ ...newCard, id: tempId }, ...updatedFlashcards]);
+    setCurrentCardIndex(0);
     setError(null);
 
     try {
@@ -195,7 +203,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          flashcards: [{ ...newCard, id: tempId }], // Send as an array
+          flashcards: [{ ...newCard, id: tempId }], // Send new card
+          updatedOrders: updatedFlashcards.map(({ id, order }) => ({ id, order })), // Send updated orders
           userId,
           deckId,
         }),
@@ -205,7 +214,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
         throw new Error(`Failed to add flashcard: ${errorData.error}, ${errorData.details}`);
       }
       const savedCards = await response.json();
-      const savedCard = savedCards[0]; // Assuming the API returns an array of saved cards
+      const savedCard = savedCards[0];
       setFlashcards((prevFlashcards) =>
         prevFlashcards.map((card) => (card.id === tempId ? savedCard : card))
       );

@@ -2,6 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
 import { toast } from 'react-toastify';
 
+interface UpdatedOrder {
+  id: string;
+  order: number;
+}
+
+interface FlashcardInput {
+  question: string;
+  answer: string;
+  order: number;
+}
+
 async function retry<T>(fn: () => Promise<T>, retries: number = 3, delay: number = 1000): Promise<T> {
   let lastError: Error | null = null;
 
@@ -42,7 +53,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(200).json(flashcards);
     } else if (req.method === 'POST') {
-      const { flashcards, userId, deckId } = req.body;
+      const { flashcards, updatedOrders, userId, deckId } = req.body as {
+        flashcards: FlashcardInput[];
+        updatedOrders: UpdatedOrder[];
+        userId: string;
+        deckId: string;
+      };
 
       if (!flashcards || !Array.isArray(flashcards) || flashcards.length === 0 || !userId || !deckId) {
         res.status(400).json({ error: 'Missing required fields' });
@@ -58,24 +74,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return;
         }
 
-        const newFlashcards = await prisma.$transaction(async (prisma) => {
-          const flashcardCount = await prisma.flashcard.count({ where: { deckId } });
+        // Handle both new flashcard creation and order updates in a single transaction
+        const result = await prisma.$transaction(async (prisma) => {
+          // First update existing flashcard orders if provided
+          if (updatedOrders && updatedOrders.length > 0) {
+            await Promise.all(updatedOrders.map(({ id, order }: UpdatedOrder) =>
+              prisma.flashcard.update({
+                where: { id },
+                data: { order },
+              })
+            ));
+          }
 
-          return await Promise.all(flashcards.map((flashcard, index) => 
+          // Then create the new flashcards
+          const newFlashcards = await Promise.all(flashcards.map((flashcard: FlashcardInput) =>
             prisma.flashcard.create({
               data: {
                 question: flashcard.question,
                 answer: flashcard.answer,
-                order: flashcardCount + index + 1,
+                order: flashcard.order,
                 user: { connect: { id: userId } },
                 deck: { connect: { id: deckId } },
               },
             })
           ));
+
+          return newFlashcards;
         });
 
-        console.log('New flashcards created:', newFlashcards);
-        res.status(201).json(newFlashcards);
+        console.log('New flashcards created:', result);
+        res.status(201).json(result);
       } catch (error) {
         console.error('POST flashcards error:', error);
         res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
