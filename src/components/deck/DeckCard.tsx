@@ -79,9 +79,9 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
             </div>
           )}
         </Droppable>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
           <Link href={`/decks/${deck.id}`}>
-            <Button variant="outline" className="text-black dark:text-gray-200 w-full sm:w-auto">View Deck</Button>
+            <Button variant="outline" className="text-black dark:text-gray-200 w-full sm:w-auto">Edit Deck</Button>
           </Link>
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button
@@ -89,7 +89,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
               onClick={handleEdit}
               className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600 flex-grow sm:flex-grow-0"
             >
-              Edit
+              Update
             </Button>
             <Button
               variant="ghost"
