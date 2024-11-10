@@ -6,6 +6,7 @@ import supabase from '../lib/supabaseClient';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CgSpinner } from "react-icons/cg";
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import PasswordStrengthMeter from '../components/PasswordStrengthMeter';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -144,6 +145,7 @@ const SignUp = () => {
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </div>
               </div>
+              <PasswordStrengthMeter password={password} />
             </div>
             <HCaptcha
               sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
