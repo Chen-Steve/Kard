@@ -30,8 +30,8 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
           {isFlipped ? 'Answer' : 'Question'}
         </div>
         {card ? (
-          <div className="w-full sm:w-5/6 max-w-lg overflow-auto text-sm sm:text-base">
-            <div dangerouslySetInnerHTML={{ __html: isFlipped ? card.answer : card.question }} />
+          <div className="w-full sm:w-5/6 max-w-lg overflow-y-auto overflow-x-hidden text-sm sm:text-base">
+            <div className="whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{ __html: isFlipped ? card.answer : card.question }} />
           </div>
         ) : (
           <p className="text-lg sm:text-xl text-muted-foreground dark:text-gray-400">No cards</p>
