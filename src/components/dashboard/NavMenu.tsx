@@ -15,7 +15,12 @@ interface IconProps {
 const NavMenu: React.FC<NavMenuProps> = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showDecks, setShowDecks] = useState(false);
-  const [isVertical, setIsVertical] = useState(true);
+  const [isVertical, setIsVertical] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 640;
+    }
+    return true;
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [left, setLeft] = useState(0);
@@ -92,7 +97,18 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   }, [handleMouseMove, handleTouchMove]);
 
   useEffect(() => {
-    setLeft(window.innerWidth / 2);
+    const handleOrientationChange = () => {
+      setIsVertical(window.innerWidth >= 640);
+    };
+
+    window.addEventListener('resize', handleOrientationChange);
+    return () => window.removeEventListener('resize', handleOrientationChange);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setLeft(window.innerWidth / 2);
+    }
   }, []);
 
   const menuItems = [
@@ -109,7 +125,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
     {
       href: '/node-map',
       icon: (props: IconProps) => <Icon icon="mingcute:mind-map-line" {...props} />,
-      label: 'Node Map',
+      label: 'Mind Map',
     },
     {
       href: '/public-decks',

@@ -7,6 +7,7 @@ import { Deck } from '../../types/deck';
 import MiniatureFlashcards from './MiniatureFlashcards';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { Badge } from '../ui/badge';
+import { useRouter } from 'next/router';
 
 interface DeckCardProps {
   deck: Deck;
@@ -17,11 +18,17 @@ interface DeckCardProps {
 }
 
 const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, onDelete }) => {
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/dashboard?deckId=${deck.id}`);
   };
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -80,7 +87,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck, index, isSelected, onEdit, on
           )}
         </Droppable>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-          <Link href={`/decks/${deck.id}`}>
+          <Link href={`/dashboard?deckId=${deck.id}`}>
             <Button variant="outline" className="text-black dark:text-gray-200 w-full sm:w-auto">Edit Deck</Button>
           </Link>
           <div className="flex space-x-2 w-full sm:w-auto">

@@ -95,6 +95,17 @@ const Dashboard = () => {
     }
   }, [router, fetchUserDecksAndSetSelected]);
 
+  useEffect(() => {
+    if (router.isReady && router.query.deckId) {
+      const deckId = router.query.deckId as string;
+      setSelectedDeckId(deckId);
+      const selectedDeck = decks.find(deck => deck.id === deckId);
+      if (selectedDeck) {
+        setSelectedDeckName(selectedDeck.name);
+      }
+    }
+  }, [router.isReady, router.query.deckId, decks]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     Cookies.remove('session');
