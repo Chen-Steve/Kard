@@ -139,7 +139,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                       className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <Icon icon="lucide:upload" className="h-4 w-4" />
-                      <span className="text-sm">Upload PDF</span>
+                      <span className="text-sm">Upload</span>
                     </button>
                   </div>
                 </div>
