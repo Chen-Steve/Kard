@@ -11,7 +11,7 @@ const nextConfig = {
         {
           protocol: 'https',
           hostname: 'mvnsmwxwjklawrlkksyl.supabase.co',
-          pathname: '/storage/v1/object/public/stickers/**',
+          pathname: '/storage/v1/object/**',
         },
       ],
     },

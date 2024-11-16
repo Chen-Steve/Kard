@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import NavMenu from '../components/dashboard/NavMenu';
 import FlashcardComponent from '../components/dashboard/Flashcard';
-import { useToast } from '../components/ui/use-toast';
-import { Toaster } from '../components/ui/toaster';
+import { Toaster, toast } from 'react-hot-toast';
 import Cookies from 'js-cookie';
 import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
@@ -35,7 +34,6 @@ const Dashboard = () => {
   const [selectedDeckName, setSelectedDeckName] = useState<string | null>(null);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { dismiss } = useToast();
   const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
@@ -242,7 +240,16 @@ const Dashboard = () => {
       <footer className="w-full bg-white-700 dark:bg-gray-800 text-black dark:text-white p-6 text-center">
         <p>&copy; {new Date().getFullYear()} Kard. All rights reserved.</p>
       </footer>
-      <Toaster />
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: isDarkMode ? '#374151' : '#fff',
+            color: isDarkMode ? '#fff' : '#000',
+          },
+        }}
+      />
     </div>
   );
 };

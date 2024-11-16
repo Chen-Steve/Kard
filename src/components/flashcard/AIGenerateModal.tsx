@@ -3,12 +3,10 @@ import { Button } from '../ui/Button';
 import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
 import { generateFlashcards } from '../../lib/openai';
-import { AiOutlineExperiment, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import toast from 'react-hot-toast';
 import { isAxiosError } from '../../lib/axiosErrorGuard';
-import { extractTextFromPDF } from '../../lib/pdfUtils';
-import { FiUpload } from 'react-icons/fi';
 import FlashcardQualityControl from './FlashcardQualityControl';
+import { Icon } from '@iconify/react';
 
 interface ErrorResponse {
   message: string;
@@ -23,8 +21,6 @@ interface PopupProps {
 const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId }) => {
   const [state, setState] = useState({
     description: '',
-    pdfText: '',
-    isProcessingPDF: false,
     loading: false,
     showQualityControl: false,
   });
@@ -33,13 +29,22 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
   const handleError = useCallback((error: unknown) => {
     if (isAxiosError(error)) {
       if (error.response?.status === 429) {
-        toast.error("You've used up your daily generations. Please try again tomorrow.");
+        toast('You\'ve used up your daily generations. Please try again tomorrow.', {
+          position: 'top-center',
+          duration: 3000,
+        });
         return;
       }
       const errorData = error.response?.data as ErrorResponse;
-      toast.error(errorData.message || "Failed to generate flashcards. Please try again.");
+      toast(errorData.message || "Failed to generate flashcards. Please try again.", {
+        position: 'top-center',
+        duration: 3000,
+      });
     } else {
-      toast.error("An unexpected error occurred. Please try again.");
+      toast("An unexpected error occurred. Please try again.", {
+        position: 'top-center',
+        duration: 3000,
+      });
     }
   }, []);
 
@@ -69,7 +74,10 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       setState(prev => ({ ...prev, loading: false }));
-      toast.error(error instanceof Error ? error.message : "An error occurred while generating flashcards. Please try again.");
+      toast(error instanceof Error ? error.message : "An error occurred while generating flashcards. Please try again.", {
+        position: 'top-center',
+        duration: 3000,
+      });
     }
   }, [state.description, userId]);
 
@@ -78,33 +86,17 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
     onClose();
   };
 
-  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !file.type.includes('pdf')) {
-      toast.error('Please upload a PDF file.');
-      return;
-    }
-
-    setState(prev => ({ ...prev, isProcessingPDF: true }));
-    try {
-      const text = await extractTextFromPDF(file);
-      setState(prev => ({
-        ...prev,
-        pdfText: text,
-        description: text,
-        isProcessingPDF: false,
-      }));
-      toast.success('PDF processed successfully');
-    } catch (error) {
-      setState(prev => ({ ...prev, isProcessingPDF: false }));
-      toast.error('Failed to process PDF file');
-    }
-  }, []);
-
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
   }, [onClose]);
+
+  const handlePdfClick = useCallback(() => {
+    toast('PDF upload feature coming soon!', {
+      position: 'top-center',
+      duration: 3000,
+    });
+  }, []);
 
   return (
     <>
@@ -125,7 +117,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                 <div className="flex items-center gap-3">
                   <CardTitle className="text-2xl font-bold">Generate Flashcards</CardTitle>
                   <span className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-100 rounded-full flex items-center">
-                    <AiOutlineExperiment className="mr-1.5" /> Experimental
+                    <Icon icon="lucide:flask-conical" className="mr-1.5" /> Experimental
                   </span>
                 </div>
               </div>
@@ -140,25 +132,15 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                     <label htmlFor="description" className="block text-sm font-medium">
                       What would you like to create flashcards about?
                     </label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Enter text directly or upload a PDF file
-                    </p>
                   </div>
                   <div className="flex-shrink-0">
-                    <label htmlFor="pdf-upload" className="cursor-pointer">
-                      <div className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <FiUpload className="h-4 w-4" />
-                        <span className="text-sm">Upload PDF</span>
-                      </div>
-                      <input
-                        id="pdf-upload"
-                        type="file"
-                        accept=".pdf"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                        disabled={state.isProcessingPDF}
-                      />
-                    </label>
+                    <button
+                      onClick={handlePdfClick}
+                      className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      <Icon icon="lucide:upload" className="h-4 w-4" />
+                      <span className="text-sm">Upload PDF</span>
+                    </button>
                   </div>
                 </div>
                 <Textarea
@@ -167,7 +149,6 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                   onChange={(e) => setState(prev => ({ ...prev, description: e.target.value }))}
                   className="min-h-[150px] resize-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Example: The water cycle process, including evaporation, condensation, and precipitation..."
-                  disabled={state.isProcessingPDF}
                 />
               </div>
             </CardContent>
@@ -186,7 +167,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
               >
                 {state.loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <AiOutlineLoading3Quarters className="animate-spin h-4 w-4" />
+                    <Icon icon="lucide:loader-2" className="animate-spin h-4 w-4" />
                     Generating...
                   </span>
                 ) : (
