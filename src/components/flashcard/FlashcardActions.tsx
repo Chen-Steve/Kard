@@ -3,7 +3,7 @@ import { FlashcardImportModal } from './FlashcardImportModal';
 import Popup from './AIGenerateModal';
 import { Icon } from '@iconify/react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { Flashcard, FlashcardInput } from '@/types/flashcard';
 
 interface FlashcardActionsProps {

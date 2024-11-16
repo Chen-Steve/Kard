@@ -3,7 +3,7 @@ import KeyboardShortcuts from '../KeyboardShortcuts';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './FlashcardList';
 import { debounce } from 'lodash';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import FlashcardTable from './FlashcardTable';
 import FlashcardDisplay from '../flashcard/FlashcardDisplay';
 import FlashcardToolbar from '../flashcard/FlashcardToolbar';
@@ -39,7 +39,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true);
   const [showList, setShowList] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,10 +71,9 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       const data = await response.json();
       setFlashcards(data);
       setCurrentCardIndex(0);
-      setError(null);
     } catch (error) {
       console.error('Error fetching flashcards:', error);
-      setError('Failed to fetch flashcards. Please try again.');
+      toast.error('Failed to fetch flashcards. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +186,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     };
 
     if (newCard.question.length > MAX_CHAR_LIMIT || newCard.answer.length > MAX_CHAR_LIMIT) {
-      setError(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
+      toast.error(`Flashcard content exceeds ${MAX_CHAR_LIMIT} character limit`);
       return;
     }
 
@@ -196,7 +194,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     // Add new card at the beginning of the array
     setFlashcards([{ ...newCard, id: tempId }, ...updatedFlashcards]);
     setCurrentCardIndex(0);
-    setError(null);
 
     try {
       const response = await fetch('/api/flashcard', {
@@ -235,7 +232,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const debouncedSaveCard = debounce(async (id: string, updatedQuestion: string, updatedAnswer: string) => {
     const cardToUpdate = flashcards.find(card => card.id === id);
     if (!cardToUpdate) {
-      setError('Flashcard not found');
+      toast.error('Flashcard not found');
       return;
     }
 
@@ -265,7 +262,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       setFlashcards((prevFlashcards) =>
         prevFlashcards.map((card) => (card.id === id ? updatedCard : card))
       );
-      setError(null);
+      toast.success('Flashcard updated successfully');
     } catch (error) {
       console.error('Error updating flashcard:', error);
       toast.error('Failed to update flashcard. Please try again.');
@@ -321,7 +318,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
       }
       return updatedFlashcards;
     });
-    setError(null);
+    toast.success('Flashcard deleted successfully');
   };
 
   const handleFlashcardsAdded = (newFlashcards: Flashcard[]) => {
@@ -346,7 +343,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     <div className="relative">
       <div className="container mx-auto p-4 max-w-3xl">
         <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlipWrapper} />
-        {error && <div className="text-red-500 dark:text-red-400 mb-4">{error}</div>}
         
         <FlashcardDisplay
           card={getCurrentCard()}

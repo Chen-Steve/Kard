@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Draggable } from '@hello-pangea/dnd';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import EditableDiv from '../flashcard/EditableDiv';
 import { Icon } from "@iconify/react";
 
@@ -60,6 +60,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
           throw new Error(`Failed to delete flashcard: ${errorData.error}, ${errorData.details}`);
         }
         onDelete(id);
+        toast.success('Flashcard deleted successfully');
       } catch (error) {
         console.error('Error deleting flashcard:', error);
         toast.error('Failed to delete flashcard. Please try again.');

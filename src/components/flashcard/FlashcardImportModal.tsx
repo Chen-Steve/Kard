@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { BsFiletypeCsv, BsFiletypePdf, BsFiletypeDocx } from "react-icons/bs";
 import { Icon } from '@iconify/react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Papa from 'papaparse';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Flashcard, FlashcardInput } from '@/types/flashcard';
@@ -136,13 +136,17 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
   };
 
   const handlePdfUpload = (file: File) => {
-    // TODO: Implement PDF processing
-    toast.info('PDF import functionality coming soon!');
+    toast('PDF import coming soon!', {
+      icon: '🚧',
+      duration: 2000,
+    });
   };
 
   const handleWordUpload = (file: File) => {
-    // TODO: Implement Word document processing
-    toast.info('Word document import functionality coming soon!');
+    toast('Word document import coming soon!', {
+      icon: '🚧',
+      duration: 2000,
+    });
   };
 
   const saveFlashcards = async (flashcards: FlashcardInput[]): Promise<Flashcard[]> => {
@@ -177,7 +181,15 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
     }
   };
 
-  const handleOptionClick = (accept: string) => {
+  const handleOptionClick = (optionId: string, accept: string) => {
+    if (optionId === 'pdf' || optionId === 'word') {
+      toast('Coming soon!', {
+        icon: '🚧',
+        duration: 2000,
+      });
+      return;
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.accept = accept;
       fileInputRef.current.click();
@@ -211,7 +223,7 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
               {fileImportOptions.map((option) => (
                 <div
                   key={option.id}
-                  onClick={() => handleOptionClick(option.accept)}
+                  onClick={() => handleOptionClick(option.id, option.accept)}
                   className="flex items-center p-4 cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                 >
                   {option.icon}

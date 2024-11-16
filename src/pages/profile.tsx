@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { toast, useToast } from '../components/ui/use-toast'; 
-import { Toaster } from '../components/ui/toaster'; 
+import toast, { Toaster } from 'react-hot-toast';
 import { getGlassAvatarSvg } from '../utils/avatar';
 
 import UserAvatar from '../components/profile/UserAvatar';
@@ -32,7 +31,6 @@ const Profile = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [avatarOptions, setAvatarOptions] = useState<string[]>([]);
   const router = useRouter();
-  const { dismiss } = useToast();
 
   useEffect(() => {
     const getSession = async () => {
@@ -47,10 +45,7 @@ const Profile = () => {
 
         if (userError) {
           console.error('Error fetching user data:', userError);
-          toast({
-            title: 'Error',
-            description: 'Failed to load user data. Please try again.',
-          });
+          toast.error('Failed to load user data. Please try again.');
         } else {
           setUser(userData);
           setName(userData.name);
@@ -82,17 +77,11 @@ const Profile = () => {
 
     if (error) {
       console.error('Error updating user data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile. Please try again.',
-      });
+      toast.error('Failed to update profile. Please try again.');
     } else {
       setUser(data[0]);
       setIsEditing(false);
-      toast({
-        title: 'Profile Updated',
-        description: 'Your profile has been updated successfully.',
-      });
+      toast.success('Your profile has been updated successfully.');
     }
   };
 
@@ -112,17 +101,10 @@ const Profile = () => {
       if (error) throw error;
 
       setUser({ ...user!, avatar_url: avatarUrl });
-      toast({
-        title: 'Avatar Updated',
-        description: 'Your avatar has been updated successfully.',
-      });
+      toast.success('Your avatar has been updated successfully.');
     } catch (error) {
       console.error('Error updating avatar:', error);
-      toast({
-        title: 'Update Failed',
-        description: 'Failed to update avatar. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to update avatar. Please try again.');
     }
   };
 
@@ -131,35 +113,18 @@ const Profile = () => {
 
     if (error) {
       console.error('Error changing password:', error);
-      toast({
-        title: 'Password Change Failed',
-        description: 'Failed to update password. Please try again.',
-      });
+      toast.error('Failed to update password. Please try again.');
     } else {
       setIsChangingPassword(false);
-      toast({
-        title: 'Password Changed Successfully',
-        description: 'Your new password has been set.',
-      });
+      toast.success('Your new password has been set.');
     }
   };
 
   const handleDeleteAccount = () => {
-    toast({
-      title: 'Delete Account',
-      description: 'Are you sure you want to delete your account? This action cannot be undone.',
-      action: (
-        <div className="flex space-x-2">
-          <Button onClick={confirmDeleteAccount} variant="destructive">
-            Confirm
-          </Button>
-          <Button onClick={() => dismiss()} variant="secondary">
-            Cancel
-          </Button>
-        </div>
-      ),
-      duration: 5000,
-    });
+    const confirmDelete = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    if (confirmDelete) {
+      confirmDeleteAccount();
+    }
   };
 
   const confirmDeleteAccount = async () => {
@@ -167,18 +132,11 @@ const Profile = () => {
       const { error } = await supabase.auth.admin.deleteUser(user!.id);
       if (error) throw error;
       
-      toast({
-        title: 'Account Deleted',
-        description: 'Your account has been successfully deleted.',
-      });
+      toast.success('Your account has been successfully deleted.');
       router.push('/signin');
     } catch (error) {
       console.error('Error deleting account:', error);
-      toast({
-        title: 'Error',
-        description: 'There was an error deleting your account. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('There was an error deleting your account. Please try again.');
     }
   };
 

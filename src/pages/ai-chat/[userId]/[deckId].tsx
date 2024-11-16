@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import AIChatComponent from '../../../components/modes/AIChatComponent';
-import { toast } from 'react-toastify';
 
 interface Flashcard {
   id: string;

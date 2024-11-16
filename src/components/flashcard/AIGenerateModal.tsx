@@ -4,7 +4,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
 import { generateFlashcards } from '../../lib/openai';
 import { AiOutlineExperiment, AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { toast } from '../ui/use-toast';
+import toast from 'react-hot-toast';
 import { isAxiosError } from '../../lib/axiosErrorGuard';
 import { extractTextFromPDF } from '../../lib/pdfUtils';
 import { FiUpload } from 'react-icons/fi';
@@ -33,25 +33,13 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
   const handleError = useCallback((error: unknown) => {
     if (isAxiosError(error)) {
       if (error.response?.status === 429) {
-        toast({
-          title: "Generation Limit Reached",
-          description: "You've used up your daily generations. Please try again tomorrow.",
-          variant: "destructive",
-        });
+        toast.error("You've used up your daily generations. Please try again tomorrow.");
         return;
       }
       const errorData = error.response?.data as ErrorResponse;
-      toast({
-        title: "Error",
-        description: errorData.message || "Failed to generate flashcards. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(errorData.message || "Failed to generate flashcards. Please try again.");
     } else {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred. Please try again.");
     }
   }, []);
 
@@ -81,11 +69,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       setState(prev => ({ ...prev, loading: false }));
-      toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : "An error occurred while generating flashcards. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : "An error occurred while generating flashcards. Please try again.");
     }
   }, [state.description, userId]);
 
@@ -97,11 +81,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !file.type.includes('pdf')) {
-      toast({
-        title: 'Invalid File',
-        description: 'Please upload a PDF file.',
-        variant: 'destructive',
-      });
+      toast.error('Please upload a PDF file.');
       return;
     }
 
@@ -114,17 +94,10 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         description: text,
         isProcessingPDF: false,
       }));
-      toast({
-        title: 'PDF Processed',
-        description: 'Your PDF has been processed successfully.',
-      });
+      toast.success('PDF processed successfully');
     } catch (error) {
       setState(prev => ({ ...prev, isProcessingPDF: false }));
-      toast({
-        title: 'Error',
-        description: 'Failed to process PDF file.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to process PDF file');
     }
   }, []);
 

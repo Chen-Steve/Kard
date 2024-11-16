@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
-import { toast } from 'react-toastify';
 
 interface UpdatedOrder {
   id: string;
@@ -129,7 +128,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(200).json(updatedFlashcard);
       } catch (error) {
         console.error('PUT flashcard error:', error);
-        toast.error('Internal Server Error: ' + (error as Error).message);
         res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
       }
     } else if (req.method === 'DELETE') {
@@ -145,7 +143,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(204).end();
       } catch (error) {
         console.error('DELETE flashcard error:', error);
-        toast.error('Internal Server Error: ' + (error as Error).message);
         res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
       }
     } else if (req.method === 'PATCH') {

@@ -2,13 +2,11 @@ import { SessionProvider, useSession } from 'next-auth/react';
 import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
 import Head from 'next/head';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 import '../app/globals.css';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Analytics } from '@vercel/analytics/react';
-import { Toaster } from '../components/ui/toaster';
 
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -48,8 +46,26 @@ function MyApp({ Component, pageProps: { session: initialSession, ...pageProps }
           <DragDropContext onDragEnd={handleDragEnd}>
             <Component {...pageProps} />
             <Analytics />
-            <Toaster />
-            <ToastContainer />
+            <Toaster 
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#fff',
+                  color: '#000',
+                },
+                success: {
+                  style: {
+                    background: '#fff',
+                  },
+                },
+                error: {
+                  style: {
+                    background: '#fff',
+                  },
+                },
+              }}
+            />
           </DragDropContext>
         </AuthWrapper>
       </SessionProvider>

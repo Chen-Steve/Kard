@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaShuffle } from 'react-icons/fa6';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 interface Flashcard {
   id: string;
@@ -45,10 +45,10 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
         console.log('Shuffle response:', result);
 
         onShuffleComplete(updatedFlashcards);
-        toast.success('Flashcards shuffled and saved');
+        toast.success('Flashcards shuffled!');
       } catch (error) {
         console.error('Error shuffling flashcards:', error);
-        toast.error('Failed to shuffle flashcards. Please try again.');
+        toast.error('Failed to shuffle flashcards');
       }
     }
   };
