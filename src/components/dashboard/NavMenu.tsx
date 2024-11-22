@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { FaArrowsAltH } from "react-icons/fa";
 import Link from 'next/link';
-import { useToast } from "../../components/ui/use-toast";
 import { Icon } from "@iconify/react";
 
 interface NavMenuProps {
@@ -14,7 +12,6 @@ interface IconProps {
 
 const NavMenu: React.FC<NavMenuProps> = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [showDecks, setShowDecks] = useState(false);
   const [isVertical, setIsVertical] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth >= 640;
@@ -25,7 +22,6 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const [startX, setStartX] = useState(0);
   const [left, setLeft] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   const dragThreshold = 5;
   const dragStartPos = useRef({ x: 0, moved: false });
 
@@ -157,7 +153,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
         )}
         <NavIcon
           onClick={() => setIsVertical(!isVertical)}
-          icon={FaArrowsAltH}
+          icon={(props) => <Icon icon="material-symbols:swap-horiz" {...props} />}
           label={isVertical ? "Switch to Horizontal" : "Switch to Vertical"}
           index={-1}
           hoveredIndex={hoveredIndex}

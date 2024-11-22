@@ -3,8 +3,6 @@
 import '../app/globals.css';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useTypewriter, Cursor } from 'react-simple-typewriter';
-import { RiFeedbackFill } from "react-icons/ri";
 import CookieConsent from '../components/CookieConsent';
 import { Button } from '../components/ui/Button';
 import Image from 'next/image';
@@ -14,29 +12,12 @@ import FeaturesSection from '../components/demo/FeaturesSection';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
 import Bubbles from '../components/demo/Bubbles';
+import { Icon } from '@iconify/react';
 
 const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndDropDemo'), {
   ssr: false,
   loading: () => <p>Loading drag and drop demo...</p>
 });
-
-interface DynamicTitleProps {
-  isMobile: boolean;
-  text: string;
-}
-
-const DynamicTitle = dynamic<DynamicTitleProps>(() => Promise.resolve(({ isMobile, text }) => (
-  <h1 className="font-bold mb-2 mt-20 text-black text-4xl md:text-5xl lg:text-6xl">
-    {isMobile ? (
-      "Kard is an Uncomplicated learning platform"
-    ) : (
-      <>
-        {text}
-        <Cursor />
-      </>
-    )}
-  </h1>
-)), { ssr: false });
 
 const HomePage: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -64,12 +45,6 @@ const HomePage: React.FC = () => {
       window.removeEventListener('resize', updateNavHeight);
     };
   }, []);
-
-  const [text] = useTypewriter({
-    words: ['Uncomplicated & Fast', 'For Everyone'],
-    loop: true,
-    delaySpeed: 2000,
-  });
 
   const handleSupportClick = () => {
     window.open('https://forms.gle/bP14r8vtGhmj8s7S7', '_blank');
@@ -112,7 +87,9 @@ const HomePage: React.FC = () => {
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
           <div className="text-center mb-12 fixed-title">
             {isMounted ? (
-              <DynamicTitle isMobile={isMobile} text={text} />
+              <h1 className="font-bold mb-2 mt-20 text-black text-4xl md:text-5xl lg:text-6xl">
+                {isMobile ? "Kard is an Uncomplicated learning platform" : "Uncomplicated & Fast"}
+              </h1>
             ) : (
               <h1 className="font-bold mb-2 text-black text-4xl md:text-5xl lg:text-6xl">
                 Kard is a Better Quizlet Alternative
@@ -188,7 +165,7 @@ const HomePage: React.FC = () => {
             className="text-md font-bold px-3 py-3 sm:px-4 sm:py-2 rounded-full shadow-lg transition duration-300 flex items-center bg-background text-foreground hover:bg-gray-200"
             onClick={handleSupportClick}
           >
-            <RiFeedbackFill className="text-xl sm:text-base sm:mr-2" />
+            <Icon icon="ri:feedback-fill" className="text-xl sm:text-base sm:mr-2" />
             <span className="hidden sm:inline">Feedback</span>
           </button>
         </div>
