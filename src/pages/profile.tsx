@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { getGlassAvatarSvg } from '../utils/avatar';
 
 import UserAvatar from '../components/profile/UserAvatar';
@@ -211,7 +211,6 @@ const Profile = () => {
           </CardFooter>
         </Card>
       </div>
-      <Toaster />
     </div>
   );
 };

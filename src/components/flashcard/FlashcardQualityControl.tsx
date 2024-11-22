@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
-import { toast } from '../ui/use-toast';
+import { toast } from 'react-hot-toast';
 
 interface FlashcardQualityControlProps {
   flashcards: { question: string; answer: string }[];
@@ -38,11 +38,7 @@ const FlashcardQualityControl: React.FC<FlashcardQualityControlProps> = ({
     );
 
     if (validFlashcards.length === 0) {
-      toast({
-        title: "No Valid Flashcards",
-        description: "Please ensure at least one flashcard has both question and answer.",
-        variant: "destructive",
-      });
+      toast.error('Please ensure at least one flashcard has both question and answer.');
       return;
     }
 
