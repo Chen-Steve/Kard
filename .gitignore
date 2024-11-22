@@ -45,3 +45,9 @@ venv/
 .vscode/
 
 __pycache__/
+.VSCodeCounter
+node_modules
+.next
+
+.env
+.env.local

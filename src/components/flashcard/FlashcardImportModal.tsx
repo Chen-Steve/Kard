@@ -1,12 +1,8 @@
 import React, { useRef } from 'react';
-import { FaQuestionCircle } from 'react-icons/fa';
-import { BsFiletypeCsv, BsFiletypePdf, BsFiletypeDocx } from "react-icons/bs";
 import { Icon } from '@iconify/react';
-import toast from 'react-hot-toast';
 import Papa from 'papaparse';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Flashcard, FlashcardInput } from '@/types/flashcard';
-import { SiQuizlet } from "react-icons/si";
 
 interface FlashcardImportModalProps {
   onClose: () => void;
@@ -19,23 +15,25 @@ const fileImportOptions = [
   {
     id: 'csv',
     label: 'CSV File',
-    icon: <BsFiletypeCsv className="w-10 h-10 ml-1 text-green-600" />,
+    icon: <Icon icon="vscode-icons:file-type-csv" className="w-10 h-10 ml-1" />,
     accept: '.csv',
     description: 'Import from a CSV file with question and answer columns'
   },
   {
     id: 'pdf',
     label: 'PDF Document',
-    icon: <BsFiletypePdf className="w-10 h-10 ml-1 text-red-600" />,
+    icon: <Icon icon="vscode-icons:file-type-pdf2" className="w-10 h-10 ml-1" />,
     accept: '.pdf',
-    description: 'Extract flashcards from PDF documents automatically'
+    description: 'Extract flashcards from PDF documents automatically',
+    comingSoon: true
   },
   {
     id: 'word',
     label: 'Word Document',
-    icon: <BsFiletypeDocx className="w-10 h-10 ml-1 text-blue-600" />,
+    icon: <Icon icon="vscode-icons:file-type-word" className="w-10 h-10 ml-1" />,
     accept: '.doc,.docx',
-    description: 'Import from Word documents with formatted Q&A'
+    description: 'Import from Word documents with formatted Q&A',
+    comingSoon: true
   }
 ];
 
@@ -50,7 +48,7 @@ const cloudImportOptions = [
   {
     id: 'quizlet',
     label: 'Quizlet',
-    icon: <SiQuizlet className="w-10 h-10 ml-1 text-[#4257B2]" />,
+    icon: <Icon icon="simple-icons:quizlet" className="w-10 h-10 ml-1 text-[#4257B2]" />,
     description: 'Import your existing Quizlet sets',
     comingSoon: true
   }
@@ -76,14 +74,10 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
           handleCsvUpload(file);
           break;
         case 'pdf':
-          handlePdfUpload(file);
           break;
         case 'doc':
         case 'docx':
-          handleWordUpload(file);
           break;
-        default:
-          toast.error('Unsupported file format');
       }
     }
   };
@@ -93,7 +87,7 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
       complete: async (results) => {
         const data = results.data as string[][];
         if (data.length === 0) {
-          toast.error('The CSV file is empty.');
+          console.error('The CSV file is empty.');
           return;
         }
 
@@ -105,13 +99,13 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
           header.includes('answer') || header.includes('back'));
 
         if (questionIndex === -1 || answerIndex === -1) {
-          toast.error('CSV must have columns for questions and answers.');
+          console.error('CSV must have columns for questions and answers.');
           return;
         }
 
         // Process the rows
         const flashcards = data.slice(1)
-          .filter(row => row[questionIndex] && row[answerIndex]) // Skip empty rows
+          .filter(row => row[questionIndex] && row[answerIndex])
           .map(row => ({
             question: row[questionIndex].trim(),
             answer: row[answerIndex].trim()
@@ -122,7 +116,7 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
           );
 
         if (flashcards.length === 0) {
-          toast.error('No valid flashcards found in the CSV file.');
+          console.error('No valid flashcards found in the CSV file.');
           return;
         }
 
@@ -130,22 +124,7 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
-        toast.error('Failed to parse CSV file. Please check the file format.');
       }
-    });
-  };
-
-  const handlePdfUpload = (file: File) => {
-    toast('PDF import coming soon!', {
-      icon: '🚧',
-      duration: 2000,
-    });
-  };
-
-  const handleWordUpload = (file: File) => {
-    toast('Word document import coming soon!', {
-      icon: '🚧',
-      duration: 2000,
     });
   };
 
@@ -170,27 +149,18 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
       }
 
       const savedFlashcards: Flashcard[] = await response.json();
-      toast.success('Flashcards imported successfully!');
       onFlashcardsAdded(savedFlashcards);
       onClose();
       return savedFlashcards;
     } catch (error) {
       console.error('Error saving flashcards:', error);
-      toast.error('Failed to import flashcards. Please try again.');
       return [];
     }
   };
 
   const handleOptionClick = (optionId: string, accept: string) => {
-    if (optionId === 'pdf' || optionId === 'word') {
-      toast('Coming soon!', {
-        icon: '🚧',
-        duration: 2000,
-      });
-      return;
-    }
-
-    if (fileInputRef.current) {
+    // Only proceed with file input click for CSV files
+    if (optionId === 'csv' && fileInputRef.current) {
       fileInputRef.current.accept = accept;
       fileInputRef.current.click();
     }
@@ -224,13 +194,20 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
                 <div
                   key={option.id}
                   onClick={() => handleOptionClick(option.id, option.accept)}
-                  className="flex items-center p-4 cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className={`flex items-center p-4 ${option.id === 'csv' ? 'cursor-pointer' : 'cursor-default'} rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200`}
                 >
                   {option.icon}
                   <div className="ml-4 flex-1">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                      {option.label}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                        {option.label}
+                      </h3>
+                      {option.comingSoon && (
+                        <span className="px-2 py-1 text-xs font-medium text-white bg-blue-500 rounded-full">
+                          Coming Soon
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {option.description}
                     </p>
@@ -239,7 +216,7 @@ export const FlashcardImportModal: React.FC<FlashcardImportModalProps> = ({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button aria-label="question-and-answer-columns" className="text-gray-400 hover:text-gray-500">
-                          <FaQuestionCircle className="w-5 h-5" />
+                          <Icon icon="material-symbols:help-outline" className="w-5 h-5" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
