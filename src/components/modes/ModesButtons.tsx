@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { toast } from '../../components/ui/use-toast';
 import { Icon } from '@iconify/react';
 
 interface ModesButtonsProps {
@@ -13,66 +12,26 @@ const ModesButtons: React.FC<ModesButtonsProps> = ({ userId, selectedDeckId, sel
   const router = useRouter();
 
   const handleLearnClick = () => {
-    if (userId && selectedDeckId) {
+    if (selectedDeckId) {
       router.push(`/learning-mode/${userId}/${selectedDeckId}`);
-    } else if (!userId) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access learning mode.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to start learning.',
-      });
     }
   };
 
   const handleTestClick = () => {
-    if (userId && selectedDeckId) {
+    if (selectedDeckId) {
       router.push(`/test-mode/${userId}/${selectedDeckId}`);
-    } else if (!userId) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access test mode.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to start the test.',
-      });
     }
   };
 
   const handleMatchClick = () => {
-    if (userId && selectedDeckId) {
+    if (selectedDeckId) {
       router.push(`/matching-game/${userId}/${selectedDeckId}`);
-    } else if (!userId) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access the matching game.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to play the matching game.',
-      });
     }
   };
 
   const handleKChatClick = () => {
-    if (userId && selectedDeckId) {
+    if (selectedDeckId) {
       router.push(`/ai-chat/${userId}/${selectedDeckId}`);
-    } else if (!userId) {
-      toast({
-        title: 'User Not Found',
-        description: 'Please sign in to access the AI chat.',
-      });
-    } else {
-      toast({
-        title: 'No Deck Selected',
-        description: 'Please select a deck to start the AI chat.',
-      });
     }
   };
 

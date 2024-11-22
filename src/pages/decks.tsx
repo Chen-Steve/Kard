@@ -4,13 +4,13 @@ import supabase from '../lib/supabaseClient';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import useDOMNodeInserted from '../hooks/useDOMNodeInserted';
 import NavMenu from '../components/dashboard/NavMenu';
-import { useToast } from "@/components/ui/use-toast";
 import DeckFormDialog from '../components/deck/DeckFormDialog';
 import DeckSearchAndFilter from '../components/deck/DeckSearchAndFilter';
 import DeckCard from '../components/deck/DeckCard';
 import { Deck } from '../types/deck';
 import { Switch } from '@/components/ui/switch';
-import { TbArrowsSort } from "react-icons/tb";
+import { Icon } from '@iconify/react';
+import toast from 'react-hot-toast';
 
 const DecksPage = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -21,7 +21,6 @@ const DecksPage = () => {
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const router = useRouter();
-  const { toast } = useToast();
   
   const [isReorderingEnabled, setIsReorderingEnabled] = useState(false);
   
@@ -67,11 +66,7 @@ const DecksPage = () => {
     }
 
     if (newDeck.name.length > 20) {
-      toast({
-        title: "Error",
-        description: "Deck name must be 20 characters or less",
-        variant: "destructive",
-      });
+      toast.error("Deck name must be 20 characters or less");
       return;
     }
 
@@ -150,11 +145,7 @@ const DecksPage = () => {
     }
   
     if (updatedDeck.name.length > 20) {
-      toast({
-        title: "Error",
-        description: "Deck name must be 20 characters or less",
-        variant: "destructive",
-      });
+      toast.error("Deck name must be 20 characters or less");
       return;
     }
   
@@ -189,17 +180,10 @@ const DecksPage = () => {
       const updatedDeckData = await response.json();
       setDecks((prevDecks) => prevDecks.map((deck) => (deck.id === updatedDeckData.id ? updatedDeckData : deck)));
       setEditingDeck(null);
-      toast({
-        title: "Success",
-        description: "Deck updated successfully",
-      });
+      toast.success("Deck updated successfully");
     } catch (error) {
       console.error('Error updating deck:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update deck. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update deck. Please try again.");
     }
   };
 
@@ -250,11 +234,7 @@ const DecksPage = () => {
 
       } catch (error) {
         console.error('Error updating deck order:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update deck order",
-          variant: "destructive",
-        });
+        toast.error("Failed to update deck order");
         // Optionally revert the state if the API call fails
         fetchDecks();
       }
@@ -313,17 +293,10 @@ const DecksPage = () => {
           });
         });
 
-        toast({
-          title: "Success",
-          description: "Flashcard moved successfully",
-        });
+        toast.success("Flashcard moved successfully");
       } catch (error) {
         console.error('Error moving flashcard:', error);
-        toast({
-          title: "Error",
-          description: "Failed to move flashcard",
-          variant: "destructive",
-        });
+        toast.error("Failed to move flashcard");
       }
     }
   };
@@ -372,7 +345,7 @@ const DecksPage = () => {
               
               {/* Reorder Control */}
               <div className="flex items-center justify-center min-w-[150px] space-x-2 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 shadow-md rounded-lg p-2 h-10 sm:h-12">
-                <TbArrowsSort className="text-[#637FBF] text-xl" />
+                <Icon icon="material-symbols:sort" className="text-[#637FBF] text-xl" />
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Reorder
                 </span>

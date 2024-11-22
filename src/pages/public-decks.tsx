@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import NavMenu from '../components/dashboard/NavMenu';
-import { useToast } from "@/components/ui/use-toast";
 import supabase from '../lib/supabaseClient';
-import { useRouter } from 'next/router';
 import { Switch } from '../components/ui/switch';
 import ErrorMessage from '@/components/public-deck/ErrorMessage';
 import DeckCard from '../components/public-deck/DeckCard';
+import toast from 'react-hot-toast';
 
 interface PublicDeck {
   id: string;
@@ -25,8 +24,6 @@ const PublicDecksPage: React.FC = () => {
   const [publicDecks, setPublicDecks] = useState<PublicDeck[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  const router = useRouter();
   const [showOnlyUserDecks, setShowOnlyUserDecks] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,31 +80,20 @@ const PublicDecksPage: React.FC = () => {
           )
         );
 
-        // Save star status in localStorage
         localStorage.setItem(`deck-${deckId}-starred`, updatedDeck.isStarred.toString());
 
-        toast({
-          title: updatedDeck.isStarred ? "Deck Starred" : "Star Removed",
-          description: updatedDeck.isStarred ? "You've starred this deck." : "You've removed your star from this deck.",
-        });
+        toast.success(updatedDeck.isStarred ? "You've starred this deck." : "You've removed your star from this deck.");
       } else {
         throw new Error('Failed to update star');
       }
     } catch (error) {
       console.error('Error updating star:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update star. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update star. Please try again.");
     }
   };
 
   const handleCopyClick = () => {
-    toast({
-      title: "Coming Soon!",
-      description: "The Copy feature is coming soon.",
-    });
+    toast.success("The Copy feature is coming soon.");
   };
 
   const filteredDecks = publicDecks.filter(deck =>

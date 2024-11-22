@@ -1,6 +1,6 @@
 import React from 'react';
-import { FaShuffle } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
+import { Icon } from '@iconify/react';
 
 interface Flashcard {
   id: string;
@@ -59,7 +59,7 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
       className="flex items-center justify-center px-3 py-1 bg-black dark:bg-gray-700 text-white dark:text-gray-200 rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors duration-200"
       aria-label="Shuffle flashcards"
     >
-      <FaShuffle className="text-lg" />
+      <Icon icon="material-symbols:shuffle" className="text-lg" />
     </button>
   );
 };
