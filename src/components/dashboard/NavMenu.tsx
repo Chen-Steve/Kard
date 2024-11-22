@@ -159,7 +159,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
           hoveredIndex={hoveredIndex}
           setHoveredIndex={setHoveredIndex}
           isVertical={isVertical}
-          className={isVertical ? "" : "-ml-1 sm:-ml-2"}
+          className={isVertical ? "" : "-ml-3 sm:-ml-5"}
         />
         {menuItems.map((item, index) => (
           <NavIcon 

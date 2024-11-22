@@ -1,14 +1,14 @@
-import React, { useReducer, useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
+import React, { useEffect, useCallback, useReducer, useState } from 'react';
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useToast } from "@/components/ui/use-toast";
 import { LuDelete } from "react-icons/lu";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Icon } from "@iconify/react";
+import toast from 'react-hot-toast';
+import { createPortal } from 'react-dom';
 
 interface Tag {
   id: number;
@@ -112,9 +112,7 @@ interface TagInputProps {
   existingTags?: Tag[];
 }
 
-
-
-const TagInput: React.FC<TagInputProps> = ({ 
+const TagInput = React.memo<TagInputProps>(({ 
   newTagName, 
   onTagNameChange, 
   onAddTag, 
@@ -198,7 +196,8 @@ const TagInput: React.FC<TagInputProps> = ({
       )}
     </div>
   );
-};
+});
+TagInput.displayName = 'TagInput';
 
 const DeckFormDialog: React.FC<DeckFormDialogProps> = ({ 
   isOpen, 
@@ -215,8 +214,6 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
     isPublic: false
   });
 
-  const { toast } = useToast();
-
   useEffect(() => {
     if (initialDeck) {
       dispatch({ type: 'INITIALIZE_FORM', payload: initialDeck });
@@ -225,22 +222,14 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
     }
   }, [initialDeck, isOpen]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (state.name.trim() === '' || state.description.trim() === '') {
-      toast({
-        title: "Error",
-        description: "Both name and description are required.",
-        variant: "destructive",
-      });
+      toast.error('Both name and description are required.');
       return;
     }
 
     if (state.name.length > 20) {
-      toast({
-        title: "Error",
-        description: "Deck name must be 20 characters or less",
-        variant: "destructive",
-      });
+      toast.error('Deck name must be 20 characters or less');
       return;
     }
 
@@ -253,18 +242,48 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
     });
     onClose();
     dispatch({ type: 'RESET_FORM' });
-  };
+  }, [state, initialDeck, onSubmit, onClose]);
 
-  const isFormValid = state.name.trim() !== '' && state.description.trim() !== '' && state.name.length <= 20;
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  }, [onClose]);
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[450px] p-5">
-        <DialogHeader className="space-y-2 pb-4">
-          <DialogTitle>{initialDeck ? 'Edit Deck' : 'Create New Deck'}</DialogTitle>
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, handleKeyDown]);
 
-        </DialogHeader>
+  if (!isOpen) return null;
 
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Dialog Content */}
+      <div 
+        className="relative bg-background/90 backdrop-blur-sm rounded-lg shadow-lg w-full max-w-[450px] p-5 m-4 animate-in fade-in-0 zoom-in-95"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="space-y-2 pb-4">
+          <h2 className="text-lg font-semibold">
+            {initialDeck ? 'Edit Deck' : 'Create New Deck'}
+          </h2>
+        </div>
+
+        {/* Form Content */}
         <div className="space-y-4">
           {/* Name Input */}
           <div className="space-y-2">
@@ -349,18 +368,21 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
           </div>
         </div>
 
-        <DialogFooter className="mt-6">
+        {/* Footer */}
+        <div className="mt-6 flex justify-end">
           <Button
             onClick={handleSubmit}
-            disabled={!isFormValid}
-            className="w-full sm:w-auto"
+            disabled={!state.name.trim() || !state.description.trim() || state.name.length > 20}
           >
             {initialDeck ? 'Save Changes' : 'Create Deck'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };
+
+DeckFormDialog.displayName = 'DeckFormDialog';
 
 export default DeckFormDialog;
