@@ -107,15 +107,15 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         />
         <div className={`fixed inset-y-0 flex items-center justify-center p-4 transition-all duration-300 ease-in-out
           ${state.showQualityControl 
-            ? 'right-[55%] w-[40%]'
+            ? 'md:right-[55%] md:w-[40%] w-full'
             : 'inset-x-0'
           }`}
         >
           <Card className="relative z-50 w-full max-w-2xl border-2 shadow-lg">
             <CardHeader className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CardTitle className="text-2xl font-bold">Generate Flashcards</CardTitle>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <CardTitle className="text-xl sm:text-2xl font-bold">Generate Flashcards</CardTitle>
                   <span className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-100 rounded-full flex items-center">
                     <Icon icon="lucide:flask-conical" className="mr-1.5" /> Experimental
                   </span>
@@ -127,7 +127,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <div className="flex-1">
                     <label htmlFor="description" className="block text-sm font-medium">
                       What would you like to create flashcards about?
@@ -136,7 +136,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
                   <div className="flex-shrink-0">
                     <button
                       onClick={handlePdfClick}
-                      className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <Icon icon="lucide:upload" className="h-4 w-4" />
                       <span className="text-sm">Upload</span>
@@ -180,7 +180,7 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
       </div>
 
       {state.showQualityControl && (
-        <div className="fixed right-[5%] inset-y-0 w-[45%] flex items-center justify-center p-4 z-[51]">
+        <div className="fixed md:right-[5%] inset-x-0 md:inset-x-auto inset-y-0 md:w-[45%] w-full flex items-center justify-center p-4 z-[51] mt-4 md:mt-0">
           <FlashcardQualityControl
             flashcards={generatedFlashcards}
             onSave={handleSaveReviewedFlashcards}
