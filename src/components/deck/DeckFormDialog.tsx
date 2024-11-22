@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useReducer, useState } from 'react';
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { LuDelete } from "react-icons/lu";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -344,7 +343,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
                       className="hover:text-destructive ml-1 transition-colors"
                       aria-label={`Remove ${tag.name} tag`}
                     >
-                      <LuDelete size={12} />
+                      <Icon icon="pepicons-print:trash" className="h-3 w-3" />
                     </button>
                   </Badge>
                 ))}

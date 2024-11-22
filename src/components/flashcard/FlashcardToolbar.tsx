@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useRef, useEffect } from 'react';
-import { FaPlus, FaEllipsisH, FaChevronDown } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import FlashcardShuffle from './FlashcardShuffle';
 
 interface Flashcard {
@@ -43,7 +43,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
             className="bg-primary dark:bg-gray-600 text-primary-foreground dark:text-gray-200 px-2 py-1 sm:px-4 sm:py-2 rounded flex items-center text-sm sm:text-base"
             aria-label="Add flashcard"
           >
-            <FaPlus className="sm:mr-2" /> <span className="hidden sm:inline">Add Flashcard</span>
+            <Icon icon="mdi:plus" className="sm:mr-2" /> <span className="hidden sm:inline">Add Flashcard</span>
           </button>
         )}
         <button
@@ -51,7 +51,7 @@ const FlashcardToolbar: React.FC<FlashcardToolbarProps> = ({
           className="bg-white border-2 border-black dark:border-gray-600 dark:bg-gray-600 text-black dark:text-gray-200 px-2 py-1 sm:px-3 sm:py-2 rounded flex items-center"
           aria-label={isScrollable ? "Expand list" : "Make list scrollable"}
         >
-          <FaEllipsisH />
+          <Icon icon="pepicons-print:dots-x"/>
         </button>
         <ViewSelector isTableViewActive={isTableViewActive} onToggleView={onToggleView} />
         <FlashcardShuffle 
@@ -125,7 +125,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ isTableViewActive, onToggle
           onClick={() => setIsOpen(!isOpen)}
         >
           Display Mode
-          <FaChevronDown className="ml-2" />
+          <Icon icon="mdi:chevron-down" className="ml-2" />
         </button>
       </div>
 

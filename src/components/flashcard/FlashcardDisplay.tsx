@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 interface FlashcardDisplayProps {
   card: { question: string; answer: string } | null;
@@ -45,7 +45,7 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
           aria-label="Previous"
           disabled={currentIndex === 0}
         >
-          <FaChevronLeft />
+          <Icon icon="pepicons-print:arrow-left" />
         </button>
         <span className="text-lg text-foreground dark:text-gray-200">
           {card ? `${currentIndex + 1} / ${totalCards}` : '0 / 0'}
@@ -57,7 +57,7 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
           aria-label="Next"
           disabled={currentIndex === totalCards - 1}
         >
-          <FaChevronRight />
+          <Icon icon="pepicons-print:arrow-right" />
         </button>
       </div>
     </div>

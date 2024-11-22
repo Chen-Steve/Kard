@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import Markdown from 'markdown-to-jsx';
-import { MdDeleteOutline, MdOutlineSave, MdEdit } from "react-icons/md";
+import React from 'react';
+import { Icon } from '@iconify/react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import EditableDiv from '../flashcard/EditableDiv';
 
@@ -72,7 +71,7 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                           className="text-red-500 hover:text-red-700 text-sm"
                           aria-label="Delete card"
                         >
-                          <MdDeleteOutline size={20} />
+                          <Icon icon="pepicons-print:trash" width={20} />
                         </button>
                       </div>
                     )}

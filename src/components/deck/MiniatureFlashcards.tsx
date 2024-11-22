@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../ui/Card';
 import supabase from '../../lib/supabaseClient';
-import { TbReload } from "react-icons/tb";
 import { Button } from '../ui/Button';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
+import { Icon } from '@iconify/react';
 
 interface Flashcard {
   id: string;
@@ -107,7 +107,10 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
                         className="absolute top-1 right-1 w-6 h-6 p-0 bg-blue-300 hover:bg-blue-400 rounded-full transition-colors duration-200 flex items-center justify-center"
                         title="Flip card"
                       >
-                        <TbReload className="w-4 h-4 text-gray-800" />
+                        <Icon 
+                          icon="pepicons-print:arrow-spin" 
+                          className="w-4 h-4 text-gray-800 scale-x-[-1] rotate-180" 
+                        />
                       </Button>
                     </CardContent>
                   </Card>

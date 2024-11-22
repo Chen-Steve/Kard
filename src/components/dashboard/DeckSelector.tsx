@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaSearch } from "react-icons/fa";
 import debounce from 'lodash/debounce';
 import {
   Popover,
   PopoverContent,
   PopoverAnchor,
 } from "@/components/ui/popover";
-import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Icon } from '@iconify/react';
 
 interface Deck {
   id: string;
@@ -70,7 +69,10 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
             placeholder="Search decks..."
             className="w-full p-2 pl-10 pr-4 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Icon 
+            icon="fa6-solid:magnifying-glass" 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+          />
         </div>
       </PopoverAnchor>
       <PopoverContent className="w-[calc(50vw-6rem)] sm:w-[300px] p-0" align="center">
@@ -84,7 +86,8 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
               )}
               onClick={() => handleSelect(deck.id)}
             >
-              <Check
+              <Icon
+                icon="lucide:check"
                 className={cn(
                   "mr-2 h-4 w-4",
                   selectedDeckId === deck.id ? "opacity-100" : "opacity-0"

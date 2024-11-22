@@ -1,16 +1,32 @@
 import React from 'react';
-import { SiStagetimer } from "react-icons/si";
-import { RiTimerFill } from "react-icons/ri";
-import { PiCardsFill } from "react-icons/pi";
-import { BiSolidMessageSquareDots } from "react-icons/bi";
-import { FaEllipsisH } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 const features = [
-  { icon: SiStagetimer, name: 'Learn Mode', description: 'Master your flashcards at your own pace' },
-  { icon: RiTimerFill, name: 'Test Mode', description: 'Challenge yourself and track your progress' },
-  { icon: PiCardsFill, name: 'Matching Game', description: 'Make learning fun with interactive games' },
-  { icon: BiSolidMessageSquareDots, name: 'Auto-Generate Cards', description: 'Create flashcards from text and files effortlessly' },
-  { icon: FaEllipsisH, name: 'And More!', description: 'Discover additional features to enhance your learning' },
+  { 
+    icon: () => <Icon icon="pepicons-print:comet" className="text-4xl mb-4 text-red-500" />, 
+    name: 'Learn Mode', 
+    description: 'Master your flashcards at your own pace' 
+  },
+  { 
+    icon: () => <Icon icon="pepicons-print:list" className="text-4xl mb-4 text-emerald-500" />, 
+    name: 'Test Mode', 
+    description: 'Challenge yourself and track your progress' 
+  },
+  { 
+    icon: () => <Icon icon="pepicons-print:duplicate" className="text-4xl mb-4 text-purple-500" />, 
+    name: 'Matching Game', 
+    description: 'Make learning fun with interactive games' 
+  },
+  { 
+    icon: () => <Icon icon="pepicons-print:text-bubbles" className="text-4xl mb-4 text-sky-500" />, 
+    name: 'Auto-Generate Cards', 
+    description: 'Create flashcards from text and files effortlessly' 
+  },
+  { 
+    icon: () => <Icon icon="pepicons-print:menu" className="text-4xl mb-4 text-gray-500" />, 
+    name: 'And More!', 
+    description: 'Discover additional features to enhance your learning' 
+  },
 ];
 
 const FeaturesSection: React.FC = () => {
@@ -31,7 +47,7 @@ const FeaturesSection: React.FC = () => {
                      background: 'radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(30, 64, 175, 0.4) 0%, transparent 50%)',
                    }}
               />
-              <feature.icon className="text-4xl mb-4 text-black relative z-10" />
+              <feature.icon />
               <h4 className="text-xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
               <p className="text-sm text-gray-600 relative z-10">{feature.description}</p>
             </div>

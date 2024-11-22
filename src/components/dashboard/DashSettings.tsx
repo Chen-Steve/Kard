@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LuSettings2 } from "react-icons/lu";
+import { Icon } from '@iconify/react';
 import { DashboardComponent } from '../../types/dashboard';
 
 interface DashSettingsProps {
@@ -26,7 +26,8 @@ const DashSettings: React.FC<DashSettingsProps> = ({
 
   return (
     <div className="relative inline-block">
-      <LuSettings2
+      <Icon
+        icon="lucide:settings-2"
         onClick={() => setIsOpen(!isOpen)}
         className="ml-4 mb-4 text-black dark:text-gray-200 text-3xl cursor-pointer hover:text-gray-800 dark:hover:text-gray-100 transition-colors duration-200"
         aria-label="Dashboard Settings"
@@ -37,6 +38,8 @@ const DashSettings: React.FC<DashSettingsProps> = ({
             setIsOpen(!isOpen);
           }
         }}
+        width="32"
+        height="32"
       />
       {isOpen && (
         <div className="absolute left-4 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-20">

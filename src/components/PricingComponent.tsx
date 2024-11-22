@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { FaArrowLeft, FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
+import { Icon } from '@iconify/react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -53,7 +53,7 @@ const PricingComponent: React.FC = () => {
       <div className="mb-8">
         <Link href="/dashboard" legacyBehavior>
           <a className="inline-flex items-center px-4 py-2 rounded-lg text-black dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-            <FaArrowLeft className="mr-2" />
+            <Icon icon="mdi:arrow-left" className="mr-2" width="20" height="20" />
             Back to Dashboard
           </a>
         </Link>
@@ -88,23 +88,23 @@ const PricingComponent: React.FC = () => {
           <p className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">$0/month</p>
           <ul className="mb-6 text-gray-700 dark:text-gray-300">
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Unlimited Flashcards
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Unlimited Decks
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Learning Mode
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Test Mode
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Matching Mode
             </li>
           </ul>
@@ -125,19 +125,19 @@ const PricingComponent: React.FC = () => {
           </p>
           <ul className="mb-6 text-gray-700 dark:text-gray-300">
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Everything in Free plan
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               AI Flashcard Generation
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               AI Chat Mode
             </li>
             <li className="mb-2 flex items-center">
-              <FaCheck className="text-green-500 mr-2" />
+              <Icon icon="mdi:check" className="text-green-500 mr-2" width="20" height="20" />
               Import from Quizlet
             </li>
           </ul>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 interface ForgotPasswordProps {
   isOpen: boolean;
@@ -51,7 +51,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
-            <FaTimes />
+            <Icon icon="mdi:close" width="24" height="24" />
           </button>
         </div>
         <form onSubmit={handleRequestReset} className="space-y-4">
