@@ -15,9 +15,10 @@ interface FlashcardTableProps {
   onSave: (id: string, updatedQuestion: string, updatedAnswer: string) => void;
   onReorder: (result: DropResult) => void;
   readOnly: boolean;
+  showDefinitions: boolean;
 }
 
-const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, onSave, onReorder, readOnly }) => {
+const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, onSave, onReorder, readOnly, showDefinitions }) => {
   return (
     <DragDropContext onDragEnd={onReorder}>
       <Droppable droppableId="flashcards" direction="vertical">
@@ -55,15 +56,17 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                         placeholder="Enter question here..."
                       />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">Answer:</h3>
-                      <EditableDiv
-                        htmlContent={card.answer}
-                        onChange={(content) => onSave(card.id, card.question, content)}
-                        disabled={readOnly}
-                        placeholder="Enter answer here..."
-                      />
-                    </div>
+                    {showDefinitions && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">Answer:</h3>
+                        <EditableDiv
+                          htmlContent={card.answer}
+                          onChange={(content) => onSave(card.id, card.question, content)}
+                          disabled={readOnly}
+                          placeholder="Enter answer here..."
+                        />
+                      </div>
+                    )}
                     {!readOnly && (
                       <div className="mt-4 flex justify-end">
                         <button 

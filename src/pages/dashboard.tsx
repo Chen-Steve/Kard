@@ -41,6 +41,7 @@ const Dashboard = () => {
   const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
   const [showFlashcardList, setShowFlashcardList] = useState(true);
   const [streak, setStreak] = useState(0);
+  const [showDefinitions, setShowDefinitions] = useState(true);
 
   const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
     const { data: decksData, error: decksError } = await supabase
@@ -141,6 +142,8 @@ const Dashboard = () => {
             onUpdateComponents={updateDashboardComponents}
             showFlashcardList={showFlashcardList}
             onToggleFlashcardList={handleToggleFlashcardList}
+            showDefinitions={showDefinitions}
+            onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
           />
           <NavMenu />
         </div>
@@ -218,6 +221,7 @@ const Dashboard = () => {
                             decks={decks}
                             onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
                             showFlashcardList={showFlashcardList}
+                            showDefinitions={showDefinitions}
                           />
                         </div>
                       ) : null;

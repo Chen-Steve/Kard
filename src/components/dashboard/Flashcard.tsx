@@ -8,7 +8,6 @@ import FlashcardTable from './FlashcardTable';
 import FlashcardDisplay from '../flashcard/FlashcardDisplay';
 import FlashcardToolbar from '../flashcard/FlashcardToolbar';
 import FlashcardActions from '../flashcard/FlashcardActions';
-import { Icon } from "@iconify/react";
 
 interface FlashcardProps {
   userId: string;
@@ -19,6 +18,7 @@ interface FlashcardProps {
   isTableView?: boolean;
   showFlashcardList: boolean;
   isPublicDeck?: boolean;
+  showDefinitions?: boolean;
 }
 
 interface Flashcard {
@@ -35,13 +35,11 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, isPublicDeck = false }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, showDefinitions = true, isPublicDeck = false }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showDefinitions, setShowDefinitions] = useState(true);
   const [showList, setShowList] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [isScrollable, setIsScrollable] = useState(false);
   const [isTableViewActive, setIsTableViewActive] = useState(isTableView);
   const [isImportVisible, setIsImportVisible] = useState(false);
@@ -49,7 +47,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [isLoading, setIsLoading] = useState(true);
 
   const flashcardRef = useRef<HTMLDivElement>(null);
-  const settingsRef = useRef<HTMLDivElement>(null);
 
   const fetchFlashcards = useCallback(async () => {
     setIsLoading(true);
@@ -388,6 +385,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
                   onSave={debouncedSaveCard}
                   onReorder={handleReorder}
                   readOnly={readOnly}
+                  showDefinitions={showDefinitions}
                 />
               ) : (
                 <DragDropContext onDragEnd={handleReorder}>
@@ -415,21 +413,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
               )}
             </div>
           </>
-        )}
-
-        {flashcards.length > 0 && (
-          <button
-            onClick={() => setShowDefinitions(!showDefinitions)}
-            className="fixed text-md border-2 border-black dark:border-gray-600 bottom-4 right-4 bg-muted dark:bg-gray-600 text-muted-foreground dark:text-gray-200 px-1 sm:px-2 py-1 rounded-full shadow-lg flex items-center"
-          >
-            {showDefinitions ? 
-              <Icon icon="pepicons-print:eye-closed" className="text-xl sm:mr-2" /> : 
-              <Icon icon="pepicons-print:eye" className="text-xl sm:mr-2" />
-            }
-            <span className="hidden sm:inline">
-              {showDefinitions ? 'Hide Definitions' : 'Show Definitions'}
-            </span>
-          </button>
         )}
       </div>
     </div>
