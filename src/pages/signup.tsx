@@ -3,10 +3,10 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CgSpinner } from "react-icons/cg";
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import PasswordStrengthMeter from '../components/PasswordStrengthMeter';
+import { Icon } from '@iconify/react';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -16,11 +16,20 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      setPasswordsMatch(false);
+      setLoading(false);
+      return;
+    }
 
     if (!hcaptchaToken) {
       setErrorMessage('Please complete the hCaptcha.');
@@ -82,7 +91,7 @@ const SignUp = () => {
       <div className={`w-full ${loading ? 'blur-sm' : ''}`}>
         <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
           <Link href="/">
-            <FaArrowLeft className="text-black text-2xl" />
+            <Icon icon="pepicons-print:arrow-left" className="text-black text-4xl" />
           </Link>
         </div>
         <div className="p-8 rounded-lg w-full max-w-sm mx-auto">
@@ -93,60 +102,129 @@ const SignUp = () => {
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black">
-                Email
-              </label>
+            <div className="relative">
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                           focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                placeholder="you@example.com"
+                placeholder=" "
                 required
+                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
+                           peer"
               />
-            </div>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-black">
-                Name
+              <label
+                htmlFor="email"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
+                Email
               </label>
+            </div>
+
+            <div className="relative">
               <input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                           focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                placeholder="Your username"
+                placeholder=" "
                 required
+                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
+                           peer"
               />
+              <label
+                htmlFor="name"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
+                Name
+              </label>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black">
+
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder=" "
+                required
+                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
+                           peer"
+              />
+              <label
+                htmlFor="password"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
                 Password
               </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                             focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                  placeholder="••••••••"
-                  required
-                />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </div>
+              <div
+                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <Icon icon="pepicons-print:eye" />
+                ) : (
+                  <Icon icon="pepicons-print:eye-closed" />
+                )}
               </div>
-              <PasswordStrengthMeter password={password} />
             </div>
+            <PasswordStrengthMeter password={password} />
+
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setPasswordsMatch(e.target.value === password);
+                }}
+                placeholder=" "
+                required
+                className={`block px-3 py-2 w-full text-sm bg-gray-50 border rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black
+                           peer ${!passwordsMatch ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              <label
+                htmlFor="confirmPassword"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
+                Confirm Password
+              </label>
+              <div
+                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <Icon icon="pepicons-print:eye" />
+                ) : (
+                  <Icon icon="pepicons-print:eye-closed" />
+                )}
+              </div>
+            </div>
+            {!passwordsMatch && (
+              <p className="mt-1 text-sm text-red-600">Passwords do not match</p>
+            )}
+
             <HCaptcha
               sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
               onVerify={(token) => setHcaptchaToken(token)}

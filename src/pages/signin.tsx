@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import supabase from '../lib/supabaseClient';
-import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import { CgSpinner } from "react-icons/cg";
-import { signIn } from 'next-auth/react';
 import ForgotPassword from '../components/forgotPassword';
 import { updateStreak } from '../utils/streak';
 
@@ -52,12 +51,6 @@ const SignIn = () => {
     }
   };
 
-  const handleGoogleSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    signIn('google', { callbackUrl: '/dashboard' });
-  };
-
   return (
     <div className="min-h-screen dot-pattern flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 relative">
       <div className={`absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 ${loading ? '' : 'hidden'}`}>
@@ -66,7 +59,7 @@ const SignIn = () => {
       <div className={`w-full ${loading ? 'blur-sm' : ''}`}>
         <div className="absolute top-4 left-4 sm:top-20 sm:left-40">
           <Link href="/">
-            <FaArrowLeft className="text-black text-2xl" />
+            <Icon icon="pepicons-print:arrow-left" className="text-black text-4xl" />
           </Link>
         </div>
         <div className="p-8 rounded-lg w-full max-w-sm mx-auto">
@@ -77,44 +70,64 @@ const SignIn = () => {
             </div>
           )}
           <form onSubmit={handleSignIn} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
+            <div className="relative">
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                         focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                placeholder="you@example.com"
+                placeholder=" "
                 required
+                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
+                           peer"
               />
+              <label
+                htmlFor="email"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
+                Email
+              </label>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black">
+
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder=" "
+                required
+                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                           appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
+                           peer"
+              />
+              <label
+                htmlFor="password"
+                className="absolute text-sm text-gray-500 duration-300 transform 
+                           -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
+                           peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                           peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
+                           peer-focus:scale-75 peer-focus:text-black left-1"
+              >
                 Password
               </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                   focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                  placeholder="••••••••"
-                  required
-                />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </div>
+              <div
+                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <Icon icon="pepicons-print:eye" />
+                ) : (
+                  <Icon icon="pepicons-print:eye-closed" />
+                )}
               </div>
             </div>
+
             <div className="flex items-center justify-between">
               <div className="text-sm">
                 <a
@@ -129,6 +142,7 @@ const SignIn = () => {
                 </a>
               </div>
             </div>
+
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
