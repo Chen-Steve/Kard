@@ -74,10 +74,13 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-3 text-sm"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-3 text-sm relative"
         >
-          <div className="flex justify-between items-center mb-1">
+          <div 
+            {...provided.dragHandleProps}
+            className="absolute top-0 left-0 w-full h-8 cursor-grab active:cursor-grabbing"
+          />
+          <div className="flex justify-between items-center mb-1 pt-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
               Card {index + 1}
             </span>
@@ -92,23 +95,25 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
             )}
           </div>
           <div className="space-y-4">
-            <div>
+            <div className="flashcard-edit-area">
               <h3 className="font-semibold text-base mb-1">Question:</h3>
               <EditableDiv
                 htmlContent={editedQuestion}
                 onChange={handleQuestionChange}
                 disabled={readOnly}
                 placeholder="Enter question here..."
+                className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500"
               />
             </div>
             {showDefinitions && (
-              <div>
+              <div className="flashcard-edit-area">
                 <h3 className="font-semibold text-base mb-1">Answer:</h3>
                 <EditableDiv
                   htmlContent={editedAnswer}
                   onChange={handleAnswerChange}
                   disabled={readOnly}
                   placeholder="Enter answer here..."
+                  className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500"
                 />
               </div>
             )}

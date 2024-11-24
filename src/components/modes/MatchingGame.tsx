@@ -5,7 +5,7 @@ import { FaArrowLeft, FaPlay, FaInfoCircle } from 'react-icons/fa';
 import { Card, CardContent } from '../../components/ui/Card';
 import CustomButton from '../../components/ui/CustomButton';
 import PerformanceSummary from './mode-components/PerformanceSummary';
-import Markdown from 'markdown-to-jsx';
+import { marked } from 'marked';
 
 interface Flashcard {
   id: string;
@@ -23,6 +23,10 @@ interface CardItem {
   type: 'term' | 'definition';
   content: string;
 }
+
+const parseMarkdown = (content: string) => {
+  return marked.parse(content, { async: false }) as string;
+};
 
 const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
   const [shuffledCards, setShuffledCards] = useState<CardItem[]>([]);
@@ -204,17 +208,11 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                     disabled={isMatched}
                   >
                     <div className="text-sm overflow-auto">
-                      <Markdown
-                        options={{
-                          overrides: {
-                            strong: { component: 'strong', props: { className: 'font-bold' } },
-                            em: { component: 'em', props: { className: 'italic' } },
-                            u: { component: 'u', props: { className: 'underline' } },
-                          },
-                        }}
-                      >
-                        {card.content}
-                      </Markdown>
+                      <div 
+                        dangerouslySetInnerHTML={{ 
+                          __html: parseMarkdown(card.content) 
+                        }} 
+                      />
                     </div>
                   </CustomButton>
                 </div>

@@ -17,6 +17,7 @@ const StudyMode = ({ userId, deckId, decks }: StudyModeProps) => {
             showFlashcardList={false}
             showDefinitions={true}
             isStudyMode={true}
+            readOnly={true}
         />
     </div>
   );

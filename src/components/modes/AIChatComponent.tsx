@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { generateAIResponse, Message } from '../../lib/openai';
-import Markdown from 'markdown-to-jsx';
 import Link from 'next/link';
 import { FaArrowLeft } from "react-icons/fa6";
 import {
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import { marked } from 'marked';
 
 interface Flashcard {
   id: string;
@@ -32,6 +32,11 @@ interface AIChatComponentProps {
 
 // Add a constant for maximum history length
 const MAX_HISTORY_LENGTH = 20;
+
+// Add this helper function near the top of the component
+const parseMarkdown = (content: string) => {
+  return marked.parse(content, { async: false }) as string;
+};
 
 const AIChatComponent: React.FC<AIChatComponentProps> = ({ 
   flashcards, 
@@ -137,7 +142,7 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({
                 {message.role === 'user' ? (
                   message.content
                 ) : (
-                  <Markdown>{message.content}</Markdown>
+                  <div dangerouslySetInnerHTML={{ __html: parseMarkdown(message.content) }} />
                 )}
               </span>
             </div>
