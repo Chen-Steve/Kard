@@ -98,7 +98,7 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
             <Link href="/signin">
               <Button
-                className="px-6 py-3 rounded-md font-semibold w-full sm:w-auto bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-200 ease-out hover:-translate-y-0.5 hover:translate-x-0.5 active:translate-y-0 active:translate-x-0 shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] active:shadow-none hover:bg-white"
+                className="px-6 py-3 rounded-md font-semibold w-full sm:w-auto bg-white text-black relative overflow-hidden transition-all duration-200 ease-out hover:-translate-y-0.5 hover:translate-x-0.5 active:translate-y-0 active:translate-x-0 shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:bg-gray-100"
               >
                 <span className="text-lg relative z-10">Get Started</span>
               </Button>

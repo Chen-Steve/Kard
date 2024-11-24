@@ -106,9 +106,16 @@ const DragAndDropDemo: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 max-w-3xl mx-auto">
-        {columns.map(column => (
-          <div key={column.id} className="w-full sm:w-1/3">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 max-w-3xl mx-auto px-2">
+        {columns.map((column, columnIndex) => (
+          <div 
+            key={column.id} 
+            className={`w-10/12 sm:w-1/3 mb-6 sm:mb-0 ${
+              columnIndex % 2 === 0 
+                ? '-ml-4' 
+                : '-mr-4 self-end'
+            } sm:ml-0 sm:mr-0`}
+          >
             <h3 className="text-lg font-semibold mb-2 text-center">{column.title}</h3>
             <Droppable droppableId={column.id}>
               {(provided) => (
