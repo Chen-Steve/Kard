@@ -78,13 +78,13 @@ const SignIn = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder=" "
                 required
-                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                className="block px-3 py-2 w-full text-base bg-gray-50 border border-gray-300 rounded-md 
                            appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
                            peer"
               />
               <label
                 htmlFor="email"
-                className="absolute text-sm text-gray-500 duration-300 transform 
+                className="absolute text-base text-gray-500 duration-300 transform 
                            -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
                            peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
                            peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 
@@ -102,13 +102,13 @@ const SignIn = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder=" "
                 required
-                className="block px-3 py-2 w-full text-sm bg-gray-50 border border-gray-300 rounded-md 
+                className="block px-3 py-2 w-full text-base bg-gray-50 border border-gray-300 rounded-md 
                            appearance-none focus:outline-none focus:ring-1 focus:ring-black focus:border-black
                            peer"
               />
               <label
                 htmlFor="password"
-                className="absolute text-sm text-gray-500 duration-300 transform 
+                className="absolute text-base text-gray-500 duration-300 transform 
                            -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-gray-50 px-2 peer-focus:px-2 
                            peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
                            peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:-translate-y-4 

@@ -24,6 +24,12 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   const navRef = useRef<HTMLDivElement>(null);
   const dragThreshold = 5;
   const dragStartPos = useRef({ x: 0, moved: false });
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640;
+    }
+    return true;
+  });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isVertical) {
@@ -69,6 +75,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
 
   useEffect(() => {
     const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
       if (!isVertical) {
         const navWidth = navRef.current?.offsetWidth || 0;
         setLeft((prevLeft) => Math.max(navWidth / 2, Math.min(prevLeft, window.innerWidth - navWidth / 2)));
@@ -133,10 +140,18 @@ const NavMenu: React.FC<NavMenuProps> = () => {
   return (
     <div 
       ref={navRef}
-      className={`fixed ${isVertical ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' : 'bottom-1 sm:bottom-4'} z-50`}
+      className={`fixed ${
+        isMobile 
+          ? 'bottom-4 left-1/2 -translate-x-1/2'
+          : (isVertical 
+              ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' 
+              : 'bottom-1 sm:bottom-4')
+      } z-50`}
       style={{ 
-        left: isVertical ? undefined : `${left}px`, 
-        transform: isVertical ? 'translateY(-50%)' : 'translateX(-50%)'
+        left: isMobile ? '50%' : `${left}px`,
+        transform: isMobile 
+          ? 'translateX(-50%)' 
+          : (isVertical ? 'translateY(-50%)' : 'translateX(-50%)')
       }}
     >
       <div className={`bg-white dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-30 backdrop-blur-sm rounded-full p-2 sm:p-4 shadow-lg flex border-2 border-black dark:border-gray-600 ${
@@ -144,23 +159,25 @@ const NavMenu: React.FC<NavMenuProps> = () => {
           ? 'flex-col items-center space-y-4 sm:space-y-6' 
           : 'items-center space-x-3 xs:space-x-4 sm:space-x-6'
       }`}>
-        {!isVertical && (
+        {!isVertical && !isMobile && (
           <div 
             className="absolute inset-x-0 top-0 h-6 cursor-move"
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
           />
         )}
-        <NavIcon
-          onClick={() => setIsVertical(!isVertical)}
-          icon={(props) => <Icon icon="material-symbols:swap-horiz" {...props} />}
-          label={isVertical ? "Switch to Horizontal" : "Switch to Vertical"}
-          index={-1}
-          hoveredIndex={hoveredIndex}
-          setHoveredIndex={setHoveredIndex}
-          isVertical={isVertical}
-          className={isVertical ? "" : "-ml-3 sm:-ml-5"}
-        />
+        {!isMobile && (
+          <NavIcon
+            onClick={() => setIsVertical(!isVertical)}
+            icon={(props) => <Icon icon="material-symbols:swap-horiz" {...props} />}
+            label={isVertical ? "Switch to Horizontal" : "Switch to Vertical"}
+            index={-1}
+            hoveredIndex={hoveredIndex}
+            setHoveredIndex={setHoveredIndex}
+            isVertical={isVertical}
+            className={isVertical ? "" : "-ml-3 sm:-ml-5"}
+          />
+        )}
         {menuItems.map((item, index) => (
           <NavIcon 
             key={index} 

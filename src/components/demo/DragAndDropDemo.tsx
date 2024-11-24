@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
+marked.setOptions({
+  async: false
+});
 
 interface Card {
   id: string;
@@ -106,23 +112,19 @@ const DragAndDropDemo: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 max-w-3xl mx-auto px-2">
-        {columns.map((column, columnIndex) => (
+      <div className="flex flex-col sm:flex-row sm:space-x-6 max-w-6xl mx-auto px-4">
+        {columns.map((column) => (
           <div 
             key={column.id} 
-            className={`w-10/12 sm:w-1/3 mb-6 sm:mb-0 ${
-              columnIndex % 2 === 0 
-                ? '-ml-4' 
-                : '-mr-4 self-end'
-            } sm:ml-0 sm:mr-0`}
+            className="w-[280px] sm:w-1/3 mb-8 sm:mb-0 mx-auto"
           >
-            <h3 className="text-lg font-semibold mb-2 text-center">{column.title}</h3>
+            <h3 className="text-xl font-semibold mb-4 text-center">{column.title}</h3>
             <Droppable droppableId={column.id}>
               {(provided) => (
                 <ul
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="bg-gray-100 p-2 rounded min-h-[200px]"
+                  className="bg-gray-100 p-4 rounded min-h-[300px]"
                 >
                   {column.cards.map((card, index) => (
                     <div key={card.id}>
@@ -132,14 +134,24 @@ const DragAndDropDemo: React.FC = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 text-sm relative max-w-[250px] mx-auto w-full"
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 mb-3 text-sm relative h-[160px] w-[260px] sm:h-[160px] sm:w-[320px] mx-auto flex flex-col justify-center"
                           >
-                            <div className="text-black dark:text-white text-center">
-                              {flippedCards.has(card.id) ? card.answer : card.question}
-                            </div>
+                            <span className="absolute top-2 left-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                              {flippedCards.has(card.id) ? 'Definition' : 'Term'}
+                            </span>
+                            <div 
+                              className="text-black dark:text-white text-center px-2 text-xs sm:text-base"
+                              dangerouslySetInnerHTML={{ 
+                                __html: DOMPurify.sanitize(
+                                  marked.parse(flippedCards.has(card.id) ? card.answer : card.question, {
+                                    async: false
+                                  }) as string
+                                ) 
+                              }}
+                            />
                             <button
                               onClick={() => handleFlip(card.id)}
-                              className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full z-20 flex items-center justify-center text-white text-xs"
+                              className="absolute top-2 right-2 w-5 h-5 sm:w-7 sm:h-7 bg-blue-500 rounded-full z-20 flex items-center justify-center text-white text-xs"
                               title="Flip card"
                             >
                               ↻

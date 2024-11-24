@@ -107,35 +107,43 @@ const HomePage: React.FC = () => {
         </main>
 
         <section className="py-16">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-4xl font-bold text-center mb-12 text-black">Experience Kard in Action</h2>
-            <h3 className="text-2xl font-semibold mb-4 text-black text-center underline">Drag & Drop</h3>
+          <div className="container mx-auto px-4 max-w-[90vw]">
+            <h2 className="text-2xl sm:text-4xl font-bold text-center mb-12 text-black">Experience Kard in Action</h2>
+            <h3 className="text-xl sm:text-4xl font-semibold mb-4 text-black text-center underline">Drag & Drop</h3>
             <DynamicDragAndDropDemo />
             <FeaturesSection />
           </div>
         </section>
 
-        <footer className="w-full p-6 flex flex-col items-center text-black">
-          <div className="flex flex-col items-center">
-            <div className="flex flex-row items-center mt-2">
-              <div className="relative w-24 h-24 sm:w-40 sm:h-40 md:w-55 md:h-55 lg:w-80 lg:h-80 mr-2 sm:mr-4">
-                <Image
-                  src="/blob.svg"
-                  alt="Blob"
-                  fill
-                  style={{ objectFit: 'contain' }}
-                />
+        <footer className="w-full py-20 px-6 bg-[#F8F7F6] text-black overflow-hidden">
+          <div className="container mx-auto max-w-[100vw]">
+            <div className="flex flex-col">
+              <div className="w-full flex items-center justify-center">
+                <h2 className="text-[32vw] sm:text-[32vw] font-bold leading-none">
+                  KARD
+                </h2>
               </div>
-              <p className="text-7xl sm:text-8xl md:text-8xl lg:text-kard font-bold mr-4 sm:mr-20">KARD</p>
-            </div>
-            
-            <div className="w-full flex flex-row justify-center sm:justify-end items-center mt-4 sm:mt-0 sm:mr-44">
-              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30 mr-2">
-                <Link href="/privacy">Privacy Policy</Link>
-              </p>
-              <p className="text-sm backdrop-blur-sm p-2 rounded-lg bg-white/30">
-                &copy; Kard {new Date().getFullYear()}
-              </p>
+              
+              <div className="flex flex-row items-center justify-center gap-4 sm:gap-6 mt-8 sm:mt-12">
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10">
+                  <Image
+                    src="/blob.svg"
+                    alt="Kard Logo"
+                    fill
+                    priority
+                    className="object-contain"
+                  />
+                </div>
+                <Link 
+                  href="/privacy" 
+                  className="text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-sm rounded-lg bg-white/30 hover:bg-white/40 transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+                <span className="text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-sm rounded-lg bg-white/30">
+                  &copy; Kard {new Date().getFullYear()}
+                </span>
+              </div>
             </div>
           </div>
         </footer>

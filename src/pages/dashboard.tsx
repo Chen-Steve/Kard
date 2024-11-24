@@ -7,41 +7,27 @@ import FlashcardComponent from '../components/dashboard/Flashcard';
 import Cookies from 'js-cookie';
 import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
-import StickerSelector from '../components/sticker-selector';
 import DeckSelector from '../components/dashboard/DeckSelector';
 import ModesButtons from '../components/modes/ModesButtons';
 import UserAvatarDropdown from '../components/dashboard/UserAvatarDropdown';
 import { UserType } from '../types/user';
-
-interface StickerWithUrl {
-  id: string;
-  path: string;
-  signedUrl: string;
-  publicUrl: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import { Icon } from '@iconify/react';
 
 const Dashboard = () => {
   const [user, setUser] = useState<UserType | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [selectedDeckName, setSelectedDeckName] = useState<string | null>(null);
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
-    { id: 'stickers', name: 'Stickers', visible: false, order: 2 },
   ]);
-  const [stickers, setStickers] = useState<StickerWithUrl[]>([]);
   const [showFlashcardList, setShowFlashcardList] = useState(true);
-  const [streak, setStreak] = useState(0);
   const [showDefinitions, setShowDefinitions] = useState(true);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
     const { data: decksData, error: decksError } = await supabase
@@ -67,7 +53,7 @@ const Dashboard = () => {
       if (session && session.user) {
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('id, name, email, avatar_url, membership, streak')
+          .select('id, name, email, avatar_url, membership')
           .eq('id', session.user.id)
           .single();
 
@@ -76,9 +62,6 @@ const Dashboard = () => {
         }
 
         fetchUserDecksAndSetSelected(session.user.id);
-
-        // Set streak from user data
-        setStreak(userData?.streak || 0);
       } else {
         router.push('/signin');
       }
@@ -103,6 +86,25 @@ const Dashboard = () => {
       }
     }
   }, [router.isReady, router.query.deckId, decks]);
+
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsLandscape(window.orientation === 90 || window.orientation === -90);
+      setIsMobile(window.innerWidth <= 768); // Common mobile breakpoint
+    };
+
+    // Check initial orientation
+    checkOrientation();
+
+    // Add event listeners
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
+
+    return () => {
+      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener('resize', checkOrientation);
+    };
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -132,6 +134,34 @@ const Dashboard = () => {
 
   if (!user) return <p>Loading...</p>;
 
+  if (isLandscape && isMobile && selectedDeckId) {
+    return (
+      <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-800">
+        <div className="h-full w-full flex items-center justify-center p-4">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Back button */}
+            <button 
+              aria-label="Back"
+              onClick={() => setIsLandscape(false)}
+              className="absolute top-2 left-2 z-10 text-black dark:text-white"
+            >
+              <Icon icon="material-symbols:arrow-back-rounded" className="text-2xl" />
+            </button>
+            
+            <FlashcardComponent
+              userId={user.id}
+              deckId={selectedDeckId}
+              decks={decks}
+              onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
+              showFlashcardList={false}
+              showDefinitions={showDefinitions}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50">
@@ -145,7 +175,6 @@ const Dashboard = () => {
             showDefinitions={showDefinitions}
             onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
           />
-          <NavMenu />
         </div>
         
         {/* Center section */}
@@ -171,15 +200,18 @@ const Dashboard = () => {
           )}
         </div>
       </header>
+
+      {/* Move NavMenu here, outside of header */}
+      <NavMenu />
       
       <main className="flex-grow p-4 relative">
         <div className="absolute inset-0">
-          {dashboardComponents.find(comp => comp.id === 'stickers')?.visible && (
+          {/* {dashboardComponents.find(comp => comp.id === 'stickers')?.visible && (
             <StickerSelector
               stickers={stickers}
               setStickers={setStickers}
             />
-          )}
+          )} */}
         </div>
         {decks.length > 0 && (
           <div className="mb-4">
