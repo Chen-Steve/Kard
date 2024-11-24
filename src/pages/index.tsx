@@ -86,16 +86,10 @@ const HomePage: React.FC = () => {
 
         <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
           <div className="text-center mb-12 fixed-title">
-            {isMounted ? (
-              <h1 className="font-bold mb-2 mt-20 text-black text-4xl md:text-5xl lg:text-6xl">
-                {isMobile ? "Kard is an Uncomplicated learning platform" : "Uncomplicated & Fast"}
-              </h1>
-            ) : (
-              <h1 className="font-bold mb-2 text-black text-4xl md:text-5xl lg:text-6xl">
-                Kard is a Better Quizlet Alternative
-              </h1>
-            )}
-            <p className="max-w-2xl mx-auto text-gray-900 text-base md:text-xl">
+            <h1 className="font-bold mb-2 mt-20 text-black text-6xl md:text-5xl lg:text-6xl">
+              Study how you want
+            </h1>
+            <p className="max-w-2xl mx-auto text-gray-900 text-base md:text-xl mt-4">
               A Flashcard App that scales with you.
             </p>
           </div>
