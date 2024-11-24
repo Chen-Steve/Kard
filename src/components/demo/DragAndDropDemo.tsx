@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import Markdown from 'markdown-to-jsx';
 
 interface Card {
   id: string;
@@ -35,10 +34,11 @@ const initialColumns: Column[] = [
   },
   {
     id: 'column-3',
-    title: 'Fun Facts',
+    title: 'Español',
     cards: [
-      { id: 'card-6', question: 'What is the largest organ in the human body?', answer: 'The skin.' },
-      { id: 'card-7', question: 'Which planet in our solar system has the strongest winds?', answer: 'Neptune, with wind speeds reaching up to 1,200 miles per hour (2,000 kilometers per hour).' },
+      { id: 'card-6', question: 'El felino doméstico que dice "miau"', answer: 'El gato ' },
+      { id: 'card-7', question: 'Un mueble con una superficie plana y patas', answer: 'La mesa' },
+      { id: 'card-8', question: 'Una abertura en la pared que deja entrar luz', answer: 'La ventana' },
     ],
   },
 ];
@@ -118,36 +118,29 @@ const DragAndDropDemo: React.FC = () => {
                   className="bg-gray-100 p-2 rounded min-h-[200px]"
                 >
                   {column.cards.map((card, index) => (
-                    <Draggable key={card.id} draggableId={card.id} index={index}>
-                      {(provided, snapshot) => (
-                        <li
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className={`draggable border-2 border-black dark:border-gray-600 rounded-sm p-1 mb-1 relative bg-white dark:bg-gray-800 ${
-                            snapshot.isDragging ? 'shadow-lg' : ''
-                          }`}
-                        >
+                    <div key={card.id}>
+                      <Draggable draggableId={card.id} index={index}>
+                        {(provided) => (
                           <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="absolute inset-0 cursor-grab active:cursor-grabbing"
-                          />
-                          <div className="rounded p-2 relative z-10 pointer-events-none">
-                            <div className="p-2 text-black dark:text-black text-sm sm:text-base">
-                              <Markdown>
-                                {flippedCards.has(card.id) ? card.answer : card.question}
-                              </Markdown>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleFlip(card.id)}
-                            className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full z-20 flex items-center justify-center text-white text-xs"
-                            title="Flip card"
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 text-sm relative"
                           >
-                            ↻
-                          </button>
-                        </li>
-                      )}
-                    </Draggable>
+                            <div className="text-black dark:text-white">
+                              {flippedCards.has(card.id) ? card.answer : card.question}
+                            </div>
+                            <button
+                              onClick={() => handleFlip(card.id)}
+                              className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full z-20 flex items-center justify-center text-white text-xs"
+                              title="Flip card"
+                            >
+                              ↻
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    </div>
                   ))}
                   {provided.placeholder}
                 </ul>
