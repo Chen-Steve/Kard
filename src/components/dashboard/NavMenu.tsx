@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from 'next/link';
 import { Icon } from "@iconify/react";
 
@@ -12,106 +12,21 @@ interface IconProps {
 
 const NavMenu: React.FC<NavMenuProps> = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isVertical, setIsVertical] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 640;
-    }
-    return true;
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [left, setLeft] = useState(0);
-  const navRef = useRef<HTMLDivElement>(null);
-  const dragThreshold = 5;
-  const dragStartPos = useRef({ x: 0, moved: false });
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 640;
     }
-    return true;
+    return false;
   });
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isVertical) {
-      setIsDragging(true);
-      setStartX(e.clientX - left);
-      dragStartPos.current = { x: e.clientX, moved: false };
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!isVertical) {
-      setIsDragging(true);
-      setStartX(e.touches[0].clientX - left);
-    }
-  };
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || isVertical) return;
-    
-    // Check if we've moved past the threshold
-    if (Math.abs(e.clientX - dragStartPos.current.x) > dragThreshold) {
-      dragStartPos.current.moved = true;
-      const newLeft = e.clientX - startX;
-      const navWidth = navRef.current?.offsetWidth || 0;
-      setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
-    }
-  }, [isDragging, isVertical, startX]);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!isDragging || isVertical) return;
-    const newLeft = e.touches[0].clientX - startX;
-    const navWidth = navRef.current?.offsetWidth || 0;
-    setLeft(Math.max(navWidth / 2, Math.min(newLeft, window.innerWidth - navWidth / 2)));
-  }, [isDragging, isVertical, startX]);
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
-      if (!isVertical) {
-        const navWidth = navRef.current?.offsetWidth || 0;
-        setLeft((prevLeft) => Math.max(navWidth / 2, Math.min(prevLeft, window.innerWidth - navWidth / 2)));
-      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isVertical]);
-
-  useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [handleMouseMove, handleTouchMove]);
-
-  useEffect(() => {
-    const handleOrientationChange = () => {
-      setIsVertical(window.innerWidth >= 640);
-    };
-
-    window.addEventListener('resize', handleOrientationChange);
-    return () => window.removeEventListener('resize', handleOrientationChange);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setLeft(window.innerWidth / 2);
-    }
   }, []);
 
   const menuItems = [
@@ -143,41 +58,14 @@ const NavMenu: React.FC<NavMenuProps> = () => {
       className={`fixed ${
         isMobile 
           ? 'bottom-4 left-1/2 -translate-x-1/2'
-          : (isVertical 
-              ? 'left-2 sm:left-4 top-1/2 transform -translate-y-1/2' 
-              : 'bottom-1 sm:bottom-4')
+          : 'left-4 top-1/2 -translate-y-1/2'
       } z-50`}
-      style={{ 
-        left: isMobile ? '50%' : `${left}px`,
-        transform: isMobile 
-          ? 'translateX(-50%)' 
-          : (isVertical ? 'translateY(-50%)' : 'translateX(-50%)')
-      }}
     >
       <div className={`bg-white dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-30 backdrop-blur-sm rounded-full p-2 sm:p-4 shadow-lg flex border-2 border-black dark:border-gray-600 ${
-        isVertical 
-          ? 'flex-col items-center space-y-4 sm:space-y-6' 
-          : 'items-center space-x-3 xs:space-x-4 sm:space-x-6'
+        isMobile 
+          ? 'items-center space-x-3 xs:space-x-4 sm:space-x-6'
+          : 'flex-col items-center space-y-4 sm:space-y-6'
       }`}>
-        {!isVertical && !isMobile && (
-          <div 
-            className="absolute inset-x-0 top-0 h-6 cursor-move"
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          />
-        )}
-        {!isMobile && (
-          <NavIcon
-            onClick={() => setIsVertical(!isVertical)}
-            icon={(props) => <Icon icon="material-symbols:swap-horiz" {...props} />}
-            label={isVertical ? "Switch to Horizontal" : "Switch to Vertical"}
-            index={-1}
-            hoveredIndex={hoveredIndex}
-            setHoveredIndex={setHoveredIndex}
-            isVertical={isVertical}
-            className={isVertical ? "" : "-ml-3 sm:-ml-5"}
-          />
-        )}
         {menuItems.map((item, index) => (
           <NavIcon 
             key={index} 
@@ -187,7 +75,7 @@ const NavMenu: React.FC<NavMenuProps> = () => {
             index={index} 
             hoveredIndex={hoveredIndex} 
             setHoveredIndex={setHoveredIndex} 
-            isVertical={isVertical}
+            isVertical={!isMobile}
           />
         ))}
       </div>
@@ -204,11 +92,10 @@ interface NavIconProps {
   hoveredIndex: number | null;
   setHoveredIndex: (index: number | null) => void;
   isVertical: boolean;
-  isDragging?: boolean;
   className?: string;
 }
 
-const NavIcon: React.FC<NavIconProps> = ({ href, onClick, icon: Icon, label, index, hoveredIndex, setHoveredIndex, isVertical, isDragging, className }) => {
+const NavIcon: React.FC<NavIconProps> = ({ href, onClick, icon: Icon, label, index, hoveredIndex, setHoveredIndex, isVertical, className }) => {
   const isHovered = hoveredIndex === index;
 
   const content = (
