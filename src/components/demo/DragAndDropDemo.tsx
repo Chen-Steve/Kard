@@ -106,10 +106,10 @@ const DragAndDropDemo: React.FC = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 max-w-3xl mx-auto">
         {columns.map(column => (
           <div key={column.id} className="w-full sm:w-1/3">
-            <h3 className="text-lg font-semibold mb-2">{column.title}</h3>
+            <h3 className="text-lg font-semibold mb-2 text-center">{column.title}</h3>
             <Droppable droppableId={column.id}>
               {(provided) => (
                 <ul
@@ -125,9 +125,9 @@ const DragAndDropDemo: React.FC = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 text-sm relative"
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 text-sm relative max-w-[250px] mx-auto w-full"
                           >
-                            <div className="text-black dark:text-white">
+                            <div className="text-black dark:text-white text-center">
                               {flippedCards.has(card.id) ? card.answer : card.question}
                             </div>
                             <button

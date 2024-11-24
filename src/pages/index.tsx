@@ -109,7 +109,7 @@ const HomePage: React.FC = () => {
         <section className="py-16">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="text-4xl font-bold text-center mb-12 text-black">Experience Kard in Action</h2>
-            <h3 className="text-2xl font-semibold mb-4 text-black underline">Drag & Drop</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-black text-center underline">Drag & Drop</h3>
             <DynamicDragAndDropDemo />
             <FeaturesSection />
           </div>

@@ -36,12 +36,31 @@ const FeaturesSection: React.FC = () => {
         before:content-[''] before:absolute before:w-8 before:h-8 before:border-t-2 before:border-l-2 before:border-black before:top-0 before:left-0
         after:content-[''] after:absolute after:w-8 after:h-8 after:border-b-2 after:border-r-2 after:border-black after:bottom-0 after:right-0"
       >
-        <div className="relative overflow-hidden">
-          <div className="flex animate-marquee">
-            {[...features, ...features].map((feature, index) => (
+        <div className="relative overflow-hidden whitespace-nowrap">
+          {/* First set of slides */}
+          <div className="inline-block animate-marquee">
+            {features.map((feature, index) => (
               <div 
-                key={index} 
-                className="flex-shrink-0 w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
+                key={`first-${index}`} 
+                className="inline-block w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
+              >
+                <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
+                     style={{
+                       background: 'radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(30, 64, 175, 0.4) 0%, transparent 50%)',
+                     }}
+                />
+                <feature.icon />
+                <h4 className="text-xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
+                <p className="text-sm text-gray-600 relative z-10">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+          {/* Second set of slides (clone) */}
+          <div className="inline-block animate-marquee">
+            {features.map((feature, index) => (
+              <div 
+                key={`second-${index}`} 
+                className="inline-block w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
               >
                 <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
                      style={{
