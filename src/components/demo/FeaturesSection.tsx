@@ -3,29 +3,24 @@ import { Icon } from '@iconify/react';
 
 const features = [
   { 
-    icon: () => <Icon icon="pepicons-print:comet" className="text-4xl mb-4 text-red-500" />, 
-    name: 'Learn Mode', 
-    description: 'Master your flashcards at your own pace' 
+    icon: () => <Icon icon="pepicons-print:comet" className="text-6xl mb-4 text-red-500" />, 
+    name: 'Learn Mode'
   },
   { 
-    icon: () => <Icon icon="pepicons-print:list" className="text-4xl mb-4 text-emerald-500" />, 
-    name: 'Test Mode', 
-    description: 'Challenge yourself and track your progress' 
+    icon: () => <Icon icon="pepicons-print:list" className="text-6xl mb-4 text-emerald-500" />, 
+    name: 'Test Mode'
   },
   { 
-    icon: () => <Icon icon="pepicons-print:duplicate" className="text-4xl mb-4 text-purple-500" />, 
-    name: 'Matching Game', 
-    description: 'Make learning fun with interactive games' 
+    icon: () => <Icon icon="pepicons-print:duplicate" className="text-6xl mb-4 text-purple-500" />, 
+    name: 'Matching Game'
   },
   { 
-    icon: () => <Icon icon="pepicons-print:text-bubbles" className="text-4xl mb-4 text-sky-500" />, 
-    name: 'Auto-Generate Cards', 
-    description: 'Create flashcards from text and files effortlessly' 
+    icon: () => <Icon icon="pepicons-print:text-bubbles" className="text-6xl mb-4 text-sky-500" />, 
+    name: 'Auto-Generate Cards'
   },
   { 
-    icon: () => <Icon icon="pepicons-print:menu" className="text-4xl mb-4 text-gray-500" />, 
-    name: 'And More!', 
-    description: 'Discover additional features to enhance your learning' 
+    icon: () => <Icon icon="pepicons-print:menu" className="text-6xl mb-4 text-gray-500" />, 
+    name: 'And More!'
   },
 ];
 
@@ -42,7 +37,7 @@ const FeaturesSection: React.FC = () => {
             {features.map((feature, index) => (
               <div 
                 key={`first-${index}`} 
-                className="inline-block w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
+                className="inline-block w-80 p-8 rounded-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]"
               >
                 <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
                      style={{
@@ -50,8 +45,7 @@ const FeaturesSection: React.FC = () => {
                      }}
                 />
                 <feature.icon />
-                <h4 className="text-xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
-                <p className="text-sm text-gray-600 relative z-10">{feature.description}</p>
+                <h4 className="text-2xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
               </div>
             ))}
           </div>
@@ -60,7 +54,7 @@ const FeaturesSection: React.FC = () => {
             {features.map((feature, index) => (
               <div 
                 key={`second-${index}`} 
-                className="inline-block w-64 p-6 rounded-lg shadow-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-4"
+                className="inline-block w-80 p-8 rounded-lg transition-all duration-300 ease-in-out relative overflow-hidden group bg-white mx-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]"
               >
                 <div className="absolute inset-0 bg-blue-200 opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" 
                      style={{
@@ -68,8 +62,7 @@ const FeaturesSection: React.FC = () => {
                      }}
                 />
                 <feature.icon />
-                <h4 className="text-xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
-                <p className="text-sm text-gray-600 relative z-10">{feature.description}</p>
+                <h4 className="text-2xl font-semibold mb-2 text-black relative z-10">{feature.name}</h4>
               </div>
             ))}
           </div>
