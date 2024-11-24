@@ -1,11 +1,11 @@
 import React from 'react';
-import { Search, Plus } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/Button';
 import { Dialog, DialogTrigger } from '@/components/ui/Dialog';
 import DeckFormDialog from './DeckFormDialog';
 import { Deck } from '../../types/deck';
+import { Icon } from '@iconify/react';
 
 interface DeckSearchAndFilterProps {
   searchTerm: string;
@@ -33,7 +33,10 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
   return (
     <div className="flex flex-col mt-4 space-y-4 w-full px-4 sm:px-0 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
       <div className="relative w-full sm:w-80">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" />
+        <Icon 
+          icon="mdi:magnify" 
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" 
+        />
         <Input
           type="text"
           placeholder="Search Decks"
@@ -59,7 +62,11 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" className="whitespace-nowrap w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" /> Create Deck
+              <Icon 
+                icon="mdi:plus" 
+                className="h-4 w-4 mr-2" 
+              /> 
+              Create Deck
             </Button>
           </DialogTrigger>
           <DeckFormDialog

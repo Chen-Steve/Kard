@@ -7,7 +7,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Icon } from "@iconify/react";
 import toast from 'react-hot-toast';
-import { createPortal } from 'react-dom';
 
 interface Tag {
   id: number;
@@ -262,7 +261,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
 
   if (!isOpen) return null;
 
-  return createPortal(
+  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div 
@@ -377,8 +376,7 @@ const DeckFormDialog: React.FC<DeckFormDialogProps> = ({
           </Button>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 
