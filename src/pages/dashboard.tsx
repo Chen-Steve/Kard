@@ -11,7 +11,7 @@ import DeckSelector from '../components/dashboard/DeckSelector';
 import ModesButtons from '../components/modes/ModesButtons';
 import UserAvatarDropdown from '../components/dashboard/UserAvatarDropdown';
 import { UserType } from '../types/user';
-import { Icon } from '@iconify/react';
+import StudyMode from '../components/dashboard/StudyMode';
 
 const Dashboard = () => {
   const [user, setUser] = useState<UserType | null>(null);
@@ -136,29 +136,11 @@ const Dashboard = () => {
 
   if (isLandscape && isMobile && selectedDeckId) {
     return (
-      <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-800">
-        <div className="h-full w-full flex items-center justify-center p-4">
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Back button */}
-            <button 
-              aria-label="Back"
-              onClick={() => setIsLandscape(false)}
-              className="absolute top-2 left-2 z-10 text-black dark:text-white"
-            >
-              <Icon icon="material-symbols:arrow-back-rounded" className="text-2xl" />
-            </button>
-            
-            <FlashcardComponent
-              userId={user.id}
-              deckId={selectedDeckId}
-              decks={decks}
-              onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
-              showFlashcardList={false}
-              showDefinitions={showDefinitions}
-            />
-          </div>
-        </div>
-      </div>
+      <StudyMode
+        userId={user.id}
+        deckId={selectedDeckId}
+        decks={decks}
+      />
     );
   }
 

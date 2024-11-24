@@ -19,6 +19,7 @@ interface FlashcardProps {
   showFlashcardList: boolean;
   isPublicDeck?: boolean;
   showDefinitions?: boolean;
+  isStudyMode?: boolean;
 }
 
 interface Flashcard {
@@ -35,7 +36,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, showDefinitions = true, isPublicDeck = false }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, showDefinitions = true, isPublicDeck = false, isStudyMode = false }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -336,11 +337,13 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     setIsFlipped(false);
   };
 
+  const containerClasses = isStudyMode 
+    ? 'w-full h-[80px] flex items-center justify-center'
+    : 'your-regular-classes';
+
   return (
-    <div className="relative">
-      <div className="container mx-auto p-4 max-w-3xl">
-        <KeyboardShortcuts onPrevious={handlePrevious} onNext={handleNext} onFlip={handleFlipWrapper} />
-        
+    <div className={containerClasses}>
+      <div className="container mx-auto px-4">
         <FlashcardDisplay
           card={getCurrentCard()}
           isFlipped={isFlipped}
@@ -349,6 +352,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           onFlip={handleFlipClick}
           onPrevious={handlePrevious}
           onNext={handleNext}
+          isStudyMode={isStudyMode}
         />
 
         {showFlashcardList && (
