@@ -32,9 +32,6 @@ const features = [
 const FeaturesSection: React.FC = () => {
   return (
     <div className="mt-40">
-      <h3 className="text-3xl font-bold mb-8 text-center text-black">
-        Powerful Features to Accelerate Your Learning
-      </h3>
       <div className="relative overflow-hidden p-8 mx-auto
         before:content-[''] before:absolute before:w-8 before:h-8 before:border-t-2 before:border-l-2 before:border-black before:top-0 before:left-0
         after:content-[''] after:absolute after:w-8 after:h-8 after:border-b-2 after:border-r-2 after:border-black after:bottom-0 after:right-0"
@@ -59,16 +56,6 @@ const FeaturesSection: React.FC = () => {
           </div>
         </div>
       </div>
-      <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-          width: 200%;
-        }
-      `}</style>
     </div>
   );
 };

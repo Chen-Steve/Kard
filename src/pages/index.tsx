@@ -7,7 +7,6 @@ import CookieConsent from '../components/CookieConsent';
 import { Button } from '../components/ui/Button';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import FlipCard from '../components/demo/FlipCard';
 import FeaturesSection from '../components/demo/FeaturesSection';
 import Modal from '../components/EmailModal';
 import EmailForm from '../components/EmailForm';
@@ -110,20 +109,8 @@ const HomePage: React.FC = () => {
         <section className="py-16">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="text-4xl font-bold text-center mb-12 text-black">Experience Kard in Action</h2>
-            <div className="relative">
-              <div className="backdrop-blur-sm p-6 rounded-lg shadow-lg mb-8 bg-gray-100/30">
-                <h3 className="text-2xl font-semibold mb-4 text-black">Drag & Drop</h3>
-                <DynamicDragAndDropDemo />
-              </div>
-              <div className="backdrop-blur-sm p-6 rounded-lg shadow-lg md:w-3/4 md:ml-auto md:-mt-16 bg-white/30">
-                <h3 className="text-2xl font-semibold mb-4 text-black">Flashcard</h3>
-                <FlipCard
-                  question="What is the capital of France?"
-                  answer="Paris"
-                />
-              </div>
-            </div>
-
+            <h3 className="text-2xl font-semibold mb-4 text-black underline">Drag & Drop</h3>
+            <DynamicDragAndDropDemo />
             <FeaturesSection />
           </div>
         </section>
