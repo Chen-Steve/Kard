@@ -7,7 +7,7 @@ import PerformanceSummary from './mode-components/PerformanceSummary';
 import CustomButton from '../ui/CustomButton';
 import { renderFormattedText } from '@/utils/textFormatting';
 import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 interface Flashcard {
   id: string;
@@ -168,7 +168,7 @@ const TestMode: React.FC<TestModeProps> = ({ flashcards }) => {
         <div className="mb-4">
           <Link href="/dashboard" passHref>
             <span className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer flex items-center">
-              <FaArrowLeft className="mr-2" /> Back to Dashboard
+              <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" />
             </span>
           </Link>
         </div>

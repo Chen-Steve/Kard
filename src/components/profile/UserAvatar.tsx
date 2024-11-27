@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { FaShuffle } from "react-icons/fa6";
 import { getGlassAvatarSvg } from '../../utils/avatar';
+import { Icon } from '@iconify/react';
 
 interface UserAvatarProps {
   avatarUrl: string | null;
@@ -86,9 +86,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
           <button
             aria-label="Shuffle Avatar"
             onClick={handleShuffleAvatars}
-            className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
+            className="flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5"
           >
-            <FaShuffle className="text-gray-600 dark:text-gray-300 text-xs" />
+            <Icon 
+              icon="pepicons-print:arrows-spin" 
+              className="text-gray-600 dark:text-gray-300"
+              width="20"
+              height="20"
+            />
           </button>
         </div>
       )}

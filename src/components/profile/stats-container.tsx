@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { FaUser, FaFire, FaCalendar, FaQuestion } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 interface StatsContainerProps {
   joinedAt: string;
@@ -80,22 +80,22 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => 
           {joinedAt ? (
             <>
               <div className="flex items-center">
-                <FaCalendar className="mr-2 text-green-300 dark:text-green-400" />
+                <Icon icon="pepicons-print:calendar" className="mr-2 text-green-300 dark:text-green-400 text-2xl" />
                 <span>Joined: {formatDate(joinedAt)}</span>
               </div>
               <div className="flex items-center">
-                <FaUser className="mr-2 text-blue-300 dark:text-blue-400" />
+                <Icon icon="pepicons-print:person" className="mr-2 text-blue-300 dark:text-blue-400 text-2xl" />
                 <span>Member for: {getMemberDuration(joinedAt)}</span>
               </div>
             </>
           ) : (
             <div className="flex items-center">
-              <FaQuestion className="mr-2 text-yellow-300 dark:text-yellow-400" />
+              <Icon icon="pepicons-print:question" className="mr-2 text-yellow-300 dark:text-yellow-400 text-2xl" />
               <span>Join date unknown</span>
             </div>
           )}
           <div className="flex items-center">
-            <FaFire className="mr-2 text-orange-300 dark:text-orange-400" />
+            <Icon icon="pepicons-print:fire" className="mr-2 text-orange-300 dark:text-orange-400 text-2xl" />
             <span>Current streak: {streak || 0} days</span>
           </div>
         </div>

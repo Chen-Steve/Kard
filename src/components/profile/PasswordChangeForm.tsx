@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import { validatePassword, validatePasswordMatch, ValidationResult } from '../../utils/validation';
 
 interface PasswordChangeFormProps {
@@ -79,15 +79,17 @@ const PasswordChangeForm = ({ onCancel, onSubmit }: PasswordChangeFormProps) => 
             }`}
           />
           <button
+            aria-label="Toggle password visibility"
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
           >
-            {showPassword ? (
-              <FaEyeSlash className="text-gray-400" />
-            ) : (
-              <FaEye className="text-gray-400" />
-            )}
+            <Icon 
+              icon={showPassword ? "pepicons-print:eye-closed" : "pepicons-print:eye"} 
+              className="text-gray-400"
+              width="20"
+              height="20"
+            />
           </button>
         </div>
         {renderValidationErrors(validation)}
@@ -105,15 +107,17 @@ const PasswordChangeForm = ({ onCancel, onSubmit }: PasswordChangeFormProps) => 
             }`}
           />
           <button
+            aria-label="Toggle password visibility"
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute inset-y-0 right-0 pr-3 flex items-center"
           >
-            {showConfirmPassword ? (
-              <FaEyeSlash className="text-gray-400" />
-            ) : (
-              <FaEye className="text-gray-400" />
-            )}
+            <Icon 
+              icon={showConfirmPassword ? "pepicons-print:eye-closed" : "pepicons-print:eye"} 
+              className="text-gray-400"
+              width="20"
+              height="20"
+            />
           </button>
         </div>
         {renderValidationErrors(matchValidation)}

@@ -1,7 +1,7 @@
 import '../../app/globals.css';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaArrowLeft, FaPlay, FaInfoCircle } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import { Card, CardContent } from '../../components/ui/Card';
 import CustomButton from '../../components/ui/CustomButton';
 import PerformanceSummary from './mode-components/PerformanceSummary';
@@ -106,7 +106,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
             <div className="absolute top-6 left-6">
               <Link href="/dashboard" passHref>
                 <span className="text-black dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center pl-10">
-                  <FaArrowLeft className="mr-2" /> Back to Dashboard
+                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" /> Back to Dashboard
                 </span>
               </Link>
             </div>
@@ -116,7 +116,6 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                 <h2 className="text-xl font-semibold mb-6 text-center">Matching Game</h2>
                 <div className="space-y-4 mb-8">
                   <div className="flex items-center">
-                    <FaInfoCircle className="mr-2 text-gray-500" />
                     <p className="text-sm">Match terms with their definitions as quickly as possible.</p>
                   </div>
                   <ul className="space-y-2 text-sm">
@@ -136,9 +135,9 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                 </div>
                 <CustomButton
                   onClick={startGame}
-                  className="w-full flex items-center justify-center"
+                  className="w-full flex items-center justify-center text-2xl"
                 >
-                  <FaPlay className="mr-2" /> Start Game
+                  <Icon icon="pepicons-print:play" className="mr-2 text-3xl" /> Start Game
                 </CustomButton>
               </CardContent>
             </Card>
@@ -149,7 +148,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
             <div className="absolute top-6 left-6">
               <Link href="/dashboard" passHref>
                 <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
-                  <FaArrowLeft className="mr-2" /> Back
+                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" /> Back
                 </span>
               </Link>
             </div>
@@ -168,7 +167,7 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
                     onClick={startGame}
                     className="w-full flex items-center justify-center"
                   >
-                    <FaPlay className="mr-2" /> Play Again
+                    <Icon icon="pepicons-print:play" className="mr-2" /> Play Again
                   </CustomButton>
                 </div>
               </CardContent>
@@ -182,8 +181,8 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           <div className="flex items-center mb-4">
             <div className="flex-1">
               <Link href="/dashboard" passHref>
-                <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
-                  <FaArrowLeft className="mr-2" /> Back to Dashboard
+                <span>
+                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" />
                 </span>
               </Link>
             </div>

@@ -4,10 +4,8 @@ import CustomButton from '../../components/ui/CustomButton';
 import { shuffle } from 'lodash';
 import DOMPurify from 'dompurify';
 import PerformanceSummary from './mode-components/PerformanceSummary';
-import { FaPlay } from 'react-icons/fa';
-import { FaClock } from 'react-icons/fa';
 import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 interface Flashcard {
   id: string;
@@ -239,7 +237,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
                 onClick={resetSession}
                 className="w-full flex items-center justify-center"
               >
-                <FaPlay className="mr-2" /> Learn Again
+                <Icon icon="pepicons-print:play" className="mr-2" /> Learn Again
               </CustomButton>
             </div>
           </CardContent>
@@ -256,13 +254,15 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
         <div>
           <Link href="/dashboard" passHref>
             <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
-              <FaArrowLeft className="mr-2" /> Back to Dashboard
+              <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" />
             </span>
           </Link>
         </div>
         <div className="ml-auto">
           <CustomButton onClick={toggleMode} className="flex items-center">
-            {mode === 'normal' ? <FaClock className="mr-2" /> : <FaPlay className="mr-2" />}
+            {mode === 'normal' ? 
+              <Icon icon="pepicons-print:clock" className="mr-2 text-4xl" /> : 
+              <Icon icon="pepicons-print:play" className="mr-2" />}
             {mode === 'normal' ? 'Switch to Timed' : 'Switch to Normal'}
           </CustomButton>
         </div>

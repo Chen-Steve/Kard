@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { generateAIResponse, Message } from '../../lib/openai';
 import Link from 'next/link';
-import { FaArrowLeft } from "react-icons/fa6";
+import { Icon } from '@iconify/react';
 import {
   Select,
   SelectContent,
@@ -107,18 +107,21 @@ const AIChatComponent: React.FC<AIChatComponentProps> = ({
     }
   };
 
-  const selectedDeck = decks.find(deck => deck.id === selectedDeckId);
+  const handleDeckChange = (deckId: string) => {
+    setMessages([]); // Reset messages when deck changes
+    onDeckChange(deckId);
+  };
 
   return (
     <div className="flex flex-col items-center max-w-full h-[85vh] bg-white dark:bg-gray-800 dark:text-white">
       <div className="w-full max-w-2xl flex flex-col h-full">
         <div className="mb-4 w-full flex justify-between items-center">
           <Link href="/dashboard">
-            <Button className="px-4 py-2 text-sm font-medium dark:bg-gray-700 dark:text-white flex items-center">
-              <FaArrowLeft className="mr-2" /> Back to Dashboard
+            <Button className="px-2 py-2 dark:bg-gray-700 dark:text-white">
+              <Icon icon="pepicons-print:arrow-left" className="text-3xl" />
             </Button>
           </Link>
-          <Select value={selectedDeckId || ''} onValueChange={onDeckChange}>
+          <Select value={selectedDeckId || ''} onValueChange={handleDeckChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select a deck" />
             </SelectTrigger>

@@ -1,6 +1,6 @@
 import { Button } from '../ui/Button';
-import { FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { Icon } from '@iconify/react';
 
 const ProfileHeader = () => {
   const router = useRouter();
@@ -11,9 +11,9 @@ const ProfileHeader = () => {
         <Button 
           variant="outline" 
           onClick={() => router.push('/dashboard')} 
-          className="flex items-center text-black dark:bg-gray-700 dark:text-white"
+          className=" dark:bg-gray-700 dark:text-white px-2"
         >
-          <FaArrowLeft className="mr-2" /> Back to Dashboard
+          <Icon icon="pepicons-print:arrow-left" className="text-3xl" />
         </Button>
         <Button 
           variant="outline" 
