@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Icon } from '@iconify/react';
+import DeckSelector from '../dashboard/DeckSelector';
 
 interface FlashcardDisplayProps {
   card: { question: string; answer: string } | null;
@@ -10,6 +11,9 @@ interface FlashcardDisplayProps {
   onPrevious: () => void;
   onNext: () => void;
   isStudyMode: boolean;
+  decks?: { id: string; name: string }[];
+  selectedDeckId?: string | null;
+  onDeckSelect?: (deckId: string) => void;
 }
 
 const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
@@ -21,6 +25,9 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
   onPrevious,
   onNext,
   isStudyMode,
+  decks = [],
+  selectedDeckId = null,
+  onDeckSelect,
 }) => {
   const [touchStart, setTouchStart] = React.useState<number | null>(null);
   const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
@@ -91,30 +98,50 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
         </span>
       </div>
 
-      <div className="hidden md:flex items-center mt-0">
-        <button
-          type="button"
-          onClick={onPrevious}
-          className="mr-4 text-2xl text-black dark:text-white"
-          aria-label="Previous"
-          disabled={currentIndex === 0}
-        >
-          <Icon icon="pepicons-print:arrow-left" />
-        </button>
-        
-        <span className="text-lg text-foreground dark:text-gray-200">
-          {card ? `${currentIndex + 1} / ${totalCards}` : '0 / 0'}
-        </span>
+      <div className="hidden md:flex items-center justify-between w-full mt-0">
+        <div className="flex items-center space-x-4">
+          <button
+            type="button"
+            onClick={onPrevious}
+            className={`text-2xl ${
+              currentIndex === 0 
+                ? 'text-gray-400 dark:text-gray-600' 
+                : 'text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+            aria-label="Previous"
+            disabled={currentIndex === 0}
+          >
+            <Icon icon="pepicons-print:arrow-left" />
+          </button>
+          
+          <span className="text-lg text-foreground dark:text-gray-200">
+            {card ? `${currentIndex + 1} / ${totalCards}` : '0 / 0'}
+          </span>
 
-        <button
-          type="button"
-          onClick={onNext}
-          className="ml-4 text-2xl text-black dark:text-white"
-          aria-label="Next"
-          disabled={currentIndex === totalCards - 1}
-        >
-          <Icon icon="pepicons-print:arrow-right" />
-        </button>
+          <button
+            type="button"
+            onClick={onNext}
+            className={`text-2xl ${
+              currentIndex === totalCards - 1 
+                ? 'text-gray-400 dark:text-gray-600' 
+                : 'text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+            aria-label="Next"
+            disabled={currentIndex === totalCards - 1}
+          >
+            <Icon icon="pepicons-print:arrow-right" />
+          </button>
+        </div>
+
+        {!isStudyMode && decks && onDeckSelect && (
+          <div className="w-48">
+            <DeckSelector
+              decks={decks}
+              selectedDeckId={selectedDeckId}
+              onDeckSelect={onDeckSelect}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

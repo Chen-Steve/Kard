@@ -161,13 +161,7 @@ const Dashboard = () => {
         
         {/* Center section */}
         <div className="flex-grow flex justify-center w-1/3">
-          {decks.length > 0 && (
-            <DeckSelector
-              decks={decks}
-              selectedDeckId={selectedDeckId}
-              onDeckSelect={handleDeckSelect}
-            />
-          )}
+          {/* DeckSelector moved to FlashcardDisplay */}
         </div>
         
         {/* Right section */}
@@ -236,6 +230,8 @@ const Dashboard = () => {
                             onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
                             showFlashcardList={showFlashcardList}
                             showDefinitions={showDefinitions}
+                            selectedDeckId={selectedDeckId}
+                            onDeckSelect={handleDeckSelect}
                           />
                         </div>
                       ) : null;

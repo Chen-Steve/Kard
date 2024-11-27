@@ -20,6 +20,8 @@ interface FlashcardProps {
   isPublicDeck?: boolean;
   showDefinitions?: boolean;
   isStudyMode?: boolean;
+  selectedDeckId?: string;
+  onDeckSelect?: (deckId: string) => void;
 }
 
 interface Flashcard {
@@ -36,7 +38,7 @@ interface Deck {
 
 const MAX_CHAR_LIMIT = 930;
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, showDefinitions = true, isPublicDeck = false, isStudyMode = false }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = [], onDeckChange, readOnly = false, isTableView = false, showFlashcardList, showDefinitions = true, isPublicDeck = false, isStudyMode = false, selectedDeckId, onDeckSelect }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -353,6 +355,9 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
           onPrevious={handlePrevious}
           onNext={handleNext}
           isStudyMode={isStudyMode}
+          decks={decks}
+          selectedDeckId={deckId}
+          onDeckSelect={onDeckChange}
         />
 
         {showFlashcardList && (
