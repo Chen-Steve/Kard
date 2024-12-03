@@ -75,7 +75,10 @@ const DeckSelector: React.FC<DeckSelectorProps> = ({ decks, selectedDeckId, onDe
           />
         </div>
       </PopoverAnchor>
-      <PopoverContent className="w-[calc(50vw-6rem)] sm:w-[300px] p-0" align="center">
+      <PopoverContent 
+        className="p-0 w-[var(--radix-popover-trigger-width)]" 
+        align="start"
+      >
         <ul className="max-h-[50vh] sm:max-h-[300px] overflow-auto">
           {filteredDecks.map((deck) => (
             <li

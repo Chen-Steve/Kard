@@ -130,7 +130,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ isTableViewActive, onToggle
       </div>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
+        <div className="origin-top-right absolute right-0 mt-2 min-w-full rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
           <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="view-options-menu">
             <button
               className={`${

@@ -370,29 +370,31 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
         {showFlashcardList && (
           <>
-            <FlashcardToolbar
-              onAddCard={handleAddCard}
-              onToggleScroll={() => setIsScrollable(!isScrollable)}
-              onToggleView={() => setIsTableViewActive(!isTableViewActive)}
-              isScrollable={isScrollable}
-              isTableViewActive={isTableViewActive}
-              readOnly={readOnly}
-              flashcards={flashcards}
-              onShuffleComplete={handleShuffleComplete}
-              isPublicDeck={isPublicDeck}
-            >
-              {!isPublicDeck && (
-                <FlashcardActions
-                  userId={userId}
-                  deckId={deckId}
-                  onFlashcardsAdded={handleFlashcardsAdded}
-                  onToggleImport={handleToggleImport}
-                  onToggleGenerate={handleToggleGenerate}
-                  isImportVisible={isImportVisible}
-                  isGenerateVisible={isGenerateVisible}
-                />
-              )}
-            </FlashcardToolbar>
+            <div className="sticky top-0 z-50 py-2">
+              <FlashcardToolbar
+                onAddCard={handleAddCard}
+                onToggleScroll={() => setIsScrollable(!isScrollable)}
+                onToggleView={() => setIsTableViewActive(!isTableViewActive)}
+                isScrollable={isScrollable}
+                isTableViewActive={isTableViewActive}
+                readOnly={readOnly}
+                flashcards={flashcards}
+                onShuffleComplete={handleShuffleComplete}
+                isPublicDeck={isPublicDeck}
+              >
+                {!isPublicDeck && (
+                  <FlashcardActions
+                    userId={userId}
+                    deckId={deckId}
+                    onFlashcardsAdded={handleFlashcardsAdded}
+                    onToggleImport={handleToggleImport}
+                    onToggleGenerate={handleToggleGenerate}
+                    isImportVisible={isImportVisible}
+                    isGenerateVisible={isGenerateVisible}
+                  />
+                )}
+              </FlashcardToolbar>
+            </div>
 
             <div className={`mt-4 ${isScrollable ? 'max-h-96 overflow-y-auto pr-4 custom-scrollbar' : ''}`}>
               {isTableViewActive ? (
