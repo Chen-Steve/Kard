@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import KeyboardShortcuts from '../KeyboardShortcuts';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import EditFlashcard from './FlashcardList';
 import { debounce } from 'lodash';
@@ -121,19 +120,28 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handlePrevious = () => {
-    if (flashcards.length === 0) return;
-    setCurrentCardIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
-    setIsFlipped(false);
-  };
+  useEffect(() => {
+    console.log('Current flashcards:', flashcards);
+    console.log('Current index:', currentCardIndex);
+  }, [flashcards, currentCardIndex]);
 
-  const handleNext = () => {
-    if (flashcards.length === 0) return;
-    setCurrentCardIndex((prevIndex) =>
-      prevIndex < flashcards.length - 1 ? prevIndex + 1 : flashcards.length - 1
-    );
+  const handlePrevious = useCallback(() => {
+    if (flashcards.length === 0) {
+      return;
+    }
+    
+    setCurrentCardIndex(prevIndex => Math.max(0, prevIndex - 1));
     setIsFlipped(false);
-  };
+  }, [flashcards.length]);
+
+  const handleNext = useCallback(() => {
+    if (flashcards.length === 0) {
+      return;
+    }
+    
+    setCurrentCardIndex(prevIndex => Math.min(flashcards.length - 1, prevIndex + 1));
+    setIsFlipped(false);
+  }, [flashcards.length]);
 
   const handleFlip = (event: React.KeyboardEvent) => {
     const target = event.target as HTMLElement;
@@ -340,12 +348,12 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   };
 
   const containerClasses = isStudyMode 
-    ? 'w-full h-[80px] flex items-center justify-center'
+    ? 'w-full min-h-screen flex flex-col items-center justify-center pointer-events-none'
     : 'your-regular-classes';
 
   return (
     <div className={containerClasses}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 pointer-events-auto">
         <FlashcardDisplay
           card={getCurrentCard()}
           isFlipped={isFlipped}

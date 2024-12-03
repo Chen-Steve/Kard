@@ -63,11 +63,16 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
   }, [touchStart, touchEnd, currentIndex, totalCards, onNext, onPrevious]);
 
   return (
-    <div className={`
-      ${isStudyMode 
-        ? 'h-[70vh] max-w-full flex flex-col items-center justify-center'
-        : 'flex flex-col items-center mb-8'}
-    `}>
+    <div 
+      className={`
+        ${isStudyMode 
+          ? 'h-[70vh] max-w-full flex flex-col items-center justify-center'
+          : 'flex flex-col items-center mb-8'}
+      `}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <div
         className={`
           ${isStudyMode 
@@ -76,9 +81,6 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
           touch-pan-y
         `}
         onClick={onFlip}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
         <div className="absolute top-2 left-2 text-xs sm:text-sm font-semibold text-muted-foreground dark:text-gray-400">
           {isFlipped ? 'Answer' : 'Question'}
@@ -98,20 +100,20 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
         </span>
       </div>
 
-      <div className="hidden md:flex items-center justify-between w-full mt-0">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between w-full mt-0">
+        <div className="flex items-center space-x-4 relative z-50">
           <button
             type="button"
-            onClick={onPrevious}
-            className={`text-2xl ${
-              currentIndex === 0 
-                ? 'text-gray-400 dark:text-gray-600' 
-                : 'text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-            aria-label="Previous"
+            onClick={() => onPrevious()}
             disabled={currentIndex === 0}
+            className={`text-2xl p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
+              currentIndex === 0 
+                ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
+                : 'text-black dark:text-white cursor-pointer'
+            } relative z-50 pointer-events-auto`}
+            aria-label="Previous"
           >
-            <Icon icon="pepicons-print:arrow-left" />
+            <Icon icon="pepicons-print:arrow-left" className="w-6 h-6" />
           </button>
           
           <span className="text-lg text-foreground dark:text-gray-200">
@@ -120,16 +122,16 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
 
           <button
             type="button"
-            onClick={onNext}
-            className={`text-2xl ${
-              currentIndex === totalCards - 1 
-                ? 'text-gray-400 dark:text-gray-600' 
-                : 'text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-            aria-label="Next"
+            onClick={() => onNext()}
             disabled={currentIndex === totalCards - 1}
+            className={`text-2xl p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
+              currentIndex === totalCards - 1 
+                ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' 
+                : 'text-black dark:text-white cursor-pointer'
+            } relative z-50 pointer-events-auto`}
+            aria-label="Next"
           >
-            <Icon icon="pepicons-print:arrow-right" />
+            <Icon icon="pepicons-print:arrow-right" className="w-6 h-6" />
           </button>
         </div>
 

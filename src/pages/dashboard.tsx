@@ -7,7 +7,6 @@ import FlashcardComponent from '../components/dashboard/Flashcard';
 import Cookies from 'js-cookie';
 import DashSettings from '../components/dashboard/DashSettings';
 import { DashboardComponent } from '../types/dashboard';
-import DeckSelector from '../components/dashboard/DeckSelector';
 import ModesButtons from '../components/modes/ModesButtons';
 import UserAvatarDropdown from '../components/dashboard/UserAvatarDropdown';
 import { UserType } from '../types/user';

@@ -7,13 +7,17 @@ interface StudyModeProps {
 }
 
 const StudyMode = ({ userId, deckId, decks }: StudyModeProps) => {
+  const handleDeckChange = () => {
+    // Add deck change logic if needed
+  };
+
   return (    
     <div className="w-full px-4 sm:px-10 mt-20 sm:mt-32">
         <FlashcardComponent
             userId={userId}
             deckId={deckId}
             decks={decks}
-            onDeckChange={() => {}}
+            onDeckChange={handleDeckChange}
             showFlashcardList={false}
             showDefinitions={true}
             isStudyMode={true}
