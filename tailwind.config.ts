@@ -77,6 +77,18 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         marquee: 'marquee 25s linear infinite',
       },
+      transformStyle: {
+        'preserve-3d': 'preserve-3d',
+      },
+      perspective: {
+        '1000': '1000px',
+      },
+      backfaceVisibility: {
+        'hidden': 'hidden',
+      },
+      rotate: {
+        'x-180': '180deg',
+      },
       width: {
         '48': '12rem',
         '50': '12.5rem',
@@ -94,7 +106,25 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }: { addUtilities: any }) {
+      addUtilities({
+        '.perspective-1000': {
+          'perspective': '1000px'
+        },
+        '.transform-style-preserve-3d': {
+          'transform-style': 'preserve-3d'
+        },
+        '.backface-hidden': {
+          'backface-visibility': 'hidden'
+        },
+        '.rotate-x-180': {
+          'transform': 'rotateX(180deg)'
+        }
+      })
+    }
+  ],
 } satisfies Config
 
 export default config
