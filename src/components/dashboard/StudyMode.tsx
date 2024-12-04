@@ -12,7 +12,7 @@ const StudyMode = ({ userId, deckId, decks }: StudyModeProps) => {
   };
 
   return (    
-    <div className="w-full px-4 sm:px-10 mt-20 sm:mt-32">
+    <div className="w-full px-4 sm:px-10 mt-10 sm:mt-20 min-h-screen">
         <FlashcardComponent
             userId={userId}
             deckId={deckId}

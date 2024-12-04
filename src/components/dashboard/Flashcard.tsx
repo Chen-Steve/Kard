@@ -7,33 +7,7 @@ import FlashcardTable from './FlashcardTable';
 import FlashcardDisplay from '../flashcard/FlashcardDisplay';
 import FlashcardToolbar from '../flashcard/FlashcardToolbar';
 import FlashcardActions from '../flashcard/FlashcardActions';
-
-interface FlashcardProps {
-  userId: string;
-  deckId: string;
-  decks: Deck[];
-  onDeckChange?: (newDeckId: string) => void;
-  readOnly?: boolean;
-  isTableView?: boolean;
-  showFlashcardList: boolean;
-  isPublicDeck?: boolean;
-  showDefinitions?: boolean;
-  isStudyMode?: boolean;
-  selectedDeckId?: string;
-  onDeckSelect?: (deckId: string) => void;
-}
-
-interface Flashcard {
-  id: string;
-  question: string;
-  answer: string;
-  order: number;
-}
-
-interface Deck {
-  id: string;
-  name: string;
-}
+import { Flashcard, FlashcardProps, Deck } from '@/types/flashcard';
 
 const MAX_CHAR_LIMIT = 930;
 
@@ -41,7 +15,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [showList, setShowList] = useState(true);
   const [isScrollable, setIsScrollable] = useState(false);
   const [isTableViewActive, setIsTableViewActive] = useState(isTableView);
   const [isImportVisible, setIsImportVisible] = useState(false);
@@ -153,27 +126,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
 
   const handleFlipClick = () => {
     const customEvent = { target: { tagName: '' } } as unknown as React.KeyboardEvent;
-    handleFlip(customEvent);
-  };
-
-  const handleFlipWrapper = () => {
-    const customEvent = {
-      altKey: false,
-      charCode: 0,
-      ctrlKey: false,
-      code: '',
-      key: '',
-      keyCode: 0,
-      metaKey: false,
-      repeat: false,
-      shiftKey: false,
-      getModifierState: () => false,
-      preventDefault: () => {},
-      isTrusted: true,
-      target: null,
-      // Add other necessary properties if needed
-    } as unknown as React.KeyboardEvent<Element>;
-  
     handleFlip(customEvent);
   };
 
