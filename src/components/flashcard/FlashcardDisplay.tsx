@@ -103,7 +103,7 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
 
       <div className="flex items-center justify-between w-full mt-0">
         {!isStudyMode && (
-          <div className="flex items-center space-x-4 relative z-50">
+          <div className="hidden md:flex items-center space-x-4 relative z-50">
             <button
               type="button"
               onClick={() => onPrevious()}
@@ -139,7 +139,7 @@ const FlashcardDisplay: React.FC<FlashcardDisplayProps> = ({
         )}
 
         {!isStudyMode && decks && onDeckSelect && (
-          <div className="w-48">
+          <div className="w-48 mx-auto md:mx-0">
             <DeckSelector
               decks={decks}
               selectedDeckId={selectedDeckId}
