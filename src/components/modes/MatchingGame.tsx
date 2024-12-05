@@ -103,44 +103,46 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
       <div className="container mx-auto px-8 py-4 max-w-6xl">
         {!gameStarted && !gameEnded && (
           <div className="fixed inset-0 bg-[#F8F7F6] dark:bg-gray-900 z-50 flex flex-col items-center justify-center p-4">
-            <div className="absolute top-6 left-6">
-              <Link href="/dashboard" passHref>
-                <span className="text-black dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center pl-10">
-                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" /> Back to Dashboard
-                </span>
-              </Link>
-            </div>
-            <Card className="max-w-md w-full">
-              <CardContent className="p-8">
-                <h1 className="text-3xl font-bold mb-2 text-center">{deckTitle}</h1>
-                <h2 className="text-xl font-semibold mb-6 text-center">Matching Game</h2>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center">
-                    <p className="text-sm">Match terms with their definitions as quickly as possible.</p>
+            <div className="w-full max-w-md">
+              <div className="mb-4">
+                <Link href="/dashboard" passHref>
+                  <span className="text-black dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
+                    <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" /> Back to Dashboard
+                  </span>
+                </Link>
+              </div>
+              <Card className="w-full">
+                <CardContent className="p-8">
+                  <h1 className="text-3xl font-bold mb-2 text-center">{deckTitle}</h1>
+                  <h2 className="text-xl font-semibold mb-6 text-center">Matching Game</h2>
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-center">
+                      <p className="text-sm">Match terms with their definitions as quickly as possible.</p>
+                    </div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        Click cards to select
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        Pair terms with definitions
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        Avoid mistakes to save time
+                      </li>
+                    </ul>
                   </div>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                      Click cards to select
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                      Pair terms with definitions
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                      Avoid mistakes to save time
-                    </li>
-                  </ul>
-                </div>
-                <CustomButton
-                  onClick={startGame}
-                  className="w-full flex items-center justify-center text-2xl"
-                >
-                  <Icon icon="pepicons-print:play" className="mr-2 text-3xl" /> Start Game
-                </CustomButton>
-              </CardContent>
-            </Card>
+                  <CustomButton
+                    onClick={startGame}
+                    className="w-full flex items-center justify-center text-2xl"
+                  >
+                    <Icon icon="pepicons-print:play" className="mr-2 text-3xl" /> Start Game
+                  </CustomButton>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
         {gameEnded && (
@@ -175,20 +177,20 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
           </div>
         )}
         <div className={`game-content ${gameStarted && !gameEnded ? 'transition-curtain' : ''}`}>
-          <div className="mb-10">
-            <h2 className="text-xl font-bold">{deckTitle}</h2>
-          </div>
-          <div className="flex items-center mb-4">
-            <div className="flex-1">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-4">{deckTitle}</h2>
+            <div className="flex items-center justify-between">
               <Link href="/dashboard" passHref>
-                <span>
-                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" />
+                <span className="text-black dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
+                  <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" /> Back to Dashboard
                 </span>
               </Link>
-            </div>
-            <p className="text-lg mx-4">Time: {formatTime(time)}</p>
-            <div className="flex-1 text-lg font-bold text-emerald-600 text-right">
-              {matchedCards.size}/{cards.length} Matched
+              <div className="flex items-center gap-6">
+                <p className="text-lg">Time: {formatTime(time)}</p>
+                <div className="text-lg font-bold text-emerald-600">
+                  {matchedCards.size}/{cards.length} Matched
+                </div>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
