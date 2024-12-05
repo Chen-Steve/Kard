@@ -1,5 +1,5 @@
 import '../app/globals.css';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '../lib/supabaseClient';
 import NavMenu from '../components/dashboard/NavMenu';
@@ -12,22 +12,69 @@ import UserAvatarDropdown from '../components/dashboard/UserAvatarDropdown';
 import { UserType } from '../types/user';
 import StudyMode from '../components/dashboard/StudyMode';
 
+// New type definitions
+interface Deck {
+  id: string;
+  name: string;
+  userId: string;
+}
+
+interface UIPreferences {
+  isDarkMode: boolean;
+  showFlashcardList: boolean;
+  showDefinitions: boolean;
+}
+
+// Custom hook for device detection
+const useDeviceDetection = () => {
+  const [deviceState, setDeviceState] = useState({
+    isLandscape: false,
+    isMobile: false
+  });
+
+  useEffect(() => {
+    const checkOrientation = () => {
+      setDeviceState({
+        isLandscape: window.orientation === 90 || window.orientation === -90,
+        isMobile: window.innerWidth <= 768
+      });
+    };
+
+    checkOrientation();
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('resize', checkOrientation);
+
+    return () => {
+      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener('resize', checkOrientation);
+    };
+  }, []);
+
+  return deviceState;
+};
+
 const Dashboard = () => {
   const [user, setUser] = useState<UserType | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [decks, setDecks] = useState<any[]>([]);
+  const [decks, setDecks] = useState<Deck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [selectedDeckName, setSelectedDeckName] = useState<string | null>(null);
   const router = useRouter();
+  
+  // Grouped UI preferences
+  const [uiPreferences, setUiPreferences] = useState<UIPreferences>({
+    isDarkMode: false,
+    showFlashcardList: true,
+    showDefinitions: true
+  });
+
   const [dashboardComponents, setDashboardComponents] = useState<DashboardComponent[]>([
     { id: 'flashcards', name: 'Flashcards', visible: true, order: 0 },
     { id: 'buttons', name: 'Modes', visible: true, order: 1 },
   ]);
-  const [showFlashcardList, setShowFlashcardList] = useState(true);
-  const [showDefinitions, setShowDefinitions] = useState(true);
-  const [isLandscape, setIsLandscape] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
+  const { isLandscape, isMobile } = useDeviceDetection();
+
+  // Memoized callbacks
   const fetchUserDecksAndSetSelected = useCallback(async (userId: string) => {
     const { data: decksData, error: decksError } = await supabase
       .from('decks')
@@ -44,6 +91,33 @@ const Dashboard = () => {
       }
     }
   }, []);
+
+  const handleDeckSelect = useCallback((deckId: string) => {
+    setSelectedDeckId(deckId);
+    const selectedDeck = decks.find(deck => deck.id === deckId);
+    setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
+  }, [decks]);
+
+  const toggleDarkMode = useCallback(() => {
+    setUiPreferences(prev => {
+      const newDarkMode = !prev.isDarkMode;
+      document.documentElement.classList.toggle('dark', newDarkMode);
+      return { ...prev, isDarkMode: newDarkMode };
+    });
+  }, []);
+
+  const handleToggleFlashcardList = useCallback(() => {
+    setUiPreferences(prev => ({
+      ...prev,
+      showFlashcardList: !prev.showFlashcardList
+    }));
+  }, []);
+
+  const handleSignOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    Cookies.remove('session');
+    router.push('/');
+  }, [router]);
 
   useEffect(() => {
     const getSession = async () => {
@@ -69,7 +143,10 @@ const Dashboard = () => {
     getSession();
 
     const darkMode = document.documentElement.classList.contains('dark');
-    setIsDarkMode(darkMode);
+    setUiPreferences(prev => ({
+      ...prev,
+      isDarkMode: darkMode
+    }));
     if (darkMode) {
       document.documentElement.classList.add('dark');
     }
@@ -86,50 +163,35 @@ const Dashboard = () => {
     }
   }, [router.isReady, router.query.deckId, decks]);
 
-  useEffect(() => {
-    const checkOrientation = () => {
-      setIsLandscape(window.orientation === 90 || window.orientation === -90);
-      setIsMobile(window.innerWidth <= 768); // Common mobile breakpoint
-    };
-
-    // Check initial orientation
-    checkOrientation();
-
-    // Add event listeners
-    window.addEventListener('orientationchange', checkOrientation);
-    window.addEventListener('resize', checkOrientation);
-
-    return () => {
-      window.removeEventListener('orientationchange', checkOrientation);
-      window.removeEventListener('resize', checkOrientation);
-    };
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    Cookies.remove('session');
-    router.push('/');
-  };
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    document.documentElement.classList.toggle('dark', newDarkMode);
-  };
-
-  const handleDeckSelect = useCallback((deckId: string) => {
-    setSelectedDeckId(deckId);
-    const selectedDeck = decks.find(deck => deck.id === deckId);
-    setSelectedDeckName(selectedDeck ? selectedDeck.name : null);
-  }, [decks]);
-
   const updateDashboardComponents = (newComponents: DashboardComponent[]) => {
     setDashboardComponents(newComponents);
   };
 
-  const handleToggleFlashcardList = () => {
-    setShowFlashcardList(!showFlashcardList);
-  };
+  // Memoize the selected deck to avoid recalculation on every render
+  const selectedDeck = useMemo(() => 
+    decks.find(deck => deck.id === selectedDeckId),
+    [decks, selectedDeckId]
+  );
+
+  // Memoize visible dashboard components
+  const visibleComponents = useMemo(() => 
+    dashboardComponents
+      .filter(comp => comp.visible)
+      .sort((a, b) => a.order - b.order),
+    [dashboardComponents]
+  );
+
+  // Memoize visible buttons components separately since they're used differently
+  const visibleButtonsComponents = useMemo(() => 
+    visibleComponents.filter(comp => comp.id === 'buttons'),
+    [visibleComponents]
+  );
+
+  // Memoize visible non-buttons components
+  const visibleNonButtonsComponents = useMemo(() => 
+    visibleComponents.filter(comp => comp.id !== 'buttons'),
+    [visibleComponents]
+  );
 
   if (!user) return <p>Loading...</p>;
 
@@ -146,29 +208,27 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-[#F8F7F6] dark:bg-gray-800 flex flex-col">
       <header className="w-full text-black dark:text-white p-4 flex justify-between items-center relative z-50">
-        {/* Left section */}
         <div className="flex items-center space-x-4 w-1/3">
           <DashSettings
             components={dashboardComponents}
             onUpdateComponents={updateDashboardComponents}
-            showFlashcardList={showFlashcardList}
+            showFlashcardList={uiPreferences.showFlashcardList}
             onToggleFlashcardList={handleToggleFlashcardList}
-            showDefinitions={showDefinitions}
-            onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
+            showDefinitions={uiPreferences.showDefinitions}
+            onToggleDefinitions={() => setUiPreferences(prev => ({
+              ...prev,
+              showDefinitions: !prev.showDefinitions
+            }))}
           />
         </div>
         
-        {/* Center section */}
-        <div className="flex-grow flex justify-center w-1/3">
-          {/* DeckSelector moved to FlashcardDisplay */}
-        </div>
+        <div className="flex-grow flex justify-center w-1/3" />
         
-        {/* Right section */}
         <div className="flex items-center justify-end w-1/3">
           {user && (
             <UserAvatarDropdown
               user={user}
-              isDarkMode={isDarkMode}
+              isDarkMode={uiPreferences.isDarkMode}
               toggleDarkMode={toggleDarkMode}
               handleSignOut={handleSignOut}
             />
@@ -176,68 +236,52 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Move NavMenu here, outside of header */}
       <NavMenu />
       
-      <main className="flex-grow p-4 relative">
-        <div className="absolute inset-0">
-          {/* {dashboardComponents.find(comp => comp.id === 'stickers')?.visible && (
-            <StickerSelector
-              stickers={stickers}
-              setStickers={setStickers}
-            />
-          )} */}
-        </div>
+      <main className="flex-grow p-4 relative z-0">
         {decks.length > 0 && (
           <div className="mb-4">
             <div className="flex flex-col sm:flex-row items-center justify-center">
               <div className="flex flex-col sm:flex-row items-center sm:items-center">
-                {selectedDeckName && (
+                {selectedDeck && (
                   <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white text-center sm:text-left mb-4 mr-4 sm:mb-0">
-                    {selectedDeckName}
+                    {selectedDeck.name}
                   </h2>
                 )}
                 <div className="flex flex-wrap justify-center gap-2 sm:ml-4">
-                  {dashboardComponents
-                    .filter(comp => comp.visible && comp.id === 'buttons')
-                    .map(comp => (
-                      <ModesButtons
-                        key={comp.id}
-                        userId={user.id}
-                        selectedDeckId={selectedDeckId}
-                        selectedDeckName={selectedDeckName}
-
-                        
-                      />
-                    ))}
+                  {visibleButtonsComponents.map(comp => (
+                    <ModesButtons
+                      key={comp.id}
+                      userId={user.id}
+                      selectedDeckId={selectedDeckId}
+                      selectedDeckName={selectedDeck?.name ?? null}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center mt-4">
-              {dashboardComponents
-                .filter(comp => comp.visible && comp.id !== 'buttons')
-                .sort((a, b) => a.order - b.order)
-                .map(comp => {
-                  switch (comp.id) {
-                    case 'flashcards':
-                      return selectedDeckId ? (
-                        <div key={comp.id} className="w-full max-w-3xl">
-                          <FlashcardComponent
-                            userId={user.id}
-                            deckId={selectedDeckId}
-                            decks={decks}
-                            onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
-                            showFlashcardList={showFlashcardList}
-                            showDefinitions={showDefinitions}
-                            selectedDeckId={selectedDeckId}
-                            onDeckSelect={handleDeckSelect}
-                          />
-                        </div>
-                      ) : null;
-                    default:
-                      return null;
-                  }
-                })}
+              {visibleNonButtonsComponents.map(comp => {
+                switch (comp.id) {
+                  case 'flashcards':
+                    return selectedDeckId ? (
+                      <div key={comp.id} className="w-full max-w-3xl">
+                        <FlashcardComponent
+                          userId={user.id}
+                          deckId={selectedDeckId}
+                          decks={decks}
+                          onDeckChange={(newDeckId) => setSelectedDeckId(newDeckId)}
+                          showFlashcardList={uiPreferences.showFlashcardList}
+                          showDefinitions={uiPreferences.showDefinitions}
+                          selectedDeckId={selectedDeckId}
+                          onDeckSelect={handleDeckSelect}
+                        />
+                      </div>
+                    ) : null;
+                  default:
+                    return null;
+                }
+              })}
             </div>
           </div>
         )}
