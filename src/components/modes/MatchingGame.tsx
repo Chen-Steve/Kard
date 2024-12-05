@@ -191,23 +191,24 @@ const MatchingGame: React.FC<MatchingGameProps> = ({ cards, deckTitle }) => {
               {matchedCards.size}/{cards.length} Matched
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             {shuffledCards.map((card, index) => {
               const isSelected = selectedCards.includes(card);
               const isMatched = matchedCards.has(card.id);
               return (
-                <div key={index} className="aspect-w-1 aspect-h-1">
+                <div key={index} className="aspect-square">
                   <CustomButton
                     onClick={() => handleCardClick(card)}
-                    className={`h-full w-full flex items-center justify-center text-center
+                    className={`h-full w-full flex items-center justify-center text-center p-4 text-base
                       ${isMatched ? 'bg-green-500 text-white' : 
                       isSelected ? 'bg-blue-500 text-white' : 
                       'bg-white text-black border border-gray-300'}
                       ${shakeCards && isSelected ? 'animate-rotate-shake bg-red-500 text-white' : ''}`}
                     disabled={isMatched}
                   >
-                    <div className="text-sm overflow-auto">
+                    <div className="w-full h-full flex items-center justify-center overflow-auto">
                       <div 
+                        className="text-base max-h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
                         dangerouslySetInnerHTML={{ 
                           __html: parseMarkdown(card.content) 
                         }} 
