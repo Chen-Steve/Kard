@@ -3,6 +3,8 @@
 import '../app/globals.css';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import CookieConsent from '../components/CookieConsent';
 import { Button } from '../components/ui/Button';
 import Image from 'next/image';
@@ -19,10 +21,18 @@ const DynamicDragAndDropDemo = dynamic(() => import('../components/demo/DragAndD
 });
 
 const HomePage: React.FC = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/dashboard');
+    }
+  }, [status, router]);
 
   useEffect(() => {
     setIsMounted(true);
