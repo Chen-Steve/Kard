@@ -63,7 +63,7 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
   };
 
   if (loading) {
-    return <div>Loading flashcards...</div>;
+    return <div className="text-gray-600 dark:text-gray-400">Loading flashcards...</div>;
   }
 
   const displayedFlashcards = showAll ? flashcards : flashcards.slice(0, 3);
@@ -91,12 +91,14 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
                   }}
                 >
                   <Card 
-                    className="bg-gray-100 dark:bg-gray-600 cursor-pointer relative"
+                    className={`bg-gray-50 dark:bg-gray-700/40 cursor-pointer relative border dark:border-gray-600/50 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors ${
+                      snapshot.isDragging ? 'ring-2 ring-blue-500' : ''
+                    }`}
                     onClick={() => flipCard(flashcard.id)}
                   >
                     <CardContent className="p-2">
                       <div 
-                        className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap pr-8"
+                        className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap pr-8"
                         dangerouslySetInnerHTML={{ __html: flashcard.isFlipped ? flashcard.answer : flashcard.question }}
                       />
                       <Button
@@ -104,12 +106,12 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
                           e.stopPropagation();
                           flipCard(flashcard.id);
                         }}
-                        className="absolute top-1 right-1 w-6 h-6 p-0 bg-blue-300 hover:bg-blue-400 rounded-full transition-colors duration-200 flex items-center justify-center"
+                        className="absolute top-1 right-1 w-6 h-6 p-0 bg-blue-400/80 hover:bg-blue-400 dark:bg-blue-500/40 dark:hover:bg-blue-500/60 rounded-full transition-colors duration-200 flex items-center justify-center"
                         title="Flip card"
                       >
                         <Icon 
                           icon="pepicons-print:arrow-spin" 
-                          className="w-4 h-4 text-gray-800 scale-x-[-1] rotate-180" 
+                          className="w-4 h-4 text-white dark:text-gray-100 scale-x-[-1] rotate-180" 
                         />
                       </Button>
                     </CardContent>
@@ -122,7 +124,7 @@ const MiniatureFlashcards: React.FC<MiniatureFlashcardsProps> = ({ deckId }) => 
           {!showAll && flashcards.length > 3 && (
             <Button
               onClick={() => setShowAll(true)}
-              className="w-full bg-white hover:bg-gray-100 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-2"
+              className="w-full bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700/30 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-2 border dark:border-gray-700/50"
             >
               {flashcards.length - 3} more flashcard(s)... (Click to show all)
             </Button>

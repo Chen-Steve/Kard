@@ -102,7 +102,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                 onChange={handleQuestionChange}
                 disabled={readOnly}
                 placeholder="Enter question here..."
-                className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500"
+                className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500 dark:bg-gray-800"
               />
             </div>
             {showDefinitions && (
@@ -113,7 +113,7 @@ const EditFlashcard: React.FC<EditFlashcardProps> = ({
                   onChange={handleAnswerChange}
                   disabled={readOnly}
                   placeholder="Enter answer here..."
-                  className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500"
+                  className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500 dark:bg-gray-800"
                 />
               </div>
             )}

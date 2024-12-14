@@ -54,6 +54,7 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                         onChange={(content) => onSave(card.id, content, card.answer)}
                         disabled={readOnly}
                         placeholder="Enter question here..."
+                        className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500 dark:bg-gray-800"
                       />
                     </div>
                     {showDefinitions && (
@@ -64,6 +65,7 @@ const FlashcardTable: React.FC<FlashcardTableProps> = ({ flashcards, onDelete, o
                           onChange={(content) => onSave(card.id, card.question, content)}
                           disabled={readOnly}
                           placeholder="Enter answer here..."
+                          className="min-h-[40px] p-2 rounded border border-transparent hover:border-gray-300 focus-within:border-blue-500 dark:bg-gray-800"
                         />
                       </div>
                     )}

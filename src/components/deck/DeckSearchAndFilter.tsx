@@ -61,7 +61,10 @@ const DeckSearchAndFilter: React.FC<DeckSearchAndFilterProps> = ({
       <div className="w-full sm:w-auto">
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="whitespace-nowrap w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              className="whitespace-nowrap w-full sm:w-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
               <Icon 
                 icon="mdi:plus" 
                 className="h-4 w-4 mr-2" 
