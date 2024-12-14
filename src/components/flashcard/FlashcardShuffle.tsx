@@ -23,7 +23,7 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
       order: index + 1
     }));
 
-    console.log('Shuffling flashcards:', updatedFlashcards);
+    // console.log('Shuffling flashcards:', updatedFlashcards);
 
     if (isPublicDeck) {
       // For public decks, just update the local state
@@ -42,7 +42,7 @@ const FlashcardShuffle: React.FC<FlashcardShuffleProps> = ({ flashcards, onShuff
         }
 
         const result = await response.json();
-        console.log('Shuffle response:', result);
+        // console.log('Shuffle response:', result);
 
         onShuffleComplete(updatedFlashcards);
         toast.success('Flashcards shuffled!');

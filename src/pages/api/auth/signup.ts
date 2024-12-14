@@ -5,7 +5,7 @@ import { getGlassAvatarSvg } from '../../../utils/avatar';
 import axios from 'axios';
 
 const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log(`Received ${req.method} request at /api/auth/signup`);
+  // console.log(`Received ${req.method} request at /api/auth/signup`);
   if (req.method === 'POST') {
     const { id, email, password, name, hcaptchaToken } = req.body;
 
@@ -71,7 +71,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      console.log('User created in database:', user);
+      // console.log('User created in database:', user);
       res.status(201).json(user);
     } catch (error) {
       console.error('Signup error:', error as any);

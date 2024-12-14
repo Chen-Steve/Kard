@@ -25,7 +25,7 @@ const AIChatPage: React.FC = () => {
   const fetchDecks = useCallback(async () => {
     if (!userId) return;
   
-    console.log('Fetching decks for userId:', userId);
+    // console.log('Fetching decks for userId:', userId);
     try {
       const response = await fetch(`/api/decks?userId=${userId}`, {
         headers: {
@@ -37,7 +37,7 @@ const AIChatPage: React.FC = () => {
         throw new Error('Failed to fetch decks');
       }
       const data: Deck[] = await response.json();
-      console.log('Fetched decks:', data);
+      // console.log('Fetched decks:', data);
       setDecks(data);
     } catch (error) {
       console.error('Error fetching decks:', error);

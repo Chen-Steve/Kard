@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) throw error;
 
-    console.log('Subscription added:', data);
+    // console.log('Subscription added:', data);
 
     res.status(200).json({ message: 'Subscription successful' });
   } catch (error) {

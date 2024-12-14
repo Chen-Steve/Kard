@@ -57,9 +57,9 @@ const Popup: React.FC<PopupProps> = ({ onClose, onFlashcardsGenerated, userId })
         Make answers comprehensive but not too long.
         Example format: [{"question": "What is X?", "answer": "X is Y"}]`;
 
-      console.log('Sending prompt:', prompt);
+      // console.log('Sending prompt:', prompt);
       const flashcards = await generateFlashcards(prompt, userId);
-      console.log('Received flashcards:', flashcards);
+      // console.log('Received flashcards:', flashcards);
 
       if (!Array.isArray(flashcards) || flashcards.length === 0) {
         throw new Error('Invalid response format from AI');

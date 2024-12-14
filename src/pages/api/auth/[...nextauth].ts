@@ -116,7 +116,7 @@ const options: NextAuthOptions = {
 };
 
 const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log("Auth request received:", req.method, req.url);
+  // console.log("Auth request received:", req.method, req.url);
   try {
     await NextAuth(req, res, options);
   } catch (error) {
@@ -128,7 +128,7 @@ const authHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 export default authHandler;
 
 async function authenticateUser(email: string, password: string) {
-  console.log("Authenticating user:", email);
+  // console.log("Authenticating user:", email);
   try {
     // Ensure to include the password in the select statement
     const user = await prisma.user.findUnique({

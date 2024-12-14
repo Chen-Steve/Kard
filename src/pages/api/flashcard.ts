@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       try {
-        console.log('Creating flashcards with data:', { flashcardsCount: flashcards.length, userId, deckId });
+        // console.log('Creating flashcards with data:', { flashcardsCount: flashcards.length, userId, deckId });
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
@@ -101,14 +101,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return newFlashcards;
         });
 
-        console.log('New flashcards created:', result);
+        // console.log('New flashcards created:', result);
         res.status(201).json(result);
       } catch (error) {
         console.error('POST flashcards error:', error);
         res.status(500).json({ error: 'Internal Server Error', details: (error as Error).message });
       }
     } else if (req.method === 'PUT') {
-      console.log('PUT request body:', req.body);
+      // console.log('PUT request body:', req.body);
       const { id, question, answer, order } = req.body;
 
       if (!id || !question || !answer || order === undefined) {
@@ -176,17 +176,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       }
     } else if (req.method === 'PUT' && req.query.action === 'shuffle') {
-      console.log('Received shuffle request:', req.body);
+      // console.log('Received shuffle request:', req.body);
       const { deckId, newOrder } = req.body;
 
       if (!deckId || !newOrder || !Array.isArray(newOrder)) {
-        console.log('Invalid request body:', { deckId, newOrder });
+        // console.log('Invalid request body:', { deckId, newOrder });
         res.status(400).json({ error: 'Missing required fields', details: 'deckId and newOrder array are required' });
         return;
       }
 
       try {
-        console.log('Shuffling flashcards with data:', { deckId, newOrder });
+        // console.log('Shuffling flashcards with data:', { deckId, newOrder });
 
         await retry(async () => {
           const updatePromises = newOrder.map((id, index) =>

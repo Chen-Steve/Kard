@@ -61,7 +61,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
-          console.log('A child node has been added or removed.');
+          // console.log('A child node has been added or removed.');
         }
       });
     });
@@ -80,10 +80,10 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
     const checkMetaTag = () => {
       const metaTag = document.querySelector("meta[property='og:type']") as HTMLMetaElement | null;
       if (metaTag) {
-        console.log("Meta tag content:", metaTag.content);
+        // console.log("Meta tag content:", metaTag.content);
         // Do something with the meta tag content if needed
       } else {
-        console.log("Meta tag not found");
+        // console.log("Meta tag not found");
       }
     };
 
@@ -94,8 +94,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   }, []);
 
   useEffect(() => {
-    console.log('Current flashcards:', flashcards);
-    console.log('Current index:', currentCardIndex);
+    //console.log('Current flashcards:', flashcards);
+    //console.log('Current index:', currentCardIndex);
   }, [flashcards, currentCardIndex]);
 
   const handlePrevious = useCallback(() => {
@@ -130,7 +130,7 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ userId, deckId, decks = 
   };
 
   const handleAddCard = async () => {
-    console.log('Adding card for userId:', userId);
+    // console.log('Adding card for userId:', userId);
     
     // Update all existing flashcards' order
     const updatedFlashcards = flashcards.map(card => ({

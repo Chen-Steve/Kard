@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    console.log('Processing generation request for user:', userId);
+    // console.log('Processing generation request for user:', userId);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('No response content from AI');
     }
 
-    console.log('Generated response:', generatedText);
+    // console.log('Generated response:', generatedText);
 
     // Validate JSON format
     try {

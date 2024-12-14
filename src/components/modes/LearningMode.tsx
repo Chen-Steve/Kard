@@ -105,17 +105,17 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
   }, [mode, showNextPrompt, handleNextCard]);
 
   useEffect(() => {
-    console.log("Timer useEffect setup", { mode, isTransitioning, isSessionComplete, isAnswerSelected });
+    // console.log("Timer useEffect setup", { mode, isTransitioning, isSessionComplete, isAnswerSelected });
     if (mode === 'timed' && !isTransitioning && !isSessionComplete && !isAnswerSelected && !timerExpired) {
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
-          console.log("Timer tick", { prevTime });
+          // console.log("Timer tick", { prevTime });
           if (prevTime <= 1) {
-            console.log("Timer about to expire, should clear and call handleNextCard");
+            // console.log("Timer about to expire, should clear and call handleNextCard");
             if (timerRef.current !== null) {
               clearInterval(timerRef.current as NodeJS.Timeout);  // Type assertion here
               timerRef.current = null;
-              console.log("Timer cleared");
+              // console.log("Timer cleared");
             }
             setTimerExpired(true);
             return 5;
@@ -142,11 +142,11 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
 
   const handleAnswerSelect = (answer: string) => {
     if (selectedAnswer !== null || isTransitioning) {
-      console.log("handleAnswerSelect early exit", { selectedAnswer, isTransitioning });
+      // console.log("handleAnswerSelect early exit", { selectedAnswer, isTransitioning });
       return;
     }
 
-    console.log("Answer selected", { answer });
+    // console.log("Answer selected", { answer });
     setSelectedAnswer(answer);
     setIsAnswerSelected(true);
     const isAnswerCorrect = answer === currentCards[0].answer;
@@ -170,7 +170,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
     } else {
       // In timed mode, move to next card after a brief delay
       setTimeout(() => {
-        console.log("Moving to next card after answer in timed mode");
+        // console.log("Moving to next card after answer in timed mode");
         handleNextCard();
       }, 1000);
     }
@@ -178,7 +178,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
     if (mode === 'timed') {
       setTimeLeft(5);
       if (timerRef.current) {
-        console.log("Clearing timer after answer selection");
+        // console.log("Clearing timer after answer selection");
         clearInterval(timerRef.current);
         timerRef.current = null;
       }

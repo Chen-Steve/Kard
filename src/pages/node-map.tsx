@@ -30,7 +30,7 @@ const NodeMapPage = () => {
 
         if (error) throw error;
         
-        console.log('Fetched decks with flashcards:', decksData);
+        // console.log('Fetched decks with flashcards:', decksData);
         setDecks(decksData);
       } catch (error) {
         console.error('Error fetching decks:', error);
@@ -54,7 +54,7 @@ const NodeMapPage = () => {
     </div>
   );
 
-  console.log('Rendering with decks:', decks);
+  // console.log('Rendering with decks:', decks);
 
   return (
     <div className="h-screen bg-[#F8F7F6] dark:bg-gray-800 overflow-hidden">

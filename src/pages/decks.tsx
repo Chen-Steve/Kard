@@ -67,8 +67,8 @@ const DecksPage = () => {
     fetchDecks 
   });
 
-  console.log('Loading:', loading);
-  console.log('Decks:', decks);
+  // console.log('Loading:', loading);
+  // console.log('Decks:', decks);
 
   const handleEditDeck = (deck: Deck) => {
     setEditingDeck(deck);
@@ -87,7 +87,7 @@ const DecksPage = () => {
   useDOMNodeInserted((mutationsList) => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
-        console.log('A child node has been added or removed.');
+        // console.log('A child node has been added or removed.');
       }
     }
   });

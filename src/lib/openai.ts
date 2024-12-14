@@ -17,7 +17,7 @@ export const generateAIResponse = async (message: string, flashcards: any[], his
       history,
     }, { timeout: 30000 });
 
-    console.log('AI Chat API response:', response.data.text);
+    // console.log('AI Chat API response:', response.data.text);
 
     return response.data.text;
   } catch (error) {
@@ -48,8 +48,8 @@ export const generateFlashcards = async (description: string, userId: string): P
     const requestedCount = numberMatch ? parseInt(numberMatch[1]) : 5;
     const finalCount = Math.min(Math.max(1, requestedCount), 20);
 
-    console.log('Generating flashcards for:', description);
-    console.log('Requested count:', requestedCount, 'Final count:', finalCount);
+    // console.log('Generating flashcards for:', description);
+    // console.log('Requested count:', requestedCount, 'Final count:', finalCount);
 
     const response = await axios.post<OpenAIResponse>('/api/generate', {
       prompt: `Generate ${finalCount} specific, fact-based flashcards about: "${description}"
@@ -80,7 +80,7 @@ Generate exactly ${finalCount} specific, fact-based flashcards about the topic. 
       userId,
     }, { timeout: 45000 });
 
-    console.log('Raw API response:', response.data);
+    // console.log('Raw API response:', response.data);
 
     if (!response.data || !response.data.text) {
       throw new Error('Invalid response from API');
