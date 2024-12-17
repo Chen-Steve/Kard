@@ -1,45 +1,58 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
-import { getGlassAvatarSvg } from '../../utils/avatar';
 import { Icon } from '@iconify/react';
 
 interface UserAvatarProps {
   avatarUrl: string | null;
   alt: string;
   onClick?: () => void;
-  showOptions?: boolean;
-  onAvatarChange?: (avatar: string) => void;
-  avatarOptions?: string[];
-  setAvatarOptions?: (options: string[]) => void;
+  onFileUpload?: (file: File) => Promise<void>;
+  isUploading?: boolean;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ 
   avatarUrl, 
   alt, 
   onClick,
-  showOptions = false,
-  onAvatarChange,
-  avatarOptions = [],
-  setAvatarOptions
+  onFileUpload,
+  isUploading = false
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isDataUrl = avatarUrl?.startsWith('data:');
   const isSvgString = avatarUrl?.startsWith('<svg');
 
-  const handleShuffleAvatars = () => {
-    if (setAvatarOptions) {
-      const newOptions = Array.from(
-        { length: 5 },
-        () => getGlassAvatarSvg(Math.random().toString())
-      );
-      setAvatarOptions(newOptions);
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      onClick();
+    } else if (onFileUpload) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onFileUpload) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+      await onFileUpload(file);
+      // Clear the input value to allow uploading the same file again
+      e.target.value = '';
     }
   };
 
   return (
-    <div className="flex items-center space-x-3">
+    <div className="relative">
       <div 
-        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden cursor-pointer"
-        onClick={onClick}
+        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden cursor-pointer relative group"
+        onClick={handleClick}
       >
         {avatarUrl ? (
           isDataUrl || isSvgString ? (
@@ -63,39 +76,35 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
             {alt.charAt(0).toUpperCase()}
           </div>
         )}
+        
+        {/* Upload overlay */}
+        {onFileUpload && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            {isUploading ? (
+              <Icon 
+                icon="eos-icons:loading" 
+                className="text-white w-8 h-8 animate-spin drop-shadow-lg"
+              />
+            ) : (
+              <Icon 
+                icon="solar:camera-add-bold" 
+                className="text-white w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 drop-shadow-lg"
+              />
+            )}
+          </div>
+        )}
       </div>
 
-      {showOptions && onAvatarChange && (
-        <div className="flex space-x-1">
-          {avatarOptions.map((avatar, index) => (
-            <button
-              aria-label={`Avatar option ${index + 1}`}
-              key={index}
-              onClick={() => onAvatarChange(avatar)}
-              className="w-6 h-6 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 hover:ring-2 hover:ring-black"
-            >
-              <Image
-                src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar)}`}
-                alt={`Avatar option ${index + 1}`}
-                width={24}
-                height={24}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-          <button
-            aria-label="Shuffle Avatar"
-            onClick={handleShuffleAvatars}
-            className="flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5"
-          >
-            <Icon 
-              icon="pepicons-print:arrows-spin" 
-              className="text-gray-600 dark:text-gray-300"
-              width="20"
-              height="20"
-            />
-          </button>
-        </div>
+      {/* Hidden file input */}
+      {onFileUpload && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+          aria-label="Upload profile picture"
+        />
       )}
     </div>
   );

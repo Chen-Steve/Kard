@@ -4,7 +4,7 @@ import supabase from '../lib/supabaseClient';
 import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import toast from 'react-hot-toast';
-import { getGlassAvatarSvg } from '../utils/avatar';
+import { uploadAvatar } from '../utils/uploadAvatar';
 
 import UserAvatar from '../components/profile/UserAvatar';
 import StatsContainer from '../components/profile/stats-container';
@@ -27,9 +27,8 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [avatarOptions, setAvatarOptions] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,7 +49,6 @@ const Profile = () => {
           setUser(userData);
           setName(userData.name);
           setEmail(userData.email);
-          setSelectedAvatar(userData.avatar_url || getGlassAvatarSvg(userData.email));
         }
       } else {
         router.push('/signin');
@@ -58,10 +56,6 @@ const Profile = () => {
     };
 
     getSession();
-    
-    // Generate initial avatar options
-    const options = Array.from({ length: 5 }, () => getGlassAvatarSvg(Math.random().toString()));
-    setAvatarOptions(options);
   }, [router]);
 
   const handleSave = async () => {
@@ -69,8 +63,7 @@ const Profile = () => {
       .from('users')
       .update({ 
         name: name.trim(), 
-        email: email.trim(), 
-        avatar_url: selectedAvatar 
+        email: email.trim()
       })
       .eq('id', user!.id)
       .select();
@@ -85,26 +78,29 @@ const Profile = () => {
     }
   };
 
-  const handleAvatarChange = async (newAvatar: string) => {
-    const avatarUrl = newAvatar.startsWith('data:') 
-      ? newAvatar 
-      : `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(newAvatar)))}`;
-
-    setSelectedAvatar(avatarUrl);
+  const handleAvatarUpload = async (file: File) => {
+    if (!user) return;
+    
+    setIsUploading(true);
     try {
+      const publicUrl = await uploadAvatar(file, user.id);
+      
       const { data, error } = await supabase
         .from('users')
-        .update({ avatar_url: avatarUrl })
-        .eq('id', user!.id)
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id)
+        .select()
         .single();
 
       if (error) throw error;
 
-      setUser({ ...user!, avatar_url: avatarUrl });
-      toast.success('Your avatar has been updated successfully.');
+      setUser(data);
+      toast.success('Profile picture updated successfully.');
     } catch (error) {
       console.error('Error updating avatar:', error);
-      toast.error('Failed to update avatar. Please try again.');
+      toast.error('Failed to update profile picture. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -156,12 +152,10 @@ const Profile = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <UserAvatar 
-                avatarUrl={selectedAvatar}
+                avatarUrl={user.avatar_url}
                 alt={user.name}
-                showOptions={true}
-                onAvatarChange={handleAvatarChange}
-                avatarOptions={avatarOptions}
-                setAvatarOptions={setAvatarOptions}
+                onFileUpload={handleAvatarUpload}
+                isUploading={isUploading}
               />
               {!isEditing && (
                 <Button 
