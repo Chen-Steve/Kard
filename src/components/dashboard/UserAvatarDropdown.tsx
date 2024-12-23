@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import UserAvatar from '../profile/UserAvatar';
+import UserAvatar from '../../app/profile/_components/UserAvatar';
 import { UserType } from '../../types/user';
 import { Icon } from "@iconify/react";
 

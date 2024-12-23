@@ -1,5 +1,5 @@
-import { Button } from '../ui/Button';
-import { useRouter } from 'next/router';
+import { Button } from '../../../components/ui/Button';
+import { useRouter } from 'next/navigation';
 
 interface ProfileFooterProps {
   onDeleteAccount: () => void;

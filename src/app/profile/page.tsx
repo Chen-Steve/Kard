@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import supabase from '../lib/supabaseClient';
-import { Card, CardHeader, CardContent, CardFooter } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import toast from 'react-hot-toast';
-import { uploadAvatar } from '../utils/uploadAvatar';
+'use client';
 
-import UserAvatar from '../components/profile/UserAvatar';
-import StatsContainer from '../components/profile/stats-container';
-import PasswordChangeForm from '../components/profile/PasswordChangeForm';
-import ProfileHeader from '../components/profile/ProfileHeader';
-import ProfileForm from '../components/profile/ProfileForm';
-import ProfileFooter from '../components/profile/ProfileFooter';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import supabase from '../../lib/supabaseClient';
+import { Card, CardHeader, CardContent, CardFooter } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import toast from 'react-hot-toast';
+import { uploadAvatar } from '../../utils/uploadAvatar';
+
+import UserAvatar from './_components/UserAvatar';
+import StatsContainer from './_components/stats-container';
+import PasswordChangeForm from './_components/PasswordChangeForm';
+import ProfileHeader from './_components/ProfileHeader';
+import ProfileForm from './_components/ProfileForm';
+import ProfileFooter from './_components/ProfileFooter';
 
 interface User {
   id: string;
@@ -22,7 +24,7 @@ interface User {
   joined_at: string;
 }
 
-const Profile = () => {
+export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
@@ -207,6 +209,4 @@ const Profile = () => {
       </div>
     </div>
   );
-};
-
-export default Profile;
+} 
