@@ -249,12 +249,12 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
   const currentCard = currentCards[0];
 
   return (
-    <div className="max-w-2xl mx-auto mt-20">
-      <div className="flex items-center max-w-[672px] mx-auto">
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center -mb-2">
         <div>
           <Link href="/dashboard" passHref>
-            <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center">
-              <Icon icon="pepicons-print:arrow-left" className="mr-2 text-4xl" />
+            <span className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer flex items-center justify-center border-2 border-gray-400 rounded p-1">
+              <Icon icon="material-symbols:close" className="text-3xl" />
             </span>
           </Link>
         </div>
@@ -267,7 +267,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
           </CustomButton>
         </div>
       </div>
-      <Card className="mb-4">
+      <Card className="mb-2">
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 
@@ -293,7 +293,7 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
                 disabled={isTransitioning || selectedAnswer !== null}
               >
                 <span 
-                  className="text-center w-full break-words"
+                  className="text-center text-sm w-full break-words"
                   dangerouslySetInnerHTML={renderFormattedText(option)} 
                 />
               </CustomButton>
@@ -302,14 +302,14 @@ const LearningMode: React.FC<LearningModeProps> = ({ flashcards, initialMode = '
         </CardContent>
       </Card>
       <div className="flex flex-col items-center">
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2 dark:bg-gray-700">
           <div 
             className="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" 
             style={{ width: `${(correctAnswers / flashcards.length) * 100}%` }}
           ></div>
         </div>
         {mode === 'normal' && showNextPrompt && (
-          <p className="text-center mb-4">
+          <p className="text-center mb-2">
             Press space to move to the next question
           </p>
         )}
