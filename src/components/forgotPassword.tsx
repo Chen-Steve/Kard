@@ -31,7 +31,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ isOpen, onClose }) => {
         throw new Error(data.message || 'An error occurred');
       }
 
-      setMessage('Password reset email sent. Please check your inbox for further instructions.');
+      setMessage('Password reset email sent. Please check your inbox or spam folder for further instructions.');
     } catch (error) {
       setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
     } finally {
@@ -42,47 +42,47 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Forgot Password</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50">
+      <div className="w-full max-w-xs bg-white rounded-lg">
+        <div className="flex items-center justify-between px-3 py-2 border-b">
+          <h2 className="text-base font-medium">Reset Password</h2>
           <button
-            aria-label="Close"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-400 hover:text-gray-600"
+            aria-label="Close"
           >
-            <Icon icon="mdi:close" width="24" height="24" />
+            <Icon icon="mdi:close" width="18" height="18" />
           </button>
         </div>
-        <form onSubmit={handleRequestReset} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm shadow-sm placeholder-gray-400 text-black
-                         focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
+        
+        <form onSubmit={handleRequestReset} className="p-3">
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-2.5 py-1.5 bg-gray-50 border rounded text-sm
+                     focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
+            placeholder="Enter your email"
+            required
+          />
+          
+          {message && (
+            <p className={`mt-2 text-xs ${message.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
+              {message}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={isLoading}
+            className="w-full mt-3 py-1.5 bg-black text-white text-sm font-medium rounded
+                     hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black
+                     disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
-        {message && (
-          <p className={`mt-4 text-sm ${message.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
-            {message}
-          </p>
-        )}
       </div>
     </div>
   );
