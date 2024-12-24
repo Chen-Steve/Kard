@@ -74,7 +74,7 @@ const StatsContainer: React.FC<StatsContainerProps> = ({ joinedAt, streak }) => 
           priority
         />
       </div>
-      <div className={`flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black dark:text-gray-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-out z-20 p-4 rounded-lg text-black dark:text-gray-200">
         <h3 className="text-xl font-bold">Your Stats</h3>
         <div className="space-y-2 text-sm">
           {joinedAt ? (

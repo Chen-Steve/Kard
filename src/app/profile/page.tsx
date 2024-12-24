@@ -11,9 +11,7 @@ import { uploadAvatar } from '../../utils/uploadAvatar';
 import UserAvatar from './_components/UserAvatar';
 import StatsContainer from './_components/stats-container';
 import PasswordChangeForm from './_components/PasswordChangeForm';
-import ProfileHeader from './_components/ProfileHeader';
-import ProfileForm from './_components/ProfileForm';
-import ProfileFooter from './_components/ProfileFooter';
+import { ProfileHeader, ProfileForm, ProfileFooter } from './_components/ProfileComponents';
 
 interface User {
   id: string;
